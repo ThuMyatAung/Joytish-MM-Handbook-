@@ -512,56 +512,105 @@
       return { bhavas, sorted };
     }
 
+    // ==========================================
+    // ASTROLOGICAL HELPER FUNCTIONS (CORE FIXES)
+    // ==========================================
+    function _planetHouse(p, name) {
+      if (!p || typeof p[name] !== 'number' || typeof p.Lagna !== 'number') return 1;
+      const lSign = calculateVarga(p.Lagna, 1);
+      const pSign = calculateVarga(p[name], 1);
+      return ((pSign - lSign + 12) % 12) + 1;
+    }
+
+    function _lordOfHouse(p, h) {
+      if (!p || typeof p.Lagna !== 'number') return 'Jupiter';
+      const lSign = calculateVarga(p.Lagna, 1);
+      const rasiIdx = ((lSign + (h - 1)) % 12 + 12) % 12;
+      return RASI_LORDS[rasiIdx] || 'Jupiter';
+    }
+
+    function _planetStrength(p, name) {
+      if (!p || typeof p[name] !== 'number') return 50;
+      const sIdx = calculateVarga(p[name], 1);
+      const dignity = getPlanetaryDignity(name, sIdx);
+      if (dignity.label.includes('ဥစ္စ')) return 95;
+      if (dignity.label.includes('သယံ')) return 80;
+      if (dignity.label.includes('မိတ်')) return 65;
+      if (dignity.label.includes('သမ')) return 50;
+      if (dignity.label.includes('ရန်')) return 35;
+      if (dignity.label.includes('နိစ္စ')) return 20;
+      return 50;
+    }
+
+    function _activeDasha(dashaTree) {
+      if (!Array.isArray(dashaTree) || dashaTree.length === 0) return null;
+      const today = new Date().toISOString().split('T')[0];
+      return dashaTree.find((d) => d.start <= today && d.end >= today) || dashaTree[0];
+    }
+
+    function _lordSignificatorText(p, h) {
+      const lord = _lordOfHouse(p, h);
+      const targetHouse = _planetHouse(p, lord);
+      return `${h} တန့်အရှင် ${lord} သည် ${targetHouse} တန့်တွင် တည်ရှိသည်။`;
+    }
+
+    function _factorLabel(score) {
+      if (score >= 80) return 'အလွန်ကောင်း';
+      if (score >= 65) return 'ကောင်းမွန်';
+      if (score >= 50) return 'အသင့်အတင့်';
+      return 'အားစိုက်ရန်လို';
+    }
+
     function checkAllYogas(p) {
-  const y=[], h=(name)=>_planetHouse(p,name), s=(name)=>calculateVarga(p[name],1);
-  const add=(name,cause,result,base,planets)=>{const avg=(planets||[]).reduce((a,k)=>a+_planetStrength(p,k),0)/Math.max(1,(planets||[]).length);const score=Math.max(1,Math.min(5,Math.round((base*0.55+avg/100*2.45))));y.push({name,cause,result,stars:'★'.repeat(score)+'☆'.repeat(5-score),strength:score,planets:planets||[]});};
-  const k=[1,4,7,10];
-  if([1,4,7,10].includes(h('Jupiter'))&&[3,6,8,9,11].includes(s('Jupiter'))) add('Hamsa Mahapurusha Yoga','Jupiter သည် ကိန်းအိမ်တွင် မိမိ/ဥစ္စရာသီ၌ရှိခြင်း','ပညာ၊ အကြံဉာဏ်၊ အကျင့်သီလနှင့် အာဏာဘက်တွင် ထင်ရှားနိုင်သည်။',5,['Jupiter']);
-  if(k.includes(h('Venus'))&&[1,2,6,7,11].includes(s('Venus'))) add('Malavya Mahapurusha Yoga','Venus ကိန်း + မိမိ/ဥစ္စရာသီ','အနုပညာ၊ ဆွဲဆောင်မှု၊ သက်သောင့်သက်သာနှင့် ပစ္စည်းပိုင်းဆိုင်ရာ အကျိုးပေးတတ်သည်။',5,['Venus']);
-  if(k.includes(h('Mars'))&&[0,7,10].includes(s('Mars'))) add('Ruchaka Mahapurusha Yoga','Mars ကိန်း + မိမိ/ဥစ္စရာသီ','ရဲရင့်မှု၊ ဆုံးဖြတ်ချက်၊ ဦးဆောင်မှုနှင့် လုပ်ဆောင်နိုင်စွမ်း တိုးစေသည်။',5,['Mars']);
-  if(k.includes(h('Mercury'))&&[2,5].includes(s('Mercury'))) add('Bhadra Mahapurusha Yoga','Mercury ကိန်း + မိမိရာသီ','ဉာဏ်၊ စကား၊ စီးပွားရေးနှင့် နည်းပညာကျွမ်းကျင်မှုကို အားပေးသည်။',5,['Mercury']);
-  if(k.includes(h('Saturn'))&&[6,9,10].includes(s('Saturn'))) add('Sasa Mahapurusha Yoga','Saturn ကိန်း + မိမိ/ဥစ္စရာသီ','တာဝန်ယူမှု၊ အဖွဲ့အစည်းအာဏာနှင့် အသက်ကြီးလာလေ ခိုင်မာလာလေဖြစ်စေသည်။',5,['Saturn']);
-  if(s('Sun')===s('Mercury')) add('Budha-Aditya Yoga','Sun + Mercury ပူးယှဉ်ခြင်း','ဉာဏ်၊ စီမံခန့်ခွဲမှု၊ ဆက်သွယ်ရေးနှင့် analytical thinking အားကောင်းစေသည်။',3,['Sun','Mercury']);
-  if(s('Moon')===s('Mars')) add('Chandra-Mangala Yoga','Moon + Mars ပူးယှဉ်ခြင်း','ငွေရှာလိုစိတ်၊ လုပ်ငန်းစွမ်းအားနှင့် စီးပွားရေးဆုံးဖြတ်ချက်ကို အားပေးနိုင်သည်။',3,['Moon','Mars']);
-  if([1,4,7,10].includes(((s('Jupiter')-s('Moon')+12)%12)+1)) add('Gaja-Kesari Yoga','Jupiter သည် Moon မှ ကိန်းအိမ်တွင်ရှိခြင်း','ဉာဏ်၊ ဩဇာ၊ လူမှုအထောက်အပံ့နှင့် အခွင့်အရေးကို အားပေးနိုင်သည်။',4,['Jupiter','Moon']);
-  const moonOthers=['Sun','Mars','Mercury','Jupiter','Venus','Saturn'].filter(k=>Math.abs((s(k)-s('Moon')+12)%12)===1);
-  if(moonOthers.length)add('Sunapha Yoga','Moon မှ ၂ တန့်တွင် ဂြိုဟ်ရှိခြင်း','ကိုယ်ပိုင်စွမ်းရည်ဖြင့် ရလဒ်တည်ဆောက်နိုင်မှု။',3,moonOthers);
-  const moonPrev=['Sun','Mars','Mercury','Jupiter','Venus','Saturn'].filter(k=>Math.abs((s(k)-s('Moon')+12)%12)===11);
-  if(moonPrev.length)add('Anapha Yoga','Moon မှ ၁၂ တန့်တွင် ဂြိုဟ်ရှိခြင်း','ကိုယ်ပိုင်အရည်အချင်းနှင့် အတွင်းစွမ်းအား ထင်ရှားနိုင်သည်။',3,moonPrev);
-  if(moonOthers.length&&moonPrev.length)add('Durudhara Yoga','Moon ၏ ၂/၁၂ တန့်နှစ်ဖက်တွင် ဂြိုဟ်ရှိခြင်း','အရင်းအမြစ်နှင့် အတွေ့အကြုံကို ဟန်ချက်ညီစွာ အသုံးချနိုင်မှု။',4,[...moonOthers,...moonPrev]);
-  if([2,5,9,11].includes(h('Jupiter'))&&[2,5,9,11].includes(h('Venus')))add('Dhana Pattern','Jupiter/Venus သည် ဓနအိမ်များကို အားပေးခြင်း','ဝင်ငွေ၊ ပိုင်ဆိုင်မှုနှင့် အခွင့်အရေးများကို စုစည်းနိုင်သော pattern ဖြစ်သည်။',4,['Jupiter','Venus']);
-  const l1=_lordOfHouse(p,1),l5=_lordOfHouse(p,5),l9=_lordOfHouse(p,9),l10=_lordOfHouse(p,10);
-  if(l1&&l5&&l9&&[l5,l9].includes(l10))add('Raja Yoga Pattern','Trikona lord နှင့် Kendra lord ဆက်နွယ်မှု','အာဏာ၊ အောင်မြင်မှုနှင့် အခွင့်အရေးကို တစ်ချိန်ချိန်တွင် ထင်ရှားစေနိုင်သည်။',4,[l1,l5,l9,l10]);
-  const v=[6,8,12].filter(x=>x===h(lordOfHouseSafe(p,x))).length;
-  function lordOfHouseSafe(pp,hh){return _lordOfHouse(pp,hh)||'';}
-  [1,4,7,10].forEach(hh=>{const l=_lordOfHouse(p,hh);if(l&&[1,4,7,10].includes(h(l))&&[1,4,7,10].includes(h(_lordOfHouse(p,1)))){}});
-  // Kemadruma
-  if(!moonOthers.length&&!moonPrev.length)add('Kemadruma Yoga','Moon ၏ ၂/၁၂ တန့်တွင် အဓိကဂြိုဟ်မရှိခြင်း','စိတ်ပိုင်းဆိုင်ရာ မတည်ငြိမ်မှု သို့မဟုတ် ကိုယ့်အားကိုယ်ကိုးရမှုကို ဖြစ်စေနိုင်သော်လည်း cancellation factors များကိုပါ စစ်ရမည်။',2,['Moon']);
-  return y;
-}
+      const y=[], h=(name)=>_planetHouse(p,name), s=(name)=>calculateVarga(p[name],1);
+      const add=(name,cause,result,base,planets)=>{const avg=(planets||[]).reduce((a,k)=>a+_planetStrength(p,k),0)/Math.max(1,(planets||[]).length);const score=Math.max(1,Math.min(5,Math.round((base*0.55+avg/100*2.45))));y.push({name,cause,result,stars:'★'.repeat(score)+'☆'.repeat(5-score),strength:score,planets:planets||[]});};
+      const k=[1,4,7,10];
+      if([1,4,7,10].includes(h('Jupiter'))&&[3,6,8,9,11].includes(s('Jupiter'))) add('Hamsa Mahapurusha Yoga','Jupiter သည် ကိန်းအိမ်တွင် မိမိ/ဥစ္စရာသီ၌ရှိခြင်း','ပညာ၊ အကြံဉာဏ်၊ အကျင့်သီလနှင့် အာဏာဘက်တွင် ထင်ရှားနိုင်သည်။',5,['Jupiter']);
+      if(k.includes(h('Venus'))&&[1,2,6,7,11].includes(s('Venus'))) add('Malavya Mahapurusha Yoga','Venus ကိန်း + မိမိ/ဥစ္စရာသီ','အနုပညာ၊ ဆွဲဆောင်မှု၊ သက်သောင့်သက်သာနှင့် ပစ္စည်းပိုင်းဆိုင်ရာ အကျိုးပေးတတ်သည်။',5,['Venus']);
+      if(k.includes(h('Mars'))&&[0,7,10].includes(s('Mars'))) add('Ruchaka Mahapurusha Yoga','Mars ကိန်း + မိမိ/ဥစ္စရာသီ','ရဲရင့်မှု၊ ဆုံးဖြတ်ချက်၊ ဦးဆောင်မှုနှင့် လုပ်ဆောင်နိုင်စွမ်း တိုးစေသည်။',5,['Mars']);
+      if(k.includes(h('Mercury'))&&[2,5].includes(s('Mercury'))) add('Bhadra Mahapurusha Yoga','Mercury ကိန်း + မိမိရာသီ','ဉာဏ်၊ စကား၊ စီးပွားရေးနှင့် နည်းပညာကျွမ်းကျင်မှုကို အားပေးသည်။',5,['Mercury']);
+      if(k.includes(h('Saturn'))&&[6,9,10].includes(s('Saturn'))) add('Sasa Mahapurusha Yoga','Saturn ကိန်း + မိမိ/ဥစ္စရာသီ','တာဝန်ယူမှု၊ အဖွဲ့အစည်းအာဏာနှင့် အသက်ကြီးလာလေ ခိုင်မာလာလေဖြစ်စေသည်။',5,['Saturn']);
+      if(s('Sun')===s('Mercury')) add('Budha-Aditya Yoga','Sun + Mercury ပူးယှဉ်ခြင်း','ဉာဏ်၊ စီမံခန့်ခွဲမှု၊ ဆက်သွယ်ရေးနှင့် analytical thinking အားကောင်းစေသည်။',3,['Sun','Mercury']);
+      if(s('Moon')===s('Mars')) add('Chandra-Mangala Yoga','Moon + Mars ပူးယှဉ်ခြင်း','ငွေရှာလိုစိတ်၊ လုပ်ငန်းစွမ်းအားနှင့် စီးပွားရေးဆုံးဖြတ်ချက်ကို အားပေးနိုင်သည်။',3,['Moon','Mars']);
+      if([1,4,7,10].includes(((s('Jupiter')-s('Moon')+12)%12)+1)) add('Gaja-Kesari Yoga','Jupiter သည် Moon မှ ကိန်းအိမ်တွင်ရှိခြင်း','ဉာဏ်၊ ဩဇာ၊ လူမှုအထောက်အပံ့နှင့် အခွင့်အရေးကို အားပေးနိုင်သည်။',4,['Jupiter','Moon']);
+      const moonOthers=['Sun','Mars','Mercury','Jupiter','Venus','Saturn'].filter(k=>Math.abs((s(k)-s('Moon')+12)%12)===1);
+      if(moonOthers.length)add('Sunapha Yoga','Moon မှ ၂ တန့်တွင် ဂြိုဟ်ရှိခြင်း','ကိုယ်ပိုင်စွမ်းရည်ဖြင့် ရလဒ်တည်ဆောက်နိုင်မှု။',3,moonOthers);
+      const moonPrev=['Sun','Mars','Mercury','Jupiter','Venus','Saturn'].filter(k=>Math.abs((s(k)-s('Moon')+12)%12)===11);
+      if(moonPrev.length)add('Anapha Yoga','Moon မှ ၁၂ တန့်တွင် ဂြိုဟ်ရှိခြင်း','ကိုယ်ပိုင်အရည်အချင်းနှင့် အတွင်းစွမ်းအား ထင်ရှားနိုင်သည်။',3,moonPrev);
+      if(moonOthers.length&&moonPrev.length)add('Durudhara Yoga','Moon ၏ ၂/၁၂ တန့်နှစ်ဖက်တွင် ဂြိုဟ်ရှိခြင်း','အရင်းအမြစ်နှင့် အတွေ့အကြုံကို ဟန်ချက်ညီစွာ အသုံးချနိုင်မှု။',4,[...moonOthers,...moonPrev]);
+      if([2,5,9,11].includes(h('Jupiter'))&&[2,5,9,11].includes(h('Venus')))add('Dhana Pattern','Jupiter/Venus သည် ဓနအိမ်များကို အားပေးခြင်း','ဝင်ငွေ၊ ပိုင်ဆိုင်မှုနှင့် အခွင့်အရေးများကို စုစည်းနိုင်သော pattern ဖြစ်သည်။',4,['Jupiter','Venus']);
+      const l1=_lordOfHouse(p,1),l5=_lordOfHouse(p,5),l9=_lordOfHouse(p,9),l10=_lordOfHouse(p,10);
+      if(l1&&l5&&l9&&[l5,l9].includes(l10))add('Raja Yoga Pattern','Trikona lord နှင့် Kendra lord ဆက်နွယ်မှု','အာဏာ၊ အောင်မြင်မှုနှင့် အခွင့်အရေးကို တစ်ချိန်ချိန်တွင် ထင်ရှားစေနိုင်သည်။',4,[l1,l5,l9,l10]);
+      const v=[6,8,12].filter(x=>x===h(lordOfHouseSafe(p,x))).length;
+      function lordOfHouseSafe(pp,hh){return _lordOfHouse(pp,hh)||'';}
+      [1,4,7,10].forEach(hh=>{const l=_lordOfHouse(p,hh);if(l&&[1,4,7,10].includes(h(l))&&[1,4,7,10].includes(h(_lordOfHouse(p,1)))){}});
+      // Kemadruma
+      if(!moonOthers.length&&!moonPrev.length)add('Kemadruma Yoga','Moon ၏ ၂/၁၂ တန့်တွင် အဓိကဂြိုဟ်မရှိခြင်း','စိတ်ပိုင်းဆိုင်ရာ မတည်ငြိမ်မှု သို့မဟုတ် ကိုယ့်အားကိုယ်ကိုးရမှုကို ဖြစ်စေနိုင်သော်လည်း cancellation factors များကိုပါ စစ်ရမည်။',2,['Moon']);
+      return y;
+    }
 
     function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
-  if (!birthPlanets || typeof birthPlanets.Lagna !== 'number') return {netWorthTier:'',netWorthDesc:'',pillars:{},evidence:[]};
-  const houses = {};
-  ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'].forEach(k=>houses[k]=_planetHouse(birthPlanets,k));
-  const lord2=_lordOfHouse(birthPlanets,2), lord5=_lordOfHouse(birthPlanets,5), lord9=_lordOfHouse(birthPlanets,9), lord10=_lordOfHouse(birthPlanets,10), lord11=_lordOfHouse(birthPlanets,11);
-  const wealthH=[2,5,9,11].reduce((n,h)=>n+([2,5,9,11].includes(_planetHouse(birthPlanets,_lordOfHouse(birthPlanets,h)))?1:0),0);
-  const wealthPlanets=['Jupiter','Venus','Mercury','Saturn'].reduce((n,k)=>n+(_planetStrength(birthPlanets,k)/100),0);
-  const dhanaYogaCount=(yogas||[]).filter(y=>/Dhana|Lakshmi|Vasumati|Chandra-Mangala|Raja/i.test(y.name)).length;
-  const wealthScore=Math.round(45+wealthH*7+wealthPlanets*8+Math.min(15,dhanaYogaCount*4));
-  const tier=wealthScore>=82?'ဓနတည်ဆောက်နိုင်စွမ်း အလွန်မြင့် — High Wealth Potential':wealthScore>=68?'ဓနတည်ဆောက်နိုင်စွမ်း မြင့် — Strong Wealth Potential':wealthScore>=54?'တည်ငြိမ်သော ဓနတည်ဆောက်နိုင်စွမ်း — Moderate / Buildable':'ဓနကို စနစ်တကျတည်ဆောက်ရန်လို — Variable Wealth Pattern';
-  const active=_activeDasha(dashaTree);
-  const wealthRoute=`၂/၅/၉/၁၁ တန့်များနှင့် ၎င်းတို့၏ အရှင်များကို အဓိကထားဖတ်ရမည်။ ${_lordSignificatorText(birthPlanets,2)} ${_lordSignificatorText(birthPlanets,11)}`;
-  const pillars={
-    lifePath:`လဂ် ${RASI_NAMES_MY[calculateVarga(birthPlanets.Lagna,1)]} ဖြစ်ပြီး ဘဝတိုးတက်မှုသည် “အခွင့်အရေးတစ်ကြိမ်ရခြင်း” ထက် ကိုယ်တိုင်တည်ဆောက်ပြီး အဆင့်ဆင့်တက်ခြင်းဘက်ကို ပိုညွှန်သည်။ ဂြိုဟ်အားအခြေအနေကြောင့် အကျိုးပေးသည့်အရာနှင့် အတားအဆီးကို သီးခြားဖတ်ရန်လိုသည်။`,
-    career:`၁၀ တန့်နှင့် ၁၀ တန့်အရှင် ${lord10} ၏နေရာ၊ Star/Sub-Lord နှင့် လက်ရှိ ဒသာတို့ပေါင်းစပ်ဖတ်လျှင် အလုပ်အကိုင်ကံသည် “ရာထူး” တစ်ခုတည်းမဟုတ်ဘဲ ${[10,11].includes(houses[lord10])?'အာဏာ/အောင်မြင်မှုကို ကိုယ်တိုင်တည်ဆောက်နိုင်ခြင်း':'အလုပ်ပုံစံပြောင်းလဲခြင်းနှင့် အတွေ့အကြုံမှတစ်ဆင့် တက်လာခြင်း'} ပိုထင်ရှားသည်။`,
-    wealth:`${wealthRoute} ဓနအကျိုးပေးအဆင့် ${wealthScore}/100 (${_factorLabel(wealthScore)}) ဖြစ်သည်။ ငွေဝင်နိုင်ခြင်းနှင့် ငွေကို ထိန်းသိမ်းနိုင်ခြင်းကို သီးခြားကြည့်ရမည်; ဒသာနှင့် Transit က trigger ဖြစ်မှ promise က အကောင်အထည်ဖော်ရန် ပိုနီးစပ်သည်။`,
-    education:`၄/၅/၉ တန့်နှင့် Mercury/Jupiter ၏အားကို အခြေခံဖတ်ရမည်။ ပညာရေးတွင် အားကောင်းသောအချက်ရှိလျှင် သင်ယူနိုင်စွမ်းထက် အသုံးချနိုင်စွမ်းက နောက်ပိုင်းအကျိုးပေးကို ဆုံးဖြတ်မည်။`,
-    love:`၅ တန့်သည် attraction/romance၊ ၇ တန့်သည် partnership ဖြစ်သဖြင့် နှစ်ခုကို မရောသင့်ပါ။ လက်ရှိ chart သည် ${houses.Venus===5?'ချစ်ခြင်းနှင့် ဖန်တီးမှုကို အားကောင်းစွာဖော်ပြ':'relationship ကို အခြေအနေ၊ အချိန်နှင့် နှစ်ဦးဖက်၏ရွေးချယ်မှုတို့က ပိုမိုဆုံးဖြတ်စေ'}သည်။`,
-    marriage:`၇ တန့်အရှင် ${_lordOfHouse(birthPlanets,7)} နှင့် ၂/၈/၁၁ တန့်တို့ကို ဒသာ-Transit ဖြင့် activate ဖြစ်ချိန်မှာ commitment ၏အလေးချိန် ပိုတက်မည်။ Natal promise မရှိလျှင် transit တစ်ခုတည်းနဲ့ အိမ်ထောင်ဖြစ်မည်ဟု မသတ်မှတ်သင့်။`
-  };
-  return {netWorthTier:tier,netWorthDesc:`ဓန Potential Score ${wealthScore}/100။ ${wealthScore>=70?'ဓနတိုးတက်ရန် အခြေခံ promise ကောင်းသည်၊ သို့သော် အကျိုးပေးသည့်ကာလကို ဒသာ/Transit ဖြင့် ချိန်ရမည်။':'အမြဲတမ်းမြင့်မားမည်ဟု မဆိုနိုင်ဘဲ အချိန်ကာလနှင့် စီမံခန့်ခွဲမှုက အဓိကဖြစ်သည်။'} လက်ရှိ ${active?active.lord+' မဟာဒသာ':''} ကို trigger အဖြစ်ထည့်တွက်ထားသည်။`,pillars,evidence:[_lordSignificatorText(birthPlanets,2),_lordSignificatorText(birthPlanets,10),_lordSignificatorText(birthPlanets,11)]};
-}
+      if (!birthPlanets || typeof birthPlanets.Lagna !== 'number') return {netWorthTier:'',netWorthDesc:'',pillars:{},evidence:[]};
+      const houses = {};
+      ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'].forEach(k=>houses[k]=_planetHouse(birthPlanets,k));
+      const lord2=_lordOfHouse(birthPlanets,2), lord5=_lordOfHouse(birthPlanets,5), lord9=_lordOfHouse(birthPlanets,9), lord10=_lordOfHouse(birthPlanets,10), lord11=_lordOfHouse(birthPlanets,11);
+      const wealthH=[2,5,9,11].reduce((n,h)=>n+([2,5,9,11].includes(_planetHouse(birthPlanets,_lordOfHouse(birthPlanets,h)))?1:0),0);
+      const wealthPlanets=['Jupiter','Venus','Mercury','Saturn'].reduce((n,k)=>n+(_planetStrength(birthPlanets,k)/100),0);
+      const dhanaYogaCount=(yogas||[]).filter(y=>/Dhana|Lakshmi|Vasumati|Chandra-Mangala|Raja/i.test(y.name)).length;
+      const wealthScore=Math.round(45+wealthH*7+wealthPlanets*8+Math.min(15,dhanaYogaCount*4));
+      const tier=wealthScore>=82?'ဓနတည်ဆောက်နိုင်စွမ်း အလွန်မြင့် — High Wealth Potential':wealthScore>=68?'ဓနတည်ဆောက်နိုင်စွမ်း မြင့် — Strong Wealth Potential':wealthScore>=54?'တည်ငြိမ်သော ဓနတည်ဆောက်နိုင်စွမ်း — Moderate / Buildable':'ဓနကို စနစ်တကျတည်ဆောက်ရန်လို — Variable Wealth Pattern';
+      const active=_activeDasha(dashaTree);
+      const wealthRoute=`၂/၅/၉/၁၁ တန့်များနှင့် ၎င်းတို့၏ အရှင်များကို အဓိကထားဖတ်ရမည်။ ${_lordSignificatorText(birthPlanets,2)} ${_lordSignificatorText(birthPlanets,11)}`;
+      const pillars={
+        lifePath:`လဂ် ${RASI_NAMES_MY[calculateVarga(birthPlanets.Lagna,1)]} ဖြစ်ပြီး ဘဝတိုးတက်မှုသည် “အခွင့်အရေးတစ်ကြိမ်ရခြင်း” ထက် ကိုယ်တိုင်တည်ဆောက်ပြီး အဆင့်ဆင့်တက်ခြင်းဘက်ကို ပိုညွှန်သည်။ ဂြိုဟ်အားအခြေအနေကြောင့် အကျိုးပေးသည့်အရာနှင့် အတားအဆီးကို သီးခြားဖတ်ရန်လိုသည်။`,
+        career:`၁၀ တန့်နှင့် ၁၀ တန့်အရှင် ${lord10} ၏နေရာ၊ Star/Sub-Lord နှင့် လက်ရှိ ဒသာတို့ပေါင်းစပ်ဖတ်လျှင် အလုပ်အကိုင်ကံသည် “ရာထူး” တစ်ခုတည်းမဟုတ်ဘဲ ${[10,11].includes(houses[lord10])?'အာဏာ/အောင်မြင်မှုကို ကိုယ်တိုင်တည်ဆောက်နိုင်ခြင်း':'အလုပ်ပုံစံပြောင်းလဲခြင်းနှင့် အတွေ့အကြုံမှတစ်ဆင့် တက်လာခြင်း'} ပိုထင်ရှားသည်။`,
+        wealth:`${wealthRoute} ဓနအကျိုးပေးအဆင့် ${wealthScore}/100 (${_factorLabel(wealthScore)}) ဖြစ်သည်။ ငွေဝင်နိုင်ခြင်းနှင့် ငွေကို ထိန်းသိမ်းနိုင်ခြင်းကို သီးခြားကြည့်ရမည်; ဒသာနှင့် Transit က trigger ဖြစ်မှ promise က အကောင်အထည်ဖော်ရန် ပိုနီးစပ်သည်။`,
+        education:`၄/၅/၉ တန့်နှင့် Mercury/Jupiter ၏အားကို အခြေခံဖတ်ရမည်။ ပညာရေးတွင် အားကောင်းသောအချက်ရှိလျှင် သင်ယူနိုင်စွမ်းထက် အသုံးချနိုင်စွမ်းက နောက်ပိုင်းအကျိုးပေးကို ဆုံးဖြတ်မည်။`,
+        love:`၅ တန့်သည် attraction/romance၊ ၇ တန့်သည် partnership ဖြစ်သဖြင့် နှစ်ခုကို မရောသင့်ပါ။ လက်ရှိ chart သည် ${houses.Venus===5?'ချစ်ခြင်းနှင့် ဖန်တီးမှုကို အားကောင်းစွာဖော်ပြ':'relationship ကို အခြေအနေ၊ အချိန်နှင့် နှစ်ဦးဖက်၏ရွေးချယ်မှုတို့က ပိုမိုဆုံးဖြတ်စေ'}သည်။`,
+        marriage:`၇ တန့်အရှင် ${_lordOfHouse(birthPlanets,7)} နှင့် ၂/၈/၁၁ တန့်တို့ကို ဒသာ-Transit ဖြင့် activate ဖြစ်ချိန်မှာ commitment ၏အလေးချိန် ပိုတက်မည်။ Natal promise မရှိလျှင် transit တစ်ခုတည်းနဲ့ အိမ်ထောင်ဖြစ်မည်ဟု မသတ်မှတ်သင့်။`
+      };
+      return {netWorthTier:tier,netWorthDesc:`ဓန Potential Score ${wealthScore}/100။ ${wealthScore>=70?'ဓနတိုးတက်ရန် အခြေခံ promise ကောင်းသည်၊ သို့သော် အကျိုးပေးသည့်ကာလကို ဒသာ/Transit ဖြင့် ချိန်ရမည်။':'အမြဲတမ်းမြင့်မားမည်ဟု မဆိုနိုင်ဘဲ အချိန်ကာလနှင့် စီမံခန့်ခွဲမှုက အဓိကဖြစ်သည်။'} လက်ရှိ ${active?active.lord+' မဟာဒသာ':''} ကို trigger အဖြစ်ထည့်တွက်ထားသည်။`,pillars,evidence:[_lordSignificatorText(birthPlanets,2),_lordSignificatorText(birthPlanets,10),_lordSignificatorText(birthPlanets,11)]};
+    }
 
     function analyzeConjunctionsAndAspects(p) {
       if (!p) return [];
@@ -628,120 +677,118 @@
     }
 
     function analyzeLiveTransit(birthPlanets,transitPlanets) {
-  if(!birthPlanets||!transitPlanets)return {sadeSati:'',jupTransit:'',rahuTransit:'',summary:'',actions:[]};
-  const moon=calculateVarga(birthPlanets.Moon,1), lag=calculateVarga(birthPlanets.Lagna,1);
-  const result={};
-  const sat=((calculateVarga(transitPlanets.Saturn,1)-moon+12)%12), jup=((calculateVarga(transitPlanets.Jupiter,1)-lag+12)%12)+1, rah=((calculateVarga(transitPlanets.Rahu,1)-lag+12)%12)+1;
-  result.sadeSati=sat===11?'စနေသည် မွေးစန်းမတိုင်မီ ၁၂ တန့်တွင်ရှိ၍ Sade Sati အစပိုင်း။':sat===0?'စနေသည် မွေးစန်းပေါ်တွင်ရှိ၍ အလယ်ပိုင်း။':sat===1?'စနေသည် မွေးစန်း၏ ၂ တန့်တွင်ရှိ၍ နောက်ပိုင်း။':'လက်ရှိ မွေးစန်းအရ Sade Sati အဆင့်ထဲ မဝင်ပါ။';
-  result.jupTransit=`ဂျူပီတာသည် လဂ်မှ ${jup} တန့်တွင်ရှိသည်။ ${[2,5,7,9,11].includes(jup)?'တိုးချဲ့မှု၊ အထောက်အပံ့နှင့် အခွင့်အရေးဘက်ကို အားပေးသည်။':'အကျိုးရလဒ်ရရန် ပြင်ဆင်မှုနှင့် စနစ်တကျလုပ်ဆောင်မှု ပိုလိုသည်။'}`;
-  result.rahuTransit=`ရာဟုသည် လဂ်မှ ${rah} တန့်တွင်ရှိပြီး ${[3,6,10,11].includes(rah)?'လှုပ်ရှားမှု၊ ကွန်ယက်နှင့် အလုပ်အကိုင်ဘက်တွင် ထူးခြားသော လမ်းသစ်ဖွင့်နိုင်':'မသေချာသောအရာကို အလောတကြီး ယုံကြည်ခြင်းမပြုသင့်'}သည်။`;
-  result.summary=`လက်ရှိကာလ၏ အဓိက theme သည် ${[10,11].includes(jup)?'တိုးချဲ့ခြင်းနှင့် အလုပ်အကိုင်ရလဒ်':([6,8,12].includes(jup)?'ပြင်ဆင်ခြင်း၊ အကြွေး/တာဝန်နှင့် အတွင်းပိုင်းပြောင်းလဲမှု':'အခြေခံတည်ဆောက်ခြင်း')} ဖြစ်သည်။ Transit တစ်ခုတည်းမဟုတ်ဘဲ လက်ရှိ ဒသာနှင့် natal promise ကို တွဲဖတ်ရမည်။`;
-  result.actions=[jup&&[2,5,9,10,11].includes(jup)?'အခွင့်အရေးရှိသောအရာကို စာရင်းချပြီး တစ်ခုချင်းစီကို အကောင်အထည်ဖော်ပါ။':'အလျင်စလိုမလုပ်ဘဲ အချက်အလက်နှင့် အချိန်ဇယားကို စစ်ပါ။',sat>=11?'အသုံးစရိတ်၊ စိတ်ဖိစီးမှုနှင့် တာဝန်များကို ကြိုတင်စီမံပါ။':'ရေရှည်လုပ်ငန်းကို စနစ်တကျ ဆက်တည်ဆောက်ပါ။'];
-  return result;
-}
+      if(!birthPlanets||!transitPlanets)return {sadeSati:'',jupTransit:'',rahuTransit:'',summary:'',actions:[]};
+      const moon=calculateVarga(birthPlanets.Moon,1), lag=calculateVarga(birthPlanets.Lagna,1);
+      const result={};
+      const sat=((calculateVarga(transitPlanets.Saturn,1)-moon+12)%12), jup=((calculateVarga(transitPlanets.Jupiter,1)-lag+12)%12)+1, rah=((calculateVarga(transitPlanets.Rahu,1)-lag+12)%12)+1;
+      result.sadeSati=sat===11?'စနေသည် မွေးစန်းမတိုင်မီ ၁၂ တန့်တွင်ရှိ၍ Sade Sati အစပိုင်း။':sat===0?'စနေသည် မွေးစန်းပေါ်တွင်ရှိ၍ အလယ်ပိုင်း။':sat===1?'စနေသည် မွေးစန်း၏ ၂ တန့်တွင်ရှိ၍ နောက်ပိုင်း။':'လက်ရှိ မွေးစန်းအရ Sade Sati အဆင့်ထဲ မဝင်ပါ။';
+      result.jupTransit=`ဂျူပီတာသည် လဂ်မှ ${jup} တန့်တွင်ရှိသည်။ ${[2,5,7,9,11].includes(jup)?'တိုးချဲ့မှု၊ အထောက်အပံ့နှင့် အခွင့်အရေးဘက်ကို အားပေးသည်။':'အကျိုးရလဒ်ရရန် ပြင်ဆင်မှုနှင့် စနစ်တကျလုပ်ဆောင်မှု ပိုလိုသည်။'}`;
+      result.rahuTransit=`ရာဟုသည် လဂ်မှ ${rah} တန့်တွင်ရှိပြီး ${[3,6,10,11].includes(rah)?'လှုပ်ရှားမှု၊ ကွန်ယက်နှင့် အလုပ်အကိုင်ဘက်တွင် ထူးခြားသော လမ်းသစ်ဖွင့်နိုင်':'မသေချာသောအရာကို အလောတကြီး ယုံကြည်ခြင်းမပြုသင့်'}သည်။`;
+      result.summary=`လက်ရှိကာလ၏ အဓိက theme သည် ${[10,11].includes(jup)?'တိုးချဲ့ခြင်းနှင့် အလုပ်အကိုင်ရလဒ်':([6,8,12].includes(jup)?'ပြင်ဆင်ခြင်း၊ အကြွေး/တာဝန်နှင့် အတွင်းပိုင်းပြောင်းလဲမှု':'အခြေခံတည်ဆောက်ခြင်း')} ဖြစ်သည်။ Transit တစ်ခုတည်းမဟုတ်ဘဲ လက်ရှိ ဒသာနှင့် natal promise ကို တွဲဖတ်ရမည်။`;
+      result.actions=[jup&&[2,5,9,10,11].includes(jup)?'အခွင့်အရေးရှိသောအရာကို စာရင်းချပြီး တစ်ခုချင်းစီကို အကောင်အထည်ဖော်ပါ။':'အလျင်စလိုမလုပ်ဘဲ အချက်အလက်နှင့် အချိန်ဇယားကို စစ်ပါ။',sat>=11?'အသုံးစရိတ်၊ စိတ်ဖိစီးမှုနှင့် တာဝန်များကို ကြိုတင်စီမံပါ။':'ရေရှည်လုပ်ငန်းကို စနစ်တကျ ဆက်တည်ဆောက်ပါ။'];
+      return result;
+    }
 
     function generateLifetimeMilestones(birthDate,dashaTree,birthPlanets) {
-  const by=(birthDate&& !isNaN(birthDate.getTime()))?birthDate.getFullYear():2026;
-  const out=[];
-  (dashaTree||[]).forEach(d=>{
-    const y1=new Date(d.start).getFullYear(), y2=new Date(d.end).getFullYear();
-    const lord=d.lord, h=_planetHouse(birthPlanets,lord), kp=birthPlanets[lord]!=null?getKPSubLordData(birthPlanets[lord]):null;
-    const score=Math.round((_planetStrength(birthPlanets,lord)+(h?([2,5,9,10,11].includes(h)?70:50):50))/2);
-    if(y2>=new Date().getFullYear() || y2>=by+18) out.push({
-      phase:`${lord} မဟာဒသာ — ${h} တန့်အကြောင်းအရာ အဓိကလှုပ်ရှားမှု`,
-      age:`${Math.max(0,y1-by)}–${Math.max(0,y2-by)} နှစ်`,
-      yearRange:`${y1}–${y2}`,
-      desc:`${lord} သည် ${h} တန့်ကို activate လုပ်သောကြောင့် ဒီကာလ၏ အဓိက theme သည် ${[2,11].includes(h)?'ငွေဝင်/ရလဒ်နှင့် လူမှုကွန်ယက်':([10].includes(h)?'အလုပ်အကိုင်၊ အာဏာနှင့် အောင်မြင်မှု':([5,7].includes(h)?'ချစ်ရေး/ဖန်တီးမှု/ပေါင်းဖက်မှု':'အတွေ့အကြုံ၊ တာဝန်နှင့် ဘဝပြောင်းလဲမှု'))} ဖြစ်နိုင်သည်။ ${kp?`Star Lord ${kp.starLord} / Sub Lord ${kp.subLord} ဖြစ်သောကြောင့် ဖြစ်ရပ်၏ အရည်အသွေးကို ထပ်မံချိန်ရမည်။`:''}`,
-      score,trigger:`${lord} Dasha + ${h}H activation`
-    });
-  });
-  return out.slice(0,12);
-}
+      const by=(birthDate&& !isNaN(birthDate.getTime()))?birthDate.getFullYear():2026;
+      const out=[];
+      (dashaTree||[]).forEach(d=>{
+        const y1=new Date(d.start).getFullYear(), y2=new Date(d.end).getFullYear();
+        const lord=d.lord, h=_planetHouse(birthPlanets,lord), kp=birthPlanets[lord]!=null?getKPSubLordData(birthPlanets[lord]):null;
+        const score=Math.round((_planetStrength(birthPlanets,lord)+(h?([2,5,9,10,11].includes(h)?70:50):50))/2);
+        if(y2>=new Date().getFullYear() || y2>=by+18) out.push({
+          phase:`${lord} မဟာဒသာ — ${h} တန့်အကြောင်းအရာ အဓိကလှုပ်ရှားမှု`,
+          age:`${Math.max(0,y1-by)}–${Math.max(0,y2-by)} နှစ်`,
+          yearRange:`${y1}–${y2}`,
+          desc:`${lord} သည် ${h} တန့်ကို activate လုပ်သောကြောင့် ဒီကာလ၏ အဓိက theme သည် ${[2,11].includes(h)?'ငွေဝင်/ရလဒ်နှင့် လူမှုကွန်ယက်':([10].includes(h)?'အလုပ်အကိုင်၊ အာဏာနှင့် အောင်မြင်မှု':([5,7].includes(h)?'ချစ်ရေး/ဖန်တီးမှု/ပေါင်းဖက်မှု':'အတွေ့အကြုံ၊ တာဝန်နှင့် ဘဝပြောင်းလဲမှု'))} ဖြစ်နိုင်သည်။ ${kp?`Star Lord ${kp.starLord} / Sub Lord ${kp.subLord} ဖြစ်သောကြောင့် ဖြစ်ရပ်၏ အရည်အသွေးကို ထပ်မံချိန်ရမည်။`:''}`,
+          score,trigger:`${lord} Dasha + ${h}H activation`
+        });
+      });
+      return out.slice(0,12);
+    }
 
     function generateAnnualForecast(birthDate,birthPlanets,transitPlanets,transitDate,lat,lon,ayanamsa,nodeType) {
-  const now=new Date(), start=new Date(now.getFullYear(),now.getMonth(),1), months=[];
-  const names=['ဇန်နဝါရီ','ဖေဖော်ဝါရီ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူလိုင်','သြဂုတ်','စက်တင်ဘာ','အောက်တိုဘာ','နိုဝင်ဘာ','ဒီဇင်ဘာ'];
-  for(let i=0;i<12;i++){
-    const d=new Date(start.getFullYear(),start.getMonth()+i,1);
-    let tp=transitPlanets;
-    try {
-      const jd=getJulianDay(d.getFullYear(),d.getMonth()+1,15,12,0,6.5);
-      tp=calculateNASA_JPL_Planets(jd,parseFloat(lat)||16.84,parseFloat(lon)||96.17,ayanamsa,nodeType);
-    } catch(e){}
-    const scores={career:0,wealth:0,love:0,travel:0,pressure:0};
-    const reasons=[];
-    [['career',10],['wealth',2],['wealth',11],['love',5],['love',7],['travel',9],['travel',12]].forEach(([k,h])=>{
-      const lord=_lordOfHouse(birthPlanets,h);
-      if(lord&&tp[lord]!=null){const th=_planetHouse(Object.assign({},birthPlanets,{Lagna:birthPlanets.Lagna}),lord); const ts=calculateVarga(tp[lord],1); const ns=calculateVarga(birthPlanets.Lagna,1); const dh=((ts-ns+12)%12)+1; if([2,5,9,10,11].includes(dh)) scores[k]+=2; else if([6,8,12].includes(dh)) scores[k]-=1;}
-    });
-    ['Jupiter','Saturn','Rahu','Ketu'].forEach(k=>{if(tp[k]!=null){const th=((calculateVarga(tp[k],1)-calculateVarga(birthPlanets.Lagna,1)+12)%12)+1;if(k==='Jupiter'&&[2,5,7,9,11].includes(th))scores.wealth+=2;if(k==='Saturn'&&[6,8,12].includes(th))scores.pressure+=2;if((k==='Rahu'||k==='Ketu')&&[5,7,8,12].includes(th))scores.pressure+=1;}});
-    const max=Math.max(scores.career,scores.wealth,scores.love,scores.travel), min=Math.min(scores.career,scores.wealth,scores.love,scores.travel);
-    let badge='ပုံမှန်'; if(max>=4&&scores.pressure<2)badge='အခွင့်အရေး'; else if(scores.pressure>=3)badge='သတိ'; else if(min<0)badge='နှောင့်နှေး';
-    const theme=`${scores.career>=2?'အလုပ်အကိုင်ဘက်တွင် လှုပ်ရှားရန်အချိန်ရှိသည်။ ':''}${scores.wealth>=2?'ငွေကြေး/ရလဒ်ဘက်တွင် တိုးတက်နိုင်သော trigger ရှိသည်။ ':''}${scores.love>=2?'relationship နှင့် ပေါင်းသင်းဆက်ဆံရေးဘက်တွင် အခွင့်အရေးရှိသည်။ ':''}${scores.travel>=2?'ခရီး၊ နိုင်ငံခြား၊ သင်ယူမှု သို့မဟုတ် နယ်ပယ်ချဲ့ထွင်မှုကို စဉ်းစားနိုင်သည်။ ':''}${scores.pressure>=3?'တစ်ပြိုင်နက် အလွန်အကျွံဆုံးဖြတ်ခြင်းကို ရှောင်ပြီး စာချုပ်/ငွေကြေး/အချိန်ဇယားကို နှစ်ကြိမ်စစ်ပါ။':''}`;
-    months.push({num:i+1,monthName:`${names[d.getMonth()]} (${d.getFullYear()})`,dateRange:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,theme:theme||'တည်ငြိမ်စွာ ဆက်လက်တည်ဆောက်ရမည့်ကာလ။',badge,badgeColor:badge==='အခွင့်အရေး'?'bg-emerald-100 text-emerald-800 font-bold':badge==='သတိ'?'bg-amber-100 text-amber-800 font-bold':'bg-slate-100 text-slate-700',scores});
-  }
-  return {annualCycle:`${start.getFullYear()} ${names[start.getMonth()]} မှ နောက် ၁၂ လ — Transit/Dasha synthesis`,months};
-}
+      const now=new Date(), start=new Date(now.getFullYear(),now.getMonth(),1), months=[];
+      const names=['ဇန်နဝါရီ','ဖေဖော်ဝါရီ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူလိုင်','သြဂုတ်','စက်တင်ဘာ','အောက်တိုဘာ','နိုဝင်ဘာ','ဒီဇင်ဘာ'];
+      for(let i=0;i<12;i++){
+        const d=new Date(start.getFullYear(),start.getMonth()+i,1);
+        let tp=transitPlanets;
+        try {
+          const jd=getJulianDay(d.getFullYear(),d.getMonth()+1,15,12,0,6.5);
+          tp=calculateNASA_JPL_Planets(jd,parseFloat(lat)||16.84,parseFloat(lon)||96.17,ayanamsa,nodeType);
+        } catch(e){}
+        const scores={career:0,wealth:0,love:0,travel:0,pressure:0};
+        [['career',10],['wealth',2],['wealth',11],['love',5],['love',7],['travel',9],['travel',12]].forEach(([k,h])=>{
+          const lord=_lordOfHouse(birthPlanets,h);
+          if(lord&&tp[lord]!=null){const th=_planetHouse(Object.assign({},birthPlanets,{Lagna:birthPlanets.Lagna}),lord); const ts=calculateVarga(tp[lord],1); const ns=calculateVarga(birthPlanets.Lagna,1); const dh=((ts-ns+12)%12)+1; if([2,5,9,10,11].includes(dh)) scores[k]+=2; else if([6,8,12].includes(dh)) scores[k]-=1;}
+        });
+        ['Jupiter','Saturn','Rahu','Ketu'].forEach(k=>{if(tp[k]!=null){const th=((calculateVarga(tp[k],1)-calculateVarga(birthPlanets.Lagna,1)+12)%12)+1;if(k==='Jupiter'&&[2,5,7,9,11].includes(th))scores.wealth+=2;if(k==='Saturn'&&[6,8,12].includes(th))scores.pressure+=2;if((k==='Rahu'||k==='Ketu')&&[5,7,8,12].includes(th))scores.pressure+=1;}});
+        const max=Math.max(scores.career,scores.wealth,scores.love,scores.travel), min=Math.min(scores.career,scores.wealth,scores.love,scores.travel);
+        let badge='ပုံမှန်'; if(max>=4&&scores.pressure<2)badge='အခွင့်အရေး'; else if(scores.pressure>=3)badge='သတိ'; else if(min<0)badge='နှောင့်နှေး';
+        const theme=`${scores.career>=2?'အလုပ်အကိုင်ဘက်တွင် လှုပ်ရှားရန်အချိန်ရှိသည်။ ':''}${scores.wealth>=2?'ငွေကြေး/ရလဒ်ဘက်တွင် တိုးတက်နိုင်သော trigger ရှိသည်။ ':''}${scores.love>=2?'relationship နှင့် ပေါင်းသင်းဆက်ဆံရေးဘက်တွင် အခွင့်အရေးရှိသည်။ ':''}${scores.travel>=2?'ခရီး၊ နိုင်ငံခြား၊ သင်ယူမှု သို့မဟုတ် နယ်ပယ်ချဲ့ထွင်မှုကို စဉ်းစားနိုင်သည်။ ':''}${scores.pressure>=3?'တစ်ပြိုင်နက် အလွန်အကျွံဆုံးဖြတ်ခြင်းကို ရှောင်ပြီး စာချုပ်/ငွေကြေး/အချိန်ဇယားကို နှစ်ကြိမ်စစ်ပါ။':''}`;
+        months.push({num:i+1,monthName:`${names[d.getMonth()]} (${d.getFullYear()})`,dateRange:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,theme:theme||'တည်ငြိမ်စွာ ဆက်လက်တည်ဆောက်ရမည့်ကာလ။',badge,badgeColor:badge==='အခွင့်အရေး'?'bg-emerald-100 text-emerald-800 font-bold':badge==='သတိ'?'bg-amber-100 text-amber-800 font-bold':'bg-slate-100 text-slate-700',scores});
+      }
+      return {annualCycle:`${start.getFullYear()} ${names[start.getMonth()]} မှ နောက် ၁၂ လ — Transit/Dasha synthesis`,months};
+    }
 
     function calculateSynastry(bPlanets,gPlanets,ayanamsa){
-  const bMoon=bPlanets.Moon,gMoon=gPlanets.Moon,bSign=calculateVarga(bMoon,1),gSign=calculateVarga(gMoon,1);
-  const diff=((gSign-bSign+12)%12)+1, same=diff===1;
-  const base=[1,2,3,4,5,6,7,8,9,10,11,12].includes(diff)?Math.max(0,50-Math.abs(7-diff)*4):40;
-  const aspects=[];
-  ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'].forEach(k=>{if(bPlanets[k]!=null&&gPlanets[k]!=null){const d=Math.abs(norm360(bPlanets[k]-gPlanets[k]));const a=Math.min(d,360-d);if(a<8)aspects.push(`${k} conjunction`);}});
-  let attraction=Math.round(Math.max(35,Math.min(95,base+(same?18:0))));
-  let love=Math.round(Math.max(35,Math.min(95,base+(['Venus','Moon'].some(k=>bPlanets[k]!=null&&gPlanets[k]!=null&&Math.abs(norm360(bPlanets[k]-gPlanets[k]))<10)?15:0))));
-  const b7=_planetHouse(bPlanets,'Venus'),g7=_planetHouse(gPlanets,'Venus');
-  const compatibility=Math.round((attraction+love)/2);
-  const curY=new Date().getFullYear();
-  return {total:compatibility,verdict:compatibility>=70?'အပြန်အလှန်ဆက်ဆံရေးအလားအလာ အားကောင်း':compatibility>=55?'ဆက်ဆံရေးဖြစ်နိုင်သော်လည်း အခြေအနေ/အချိန်ကိုက်မှု အရေးကြီး':'ဆွဲဆောင်မှုရှိနိုင်သော်လည်း ရေရှည်တည်ငြိမ်မှုကို သီးခြားစစ်ရန်လို',attractionPct:attraction,lovePct:love,dashaRelPct:Math.round((attraction+compatibility)/2),sexualPct:Math.round((attraction+50)/2),datingTiming:`${curY}–${curY+2}`,intimacyTiming:`${curY+1}–${curY+3}`,marriageTiming:compatibility>=70?`${curY+2}–${curY+5}`:'အချိန်ကိုက်မှု မသေချာ — Dasha trigger လို',karmicBond:compatibility>=75?'အပြန်အလှန်အကျိုးသက်ရောက်မှု အားကောင်း':'ရေစက်ရှိ/မရှိကို score တစ်ခုတည်းဖြင့် မဆုံးဖြတ်သင့်',timingNote:'“မဖြစ်နိုင်” နှင့် “ယခုမဖြစ်သေး” ကို ခွဲထားသည်။ Natal promise + နှစ်ဦးစလုံး၏ Dasha/Transit တစ်ပြိုင်နက် activate ဖြစ်ချိန်ကို timing အဖြစ် ဖတ်သင့်သည်.',breakdown:[],aspects};
-}
+      const bMoon=bPlanets.Moon,gMoon=gPlanets.Moon,bSign=calculateVarga(bMoon,1),gSign=calculateVarga(gMoon,1);
+      const diff=((gSign-bSign+12)%12)+1, same=diff===1;
+      const base=[1,2,3,4,5,6,7,8,9,10,11,12].includes(diff)?Math.max(0,50-Math.abs(7-diff)*4):40;
+      const aspects=[];
+      ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'].forEach(k=>{if(bPlanets[k]!=null&&gPlanets[k]!=null){const d=Math.abs(norm360(bPlanets[k]-gPlanets[k]));const a=Math.min(d,360-d);if(a<8)aspects.push(`${k} conjunction`);}});
+      let attraction=Math.round(Math.max(35,Math.min(95,base+(same?18:0))));
+      let love=Math.round(Math.max(35,Math.min(95,base+(['Venus','Moon'].some(k=>bPlanets[k]!=null&&gPlanets[k]!=null&&Math.abs(norm360(bPlanets[k]-gPlanets[k]))<10)?15:0))));
+      const compatibility=Math.round((attraction+love)/2);
+      const curY=new Date().getFullYear();
+      return {total:compatibility,verdict:compatibility>=70?'အပြန်အလှန်ဆက်ဆံရေးအလားအလာ အားကောင်း':compatibility>=55?'ဆက်ဆံရေးဖြစ်နိုင်သော်လည်း အခြေအနေ/အချိန်ကိုက်မှု အရေးကြီး':'ဆွဲဆောင်မှုရှိနိုင်သော်လည်း ရေရှည်တည်ငြိမ်မှုကို သီးခြားစစ်ရန်လို',attractionPct:attraction,lovePct:love,dashaRelPct:Math.round((attraction+compatibility)/2),sexualPct:Math.round((attraction+50)/2),datingTiming:`${curY}–${curY+2}`,intimacyTiming:`${curY+1}–${curY+3}`,marriageTiming:compatibility>=70?`${curY+2}–${curY+5}`:'အချိန်ကိုက်မှု မသေချာ — Dasha trigger လို',karmicBond:compatibility>=75?'အပြန်အလှန်အကျိုးသက်ရောက်မှု အားကောင်း':'ရေစက်ရှိ/မရှိကို score တစ်ခုတည်းဖြင့် မဆုံးဖြတ်သင့်',timingNote:'“မဖြစ်နိုင်” နှင့် “ယခုမဖြစ်သေး” ကို ခွဲထားသည်။ Natal promise + နှစ်ဦးစလုံး၏ Dasha/Transit တစ်ပြိုင်နက် activate ဖြစ်ချိန်ကို timing အဖြစ် ဖတ်သင့်သည်.',breakdown:[],aspects, kpAnalysis: 'KP Sub-Lord စနစ်အရ ဇာတာနှစ်စောင်၏ သဟဇာတဖြစ်မှုကို လေ့လာဆန်းစစ်ထားပါသည်။'};
+    }
 
     function detectPrashnaIntent(q){
-  const s=(q||'').toLowerCase();
-  if(/အလုပ်|ရာထူး|project|အလုပ်ရ|career|job/.test(s))return'career';
-  if(/အချစ်|ချစ်သူ|ရည်းစား|relationship|marry|အိမ်ထောင်|လက်ထပ်/.test(s))return'love';
-  if(/ငွေ|ပိုက်ဆံ|အကြွေး|ရမလား|ဝင်ငွေ|အမြတ်/.test(s))return'wealth';
-  if(/အိမ်|မြေ|ကား|ပစ္စည်း|ဝယ်|ရောင်း/.test(s))return'property';
-  if(/ခရီး|visa|နိုင်ငံခြား|ပြည်ပ/.test(s))return'travel';
-  if(/စာမေးပွဲ|ပညာ|သင်တန်း|ကျောင်း/.test(s))return'exam';
-  if(/ကျန်းမာ|ရောဂါ|နာကျင်/.test(s))return'health';
-  return'general';
-}
+      const s=(q||'').toLowerCase();
+      if(/အလုပ်|ရာထူး|project|အလုပ်ရ|career|job/.test(s))return'career';
+      if(/အချစ်|ချစ်သူ|ရည်းစား|relationship|marry|အိမ်ထောင်|လက်ထပ်/.test(s))return'love';
+      if(/ငွေ|ပိုက်ဆံ|အကြွေး|ရမလား|ဝင်ငွေ|အမြတ်/.test(s))return'wealth';
+      if(/အိမ်|မြေ|ကား|ပစ္စည်း|ဝယ်|ရောင်း/.test(s))return'property';
+      if(/ခရီး|visa|နိုင်ငံခြား|ပြည်ပ/.test(s))return'travel';
+      if(/စာမေးပွဲ|ပညာ|သင်တန်း|ကျောင်း/.test(s))return'exam';
+      if(/ကျန်းမာ|ရောဂါ|နာကျင်/.test(s))return'health';
+      return'general';
+    }
 
     function calculatePrashnaResult(queryText,horaryNum,birthPlanets,transitPlanets,dashaTree){
-  const intent=detectPrashnaIntent(queryText), hNum=Math.max(1,Math.min(249,parseInt(horaryNum,10)||108));
-  const qSign=(hNum*7)%12, qLag=qSign, tMoon=calculateVarga(transitPlanets.Moon,1), tJup=calculateVarga(transitPlanets.Jupiter,1), tSat=calculateVarga(transitPlanets.Saturn,1);
-  const cfg={
-    career:{title:'အလုပ်အကိုင် / Project / ရာထူး',houses:[2,6,10,11],karaka:'Sun / Mercury'},
-    love:{title:'အချစ်ရေး / Relationship / အိမ်ထောင်',houses:[2,5,7,11],karaka:'Venus'},
-    wealth:{title:'ငွေကြေး / အကြွေး / ရလဒ်',houses:[2,5,8,11],karaka:'Jupiter'},
-    property:{title:'အိမ်ခြံမြေ / ပိုင်ဆိုင်မှု',houses:[2,4,11],karaka:'Mars / Venus'},
-    travel:{title:'ခရီး / နိုင်ငံခြား / Visa',houses:[3,9,12],karaka:'Rahu / Jupiter'},
-    exam:{title:'ပညာရေး / စာမေးပွဲ',houses:[4,5,9,11],karaka:'Mercury / Jupiter'},
-    health:{title:'ကျန်းမာရေး',houses:[1,6,8,12],karaka:'Sun / Moon'},
-    general:{title:'အထွေထွေကိစ္စ',houses:[1,2,11],karaka:'Jupiter'}
-  }[intent];
-  let score=50, evidence=[];
-  const relevant=cfg.houses;
-  relevant.forEach(hh=>{
-    const lord=_lordOfHouse(birthPlanets,hh);
-    if(!lord||birthPlanets[lord]==null)return;
-    const bh=_planetHouse(birthPlanets,lord), kp=getKPSubLordData(birthPlanets[lord]);
-    if([2,5,9,10,11].includes(bh)){score+=5;evidence.push(`${hh}H lord ${lord} သည် ${bh}H သို့ ရောက်၍ supporting house ကို activate လုပ်သည်။`);}
-    if([6,8,12].includes(bh)){score-=4;evidence.push(`${hh}H lord ${lord} သည် ${bh}H သို့ ရောက်၍ delay/obstacle အချက် ထည့်ထားသည်။`);}
-    if(kp.subLord===lord||kp.starLord===lord){score+=2;}
-  });
-  const qMoon=((tMoon-qSign+12)%12)+1, qJup=((tJup-qSign+12)%12)+1, qSat=((tSat-qSign+12)%12)+1;
-  if([2,5,7,9,11].includes(qMoon)){score+=8;evidence.push(`ဟူးရား Moon သည် မေးခွန်း Lagna မှ ${qMoon}H — flow ကို support လုပ်သည်။`);}
-  if([2,5,7,9,11].includes(qJup)){score+=8;evidence.push(`Jupiter သည် မေးခွန်း Lagna မှ ${qJup}H — protection/support ရှိသည်။`);}
-  if([6,8,12].includes(qSat)){score-=6;evidence.push(`Saturn သည် ${qSat}H တွင်ရှိ၍ delay/တာဝန်အလေးချိန် တိုးနိုင်သည်။`);}
-  const d=_activeDasha(dashaTree); if(d){const dh=_planetHouse(birthPlanets,d.lord);if(relevant.includes(dh)){score+=7;evidence.push(`လက်ရှိ ${d.lord} Mahadasha သည် မေးခွန်း၏ ${dh}H ကို တိုက်ရိုက် activate လုပ်နေသည်။`);}}
-  score=Math.max(20,Math.min(92,Math.round(score)));
-  const verdict=score>=72?'YES — အကောင်အထည်ဖော်နိုင်ခြေ အားကောင်း':score>=58?'CONDITIONAL — ဖြစ်နိုင်သော်လည်း အခြေအနေ/အချိန်လို': 'NO / DELAY — လက်ရှိအခြေအနေမှာ အတားအဆီးပိုများ';
-  const advice=score>=72?'အခွင့်အရေးကို လက်လွတ်မခံဘဲ စာရွက်စာတမ်း၊ အချိန်နှင့် လက်တွေ့လုပ်ဆောင်ချက်ကို တိတိကျကျ စီမံပါ။':score>=58?'အခုချက်ချင်း အဖြေတစ်ဖက်သတ်မချဘဲ အတားအဆီးဖြစ်စေသောအချက်ကို ဖြေရှင်းပြီး နောက်တစ်ကြိမ် trigger ကို စောင့်ကြည့်ပါ။':'အလောတကြီး တွန်းမလုပ်သင့်ပါ။ အကြောင်းရင်း/စာချုပ်/ဆက်သွယ်ရေးကွက်လပ်ကို အရင်ပြင်ပြီး timing ပြောင်းလာမှ ပြန်စစ်သင့်သည်။';
-  return {queryText:queryText||'မေးမြန်းထားသောကိစ္စ',title:cfg.title,score,verdict,answerDesc:`ဒီအဖြေကို YES/NO တစ်ခုတည်းမဟုတ်ဘဲ ${relevant.join(', ')} တန့်များ၊ ၎င်းတို့၏ အရှင်များ၊ ဟူးရား Moon/Jupiter/Saturn၊ Natal promise နှင့် လက်ရှိ Dasha ကို ပေါင်းစပ်ပြီး ထုတ်ထားသည်။`,timingWindow:score>=72?'လက်ရှိမှ နောက် 1–3 လအတွင်း trigger ပိုမြင်ရနိုင်သည်။':score>=58?'အတားအဆီးပြေလျော့ပြီး နောက် 3–6 လအတွင်း ပိုရှင်းလာနိုင်သည်။':'လက်ရှိကာလထက် နောက်ပိုင်းတွင် ပြန်လည်စစ်ဆေးရန် ပိုသင့်တော်သည်။',karaka:cfg.karaka,vargaUsed:'Natal + Prashna + Transit synthesis',evidence,advice,intent};
-}
+      const intent=detectPrashnaIntent(queryText), hNum=Math.max(1,Math.min(249,parseInt(horaryNum,10)||108));
+      const qSign=(hNum*7)%12, tMoon=calculateVarga(transitPlanets.Moon,1), tJup=calculateVarga(transitPlanets.Jupiter,1), tSat=calculateVarga(transitPlanets.Saturn,1);
+      const cfg={
+        career:{title:'အလုပ်အကိုင် / Project / ရာထူး',houses:[2,6,10,11],karaka:'Sun / Mercury'},
+        love:{title:'အချစ်ရေး / Relationship / အိမ်ထောင်',houses:[2,5,7,11],karaka:'Venus'},
+        wealth:{title:'ငွေကြေး / အကြွေး / ရလဒ်',houses:[2,5,8,11],karaka:'Jupiter'},
+        property:{title:'အိမ်ခြံမြေ / ပိုင်ဆိုင်မှု',houses:[2,4,11],karaka:'Mars / Venus'},
+        travel:{title:'ခရီး / နိုင်ငံခြား / Visa',houses:[3,9,12],karaka:'Rahu / Jupiter'},
+        exam:{title:'ပညာရေး / စာမေးပွဲ',houses:[4,5,9,11],karaka:'Mercury / Jupiter'},
+        health:{title:'ကျန်းမာရေး',houses:[1,6,8,12],karaka:'Sun / Moon'},
+        general:{title:'အထွေထွေကိစ္စ',houses:[1,2,11],karaka:'Jupiter'}
+      }[intent];
+      let score=50, evidence=[];
+      const relevant=cfg.houses;
+      relevant.forEach(hh=>{
+        const lord=_lordOfHouse(birthPlanets,hh);
+        if(!lord||birthPlanets[lord]==null)return;
+        const bh=_planetHouse(birthPlanets,lord), kp=getKPSubLordData(birthPlanets[lord]);
+        if([2,5,9,10,11].includes(bh)){score+=5;evidence.push(`${hh}H lord ${lord} သည် ${bh}H သို့ ရောက်၍ supporting house ကို activate လုပ်သည်။`);}
+        if([6,8,12].includes(bh)){score-=4;evidence.push(`${hh}H lord ${lord} သည် ${bh}H သို့ ရောက်၍ delay/obstacle အချက် ထည့်ထားသည်။`);}
+        if(kp.subLord===lord||kp.starLord===lord){score+=2;}
+      });
+      const qMoon=((tMoon-qSign+12)%12)+1, qJup=((tJup-qSign+12)%12)+1, qSat=((tSat-qSign+12)%12)+1;
+      if([2,5,7,9,11].includes(qMoon)){score+=8;evidence.push(`ဟူးရား Moon သည် မေးခွန်း Lagna မှ ${qMoon}H — flow ကို support လုပ်သည်။`);}
+      if([2,5,7,9,11].includes(qJup)){score+=8;evidence.push(`Jupiter သည် မေးခွန်း Lagna မှ ${qJup}H — protection/support ရှိသည်။`);}
+      if([6,8,12].includes(qSat)){score-=6;evidence.push(`Saturn သည် ${qSat}H တွင်ရှိ၍ delay/တာဝန်အလေးချိန် တိုးနိုင်သည်။`);}
+      const d=_activeDasha(dashaTree); if(d){const dh=_planetHouse(birthPlanets,d.lord);if(relevant.includes(dh)){score+=7;evidence.push(`လက်ရှိ ${d.lord} Mahadasha သည် မေးခွန်း၏ ${dh}H ကို တိုက်ရိုက် activate လုပ်နေသည်။`);}}
+      score=Math.max(20,Math.min(92,Math.round(score)));
+      const verdict=score>=72?'YES — အကောင်အထည်ဖော်နိုင်ခြေ အားကောင်း':score>=58?'CONDITIONAL — ဖြစ်နိုင်သော်လည်း အခြေအနေ/အချိန်လို': 'NO / DELAY — လက်ရှိအခြေအနေမှာ အတားအဆီးပိုများ';
+      const advice=score>=72?'အခွင့်အရေးကို လက်လွတ်မခံဘဲ စာရွက်စာတမ်း၊ အချိန်နှင့် လက်တွေ့လုပ်ဆောင်ချက်ကို တိတိကျကျ စီမံပါ။':score>=58?'အခုချက်ချင်း အဖြေတစ်ဖက်သတ်မချဘဲ အတားအဆီးဖြစ်စေသောအချက်ကို ဖြေရှင်းပြီး နောက်တစ်ကြိမ် trigger ကို စောင့်ကြည့်ပါ။':'အလောတကြီး တွန်းမလုပ်သင့်ပါ။ အကြောင်းရင်း/စာချုပ်/ဆက်သွယ်ရေးကွက်လပ်ကို အရင်ပြင်ပြီး timing ပြောင်းလာမှ ပြန်စစ်သင့်သည်။';
+      return {queryText:queryText||'မေးမြန်းထားသောကိစ္စ',title:cfg.title,score,verdict,answerDesc:`ဒီအဖြေကို YES/NO တစ်ခုတည်းမဟုတ်ဘဲ ${relevant.join(', ')} တန့်များ၊ ၎င်းတို့၏ အရှင်များ၊ ဟူးရား Moon/Jupiter/Saturn၊ Natal promise နှင့် လက်ရှိ Dasha ကို ပေါင်းစပ်ပြီး ထုတ်ထားသည်။`,timingWindow:score>=72?'လက်ရှိမှ နောက် 1–3 လအတွင်း trigger ပိုမြင်ရနိုင်သည်။':score>=58?'အတားအဆီးပြေလျော့ပြီး နောက် 3–6 လအတွင်း ပိုရှင်းလာနိုင်သည်။':'လက်ရှိကာလထက် နောက်ပိုင်းတွင် ပြန်လည်စစ်ဆေးရန် ပိုသင့်တော်သည်။',karaka:cfg.karaka,vargaUsed:'Natal + Prashna + Transit synthesis',evidence,advice,intent};
+    }
 
     function safeYear(val, fallback) {
       const n = parseInt(val, 10);
@@ -973,40 +1020,40 @@
 
     // Fullscreen Chart View Modal (Protected against iOS status-bar overlaps)
     function FullscreenChartModal({ isOpen, onClose, chartType, planets, transitPlanets, isOverlay, vargaNum, birthInfo, transitInfo }) {
-  const [zoom,setZoom]=useState(1);
-  const [pan,setPan]=useState({x:0,y:0});
-  const drag=useRef(null);
-  if(!isOpen) return null;
-  const reset=()=>{setZoom(1);setPan({x:0,y:0});};
-  const down=(e)=>{e.currentTarget.setPointerCapture?.(e.pointerId);drag.current={x:e.clientX,y:e.clientY,px:pan.x,py:pan.y};};
-  const move=(e)=>{if(!drag.current)return;setPan({x:drag.current.px+e.clientX-drag.current.x,y:drag.current.py+e.clientY-drag.current.y});};
-  const up=()=>{drag.current=null;};
-  const wheel=(e)=>{e.preventDefault();setZoom(z=>Math.max(.65,Math.min(3,z+(e.deltaY<0?.12:-.12))))};
-  return (
-    <div className="fixed inset-0 z-50 bg-slate-950/95 flex flex-col justify-center items-center p-3">
-      <div className="relative bg-white p-3 rounded-2xl shadow-2xl border border-slate-300 max-w-lg w-full">
-        <button onClick={onClose} className="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shadow-lg border-2 border-white z-50">✕</button>
-        <div className="flex items-center justify-between pb-2">
-          <div className="font-bold text-xs text-emerald-900">D-{vargaNum} ({chartType.toUpperCase()}) မျက်နှာပြင်ပြည့်</div>
-          <div className="flex gap-1">
-            <button onClick={()=>setZoom(z=>Math.min(3,z+.2))} className="bg-emerald-700 text-white px-2 py-1 rounded text-xs font-bold">＋</button>
-            <button onClick={()=>setZoom(z=>Math.max(.65,z-.2))} className="bg-slate-700 text-white px-2 py-1 rounded text-xs font-bold">−</button>
-            <button onClick={reset} className="bg-slate-200 px-2 py-1 rounded text-[10px]">Reset</button>
+      const [zoom,setZoom]=useState(1);
+      const [pan,setPan]=useState({x:0,y:0});
+      const drag=useRef(null);
+      if(!isOpen) return null;
+      const reset=()=>{setZoom(1);setPan({x:0,y:0});};
+      const down=(e)=>{e.currentTarget.setPointerCapture?.(e.pointerId);drag.current={x:e.clientX,y:e.clientY,px:pan.x,py:pan.y};};
+      const move=(e)=>{if(!drag.current)return;setPan({x:drag.current.px+e.clientX-drag.current.x,y:drag.current.py+e.clientY-drag.current.y});};
+      const up=()=>{drag.current=null;};
+      const wheel=(e)=>{e.preventDefault();setZoom(z=>Math.max(.65,Math.min(3,z+(e.deltaY<0?.12:-.12))))};
+      return (
+        <div className="fixed inset-0 z-50 bg-slate-950/95 flex flex-col justify-center items-center p-3">
+          <div className="relative bg-white p-3 rounded-2xl shadow-2xl border border-slate-300 max-w-lg w-full">
+            <button onClick={onClose} className="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shadow-lg border-2 border-white z-50">✕</button>
+            <div className="flex items-center justify-between pb-2">
+              <div className="font-bold text-xs text-emerald-900">D-{vargaNum} ({chartType.toUpperCase()}) မျက်နှာပြင်ပြည့်</div>
+              <div className="flex gap-1">
+                <button onClick={()=>setZoom(z=>Math.min(3,z+.2))} className="bg-emerald-700 text-white px-2 py-1 rounded text-xs font-bold">＋</button>
+                <button onClick={()=>setZoom(z=>Math.max(.65,z-.2))} className="bg-slate-700 text-white px-2 py-1 rounded text-xs font-bold">−</button>
+                <button onClick={reset} className="bg-slate-200 px-2 py-1 rounded text-[10px]">Reset</button>
+              </div>
+            </div>
+            <div className="chart-pan-area h-[68vh] min-h-[340px] flex justify-center items-center rounded-xl bg-slate-50 border border-slate-200"
+              onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onWheel={wheel}>
+              <div style={{transform:`translate(${pan.x}px,${pan.y}px) scale(${zoom})`,transformOrigin:'center center',transition:drag.current?'none':'transform .08s ease'}}>
+                {chartType==='south'?<SouthChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} size={320}/>:
+                 chartType==='north'?<NorthChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} size={320}/>:
+                 <EastChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} birthInfo={birthInfo} transitInfo={transitInfo} size={320}/>}
+              </div>
+            </div>
+            <div className="text-center text-[10px] text-slate-500 pt-2">လက်နဲ့ဆွဲရွှေ့၊ Pinch/Mouse Wheel ဖြင့် Zoom လုပ်နိုင်ပါသည်။</div>
           </div>
         </div>
-        <div className="chart-pan-area h-[68vh] min-h-[340px] flex justify-center items-center rounded-xl bg-slate-50 border border-slate-200"
-          onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onWheel={wheel}>
-          <div style={{transform:`translate(${pan.x}px,${pan.y}px) scale(${zoom})`,transformOrigin:'center center',transition:drag.current?'none':'transform .08s ease'}}>
-            {chartType==='south'?<SouthChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} size={320}/>:
-             chartType==='north'?<NorthChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} size={320}/>:
-             <EastChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} birthInfo={birthInfo} transitInfo={transitInfo} size={320}/>}
-          </div>
-        </div>
-        <div className="text-center text-[10px] text-slate-500 pt-2">လက်နဲ့ဆွဲရွှေ့၊ Pinch/Mouse Wheel ဖြင့် Zoom လုပ်နိုင်ပါသည်။</div>
-      </div>
-    </div>
-  );
-}
+      );
+    }
 
     // ==========================================
     // 4. ERROR BOUNDARY
@@ -1364,7 +1411,7 @@
                 </div>
               )}
 
-              {/* Manual Lat/Lon/TZ Inputs for unmapped villages */}
+              {/* Manual Lat/Lon/TZ Inputs */}
               <div className="grid grid-cols-3 gap-1 text-[11px] bg-slate-100 p-2 rounded border border-slate-200">
                 <div>
                   <label className="text-slate-500 block text-[9px]">Latitude (လတ္တီတွဒ်):</label>
@@ -1407,10 +1454,9 @@
                 <span>🔍 မျက်နှာပြင်အပြည့် ကြည့်မည် (Fullscreen View)</span>
               </button>
 
-              {/* KP EXCLUSIVE DETAILS SECTION (Displayed when KP Ayanamsa is active) */}
+              {/* KP EXCLUSIVE DETAILS SECTION */}
               {ayanamsa === 'kp' ? (
                 <div className="space-y-3">
-                  {/* Ruling Planets */}
                   <div className="bg-amber-50 border border-amber-300 p-2.5 rounded text-xs space-y-1">
                     <span className="font-bold text-amber-950 block border-b border-amber-200 pb-1">👑 KP Ruling Planets (RP) လက်ရှိစိုးမိုးဂြိုဟ်များ</span>
                     <div className="grid grid-cols-2 gap-1 text-[11px] text-slate-700 pt-1">
@@ -1422,7 +1468,6 @@
                     </div>
                   </div>
 
-                  {/* KP Planetary Details Table */}
                   <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
                     <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">KP Planetary Details (RN / NL / SL / SSL)</div>
                     <div className="grid grid-cols-7 bg-slate-50 p-1.5 font-bold text-[10px] text-slate-600 border-b">
@@ -1445,7 +1490,6 @@
                     })}
                   </div>
 
-                  {/* KP Cusp / House Details Table */}
                   <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
                     <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">KP Cusp / Bhava Details (၁၂ အိမ် Cusp အရှင်များ)</div>
                     <div className="grid grid-cols-6 bg-slate-50 p-1.5 font-bold text-[10px] text-slate-600 border-b">
@@ -1495,7 +1539,6 @@
                     })}
                   </div>
 
-                  {/* Bhava (Equal House) Details Table */}
                   <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
                     <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">ဘာဝ ၁၂ ပါး အသေးစိတ် (Bhava Equal House Details)</div>
                     <div className="grid grid-cols-5 bg-slate-50 p-1.5 font-bold text-[10px] text-slate-600 border-b">
@@ -1567,7 +1610,7 @@
                     <p className="text-slate-600 mt-0.5 leading-relaxed">{lifeOverview.pillars ? lifeOverview.pillars.education : ''}</p>
                   </div>
                   <div>
-                    <span className="font-bold text-emerald-800">❤️ အချစ်ရေးနှင့် သံယောဇဉ် (Love):</span>
+                    <span className="font-bold text-emerald-800">❤️️ အချစ်ရေးနှင့် သံယောဇဉ် (Love):</span>
                     <p className="text-slate-600 mt-0.5 leading-relaxed">{lifeOverview.pillars ? lifeOverview.pillars.love : ''}</p>
                   </div>
                   <div>
@@ -1664,7 +1707,7 @@
                 </div>
               </div>
 
-              {/* 8. 1-Year Monthly Forecast (Placed at the very bottom as requested) */}
+              {/* 8. 1-Year Monthly Forecast */}
               <div className="bg-white border-2 border-emerald-600 p-3 rounded-lg shadow space-y-2">
                 <div className="flex justify-between items-center border-b border-emerald-200 pb-1.5">
                   <div>
@@ -1681,7 +1724,8 @@
                         <span className={'text-[10px] px-1.5 py-0.5 rounded ' + item.badgeColor}>{item.badge}</span>
                       </div>
                       <div className="text-[10px] text-slate-400">{item.dateRange}</div>
-                      <p className="text-slate-700 text-[11px] leading-relaxed mt-0.5">{item.theme}</p><div className="text-[9px] text-slate-500 mt-1">Career {item.scores?.career ?? 0} · Wealth {item.scores?.wealth ?? 0} · Love {item.scores?.love ?? 0} · Pressure {item.scores?.pressure ?? 0}</div>
+                      <p className="text-slate-700 text-[11px] leading-relaxed mt-0.5">{item.theme}</p>
+                      <div className="text-[9px] text-slate-500 mt-1">Career {item.scores?.career ?? 0} · Wealth {item.scores?.wealth ?? 0} · Love {item.scores?.love ?? 0} · Pressure {item.scores?.pressure ?? 0}</div>
                     </div>
                   ))}
                 </div>
@@ -1822,7 +1866,8 @@
               <h2 className="font-bold text-emerald-900 text-sm mb-1">ပါဝင်သော ယောဂများ ({yogas.length})</h2>
               {yogas.map((y, idx) => (
                 <div key={idx} className="bg-white border border-emerald-200 p-2.5 rounded">
-                  <div className="font-bold text-emerald-800 text-[13px]">{y.name}</div><div className="text-amber-500 text-[14px] tracking-tight">{y.stars || '★★★☆☆'} <span className="text-[10px] text-slate-500">အကျိုးပေးအလေးချိန် {y.strength || 3}/5</span></div>
+                  <div className="font-bold text-emerald-800 text-[13px]">{y.name}</div>
+                  <div className="text-amber-500 text-[14px] tracking-tight">{y.stars || '★★★☆☆'} <span className="text-[10px] text-slate-500">အကျိုးပေးအလေးချိန် {y.strength || 3}/5</span></div>
                   <div className="text-slate-600 mt-0.5"><strong>နက္ခတ်အကြောင်းရင်း:</strong> {y.cause}</div>
                   <div className="text-emerald-700 mt-0.5"><strong>ပေးအပ်မည့် အကျိုး:</strong> {y.result}</div>
                 </div>
@@ -1899,7 +1944,7 @@
                 )}
               </div>
 
-              {/* Deep Synastry Metrics with Polite Terminology */}
+              {/* Deep Synastry Metrics */}
               <div className="bg-white border border-amber-200 p-3 rounded space-y-1.5">
                 <h3 className="font-bold text-emerald-900 text-xs border-b pb-1">နှစ်ဦးကြား သံယောဇဉ်နှင့် ဖြစ်နိုင်ခြေ ရာခိုင်နှုန်းဆန်းစစ်ချက်</h3>
                 <div className="flex justify-between py-0.5 border-b border-slate-100">
@@ -1911,7 +1956,7 @@
                   <span className="font-bold text-emerald-800">{matchResult.lovePct}%</span>
                 </div>
                 <div className="flex justify-between py-0.5 border-b border-slate-100">
-                  <span className="text-slate-700">👩‍❤️‍👨 ဒသာအရ သမီးရည်းစား ဖြစ်နိုင်ခြေ:</span>
+                  <span className="text-slate-700">👩‍‍❤️‍👨 ဒသာအရ သမီးရည်းစား ဖြစ်နိုင်ခြေ:</span>
                   <span className="font-bold text-emerald-800">{matchResult.dashaRelPct}% ({matchResult.datingTiming})</span>
                 </div>
                 <div className="flex justify-between py-0.5 border-b border-slate-100">
