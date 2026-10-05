@@ -581,10 +581,6 @@
       if([2,5,9,11].includes(h('Jupiter'))&&[2,5,9,11].includes(h('Venus')))add('Dhana Pattern','Jupiter/Venus သည် ဓနအိမ်များကို အားပေးခြင်း','ဝင်ငွေ၊ ပိုင်ဆိုင်မှုနှင့် အခွင့်အရေးများကို စုစည်းနိုင်သော pattern ဖြစ်သည်။',4,['Jupiter','Venus']);
       const l1=_lordOfHouse(p,1),l5=_lordOfHouse(p,5),l9=_lordOfHouse(p,9),l10=_lordOfHouse(p,10);
       if(l1&&l5&&l9&&[l5,l9].includes(l10))add('Raja Yoga Pattern','Trikona lord နှင့် Kendra lord ဆက်နွယ်မှု','အာဏာ၊ အောင်မြင်မှုနှင့် အခွင့်အရေးကို တစ်ချိန်ချိန်တွင် ထင်ရှားစေနိုင်သည်။',4,[l1,l5,l9,l10]);
-      const v=[6,8,12].filter(x=>x===h(lordOfHouseSafe(p,x))).length;
-      function lordOfHouseSafe(pp,hh){return _lordOfHouse(pp,hh)||'';}
-      [1,4,7,10].forEach(hh=>{const l=_lordOfHouse(p,hh);if(l&&[1,4,7,10].includes(h(l))&&[1,4,7,10].includes(h(_lordOfHouse(p,1)))){}});
-      // Kemadruma
       if(!moonOthers.length&&!moonPrev.length)add('Kemadruma Yoga','Moon ၏ ၂/၁၂ တန့်တွင် အဓိကဂြိုဟ်မရှိခြင်း','စိတ်ပိုင်းဆိုင်ရာ မတည်ငြိမ်မှု သို့မဟုတ် ကိုယ့်အားကိုယ်ကိုးရမှုကို ဖြစ်စေနိုင်သော်လည်း cancellation factors များကိုပါ စစ်ရမည်။',2,['Moon']);
       return y;
     }
@@ -731,17 +727,205 @@
       return {annualCycle:`${start.getFullYear()} ${names[start.getMonth()]} မှ နောက် ၁၂ လ — Transit/Dasha synthesis`,months};
     }
 
-    function calculateSynastry(bPlanets,gPlanets,ayanamsa){
-      const bMoon=bPlanets.Moon,gMoon=gPlanets.Moon,bSign=calculateVarga(bMoon,1),gSign=calculateVarga(gMoon,1);
-      const diff=((gSign-bSign+12)%12)+1, same=diff===1;
-      const base=[1,2,3,4,5,6,7,8,9,10,11,12].includes(diff)?Math.max(0,50-Math.abs(7-diff)*4):40;
-      const aspects=[];
-      ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'].forEach(k=>{if(bPlanets[k]!=null&&gPlanets[k]!=null){const d=Math.abs(norm360(bPlanets[k]-gPlanets[k]));const a=Math.min(d,360-d);if(a<8)aspects.push(`${k} conjunction`);}});
-      let attraction=Math.round(Math.max(35,Math.min(95,base+(same?18:0))));
-      let love=Math.round(Math.max(35,Math.min(95,base+(['Venus','Moon'].some(k=>bPlanets[k]!=null&&gPlanets[k]!=null&&Math.abs(norm360(bPlanets[k]-gPlanets[k]))<10)?15:0))));
-      const compatibility=Math.round((attraction+love)/2);
-      const curY=new Date().getFullYear();
-      return {total:compatibility,verdict:compatibility>=70?'အပြန်အလှန်ဆက်ဆံရေးအလားအလာ အားကောင်း':compatibility>=55?'ဆက်ဆံရေးဖြစ်နိုင်သော်လည်း အခြေအနေ/အချိန်ကိုက်မှု အရေးကြီး':'ဆွဲဆောင်မှုရှိနိုင်သော်လည်း ရေရှည်တည်ငြိမ်မှုကို သီးခြားစစ်ရန်လို',attractionPct:attraction,lovePct:love,dashaRelPct:Math.round((attraction+compatibility)/2),sexualPct:Math.round((attraction+50)/2),datingTiming:`${curY}–${curY+2}`,intimacyTiming:`${curY+1}–${curY+3}`,marriageTiming:compatibility>=70?`${curY+2}–${curY+5}`:'အချိန်ကိုက်မှု မသေချာ — Dasha trigger လို',karmicBond:compatibility>=75?'အပြန်အလှန်အကျိုးသက်ရောက်မှု အားကောင်း':'ရေစက်ရှိ/မရှိကို score တစ်ခုတည်းဖြင့် မဆုံးဖြတ်သင့်',timingNote:'“မဖြစ်နိုင်” နှင့် “ယခုမဖြစ်သေး” ကို ခွဲထားသည်။ Natal promise + နှစ်ဦးစလုံး၏ Dasha/Transit တစ်ပြိုင်နက် activate ဖြစ်ချိန်ကို timing အဖြစ် ဖတ်သင့်သည်.',breakdown:[],aspects, kpAnalysis: 'KP Sub-Lord စနစ်အရ ဇာတာနှစ်စောင်၏ သဟဇာတဖြစ်မှုကို လေ့လာဆန်းစစ်ထားပါသည်။'};
+    // ==========================================
+    // AUTHENTIC ASHTAKOOTA (36 POINTS) & SYNASTRY
+    // ==========================================
+    function calculateSynastry(bPlanets, gPlanets, ayanamsa, bDate, gDate) {
+      if (!bPlanets || !gPlanets || typeof bPlanets.Moon !== 'number' || typeof gPlanets.Moon !== 'number') {
+        return { total: 0, verdict: 'အချက်အလက် မပြည့်စုံပါ', breakdown: [], futureWindow: null };
+      }
+
+      const bMoon = norm360(bPlanets.Moon);
+      const gMoon = norm360(gPlanets.Moon);
+      const bSign = Math.floor(bMoon / 30);
+      const gSign = Math.floor(gMoon / 30);
+      const bNak = Math.floor(bMoon / (360 / 27));
+      const gNak = Math.floor(gMoon / (360 / 27));
+
+      // 1. Varna (1 Point)
+      const getVarna = (s) => ([3, 7, 11].includes(s) ? 4 : [0, 4, 8].includes(s) ? 3 : [1, 5, 9].includes(s) ? 2 : 1);
+      const varnaScore = getVarna(bSign) >= getVarna(gSign) ? 1 : 0;
+
+      // 2. Vashya (2 Points)
+      const getVashyaGroup = (s) => {
+        if ([0, 1].includes(s)) return 'Chatushpada';
+        if ([2, 5, 6, 10].includes(s)) return 'Manava';
+        if ([3, 11].includes(s)) return 'Jalachara';
+        if (s === 4) return 'Vanachara';
+        if (s === 7) return 'Keeta';
+        return 'Chatushpada';
+      };
+      const bVashya = getVashyaGroup(bSign);
+      const gVashya = getVashyaGroup(gSign);
+      let vashyaScore = (bVashya === gVashya) ? 2 : 1;
+      if ((bVashya === 'Vanachara' && gVashya === 'Chatushpada') || (bVashya === 'Keeta' && gVashya === 'Manava')) {
+        vashyaScore = 0;
+      }
+
+      // 3. Tara / Dina (3 Points)
+      const tara1 = ((bNak - gNak + 27) % 27 + 1) % 9;
+      const tara2 = ((gNak - bNak + 27) % 27 + 1) % 9;
+      const isBad1 = [3, 5, 7].includes(tara1);
+      const isBad2 = [3, 5, 7].includes(tara2);
+      let taraScore = (!isBad1 && !isBad2) ? 3 : (!isBad1 || !isBad2) ? 1.5 : 0;
+
+      // 4. Yoni (4 Points)
+      const YONI_ANIMALS = [
+        'Horse', 'Elephant', 'Sheep', 'Serpent', 'Serpent', 'Dog', 'Cat', 'Sheep', 'Cat',
+        'Rat', 'Rat', 'Cow', 'Buffalo', 'Tiger', 'Buffalo', 'Tiger', 'Deer', 'Deer',
+        'Dog', 'Monkey', 'Mongoose', 'Monkey', 'Lion', 'Horse', 'Lion', 'Cow', 'Elephant'
+      ];
+      const bYoni = YONI_ANIMALS[bNak] || 'Horse';
+      const gYoni = YONI_ANIMALS[gNak] || 'Horse';
+      const enemyPairs = [
+        ['Horse', 'Buffalo'], ['Elephant', 'Lion'], ['Sheep', 'Monkey'],
+        ['Serpent', 'Mongoose'], ['Dog', 'Deer'], ['Cat', 'Rat'], ['Cow', 'Tiger']
+      ];
+      const isEnemy = enemyPairs.some(([a, b]) => (bYoni === a && gYoni === b) || (bYoni === b && gYoni === a));
+      let yoniScore = (bYoni === gYoni) ? 4 : isEnemy ? 0 : 2;
+
+      // 5. Graha Maitri (5 Points)
+      const bLord = RASI_LORDS[bSign];
+      const gLord = RASI_LORDS[gSign];
+      let maitriScore = 2.5;
+      if (bLord === gLord) {
+        maitriScore = 5;
+      } else {
+        const bRel = NATURAL_RELATIONS[bLord];
+        const gRel = NATURAL_RELATIONS[gLord];
+        const bFriend = bRel && bRel.friends.includes(gLord);
+        const bEnemy = bRel && bRel.enemies.includes(gLord);
+        const gFriend = gRel && gRel.friends.includes(bLord);
+        const gEnemy = gRel && gRel.enemies.includes(bLord);
+
+        if (bFriend && gFriend) maitriScore = 5;
+        else if ((bFriend && !gEnemy) || (gFriend && !bEnemy)) maitriScore = 4;
+        else if (!bEnemy && !gEnemy) maitriScore = 3;
+        else if (bEnemy && gEnemy) maitriScore = 0;
+        else maitriScore = 1;
+      }
+
+      // 6. Gana (6 Points)
+      const DevaNaks = [0, 4, 6, 7, 12, 14, 16, 21, 26];
+      const ManushyaNaks = [1, 3, 5, 10, 11, 19, 20, 24, 25];
+      const getGana = (n) => (DevaNaks.includes(n) ? 'Deva' : ManushyaNaks.includes(n) ? 'Manushya' : 'Rakshasa');
+      const bGana = getGana(bNak);
+      const gGana = getGana(gNak);
+      let ganaScore = (bGana === gGana) ? 6 : 0;
+      if (bGana === 'Deva' && gGana === 'Manushya') ganaScore = 6;
+      else if (bGana === 'Manushya' && gGana === 'Deva') ganaScore = 5;
+      else if (bGana === 'Deva' && gGana === 'Rakshasa') ganaScore = 1;
+      else if (bGana === 'Rakshasa' && gGana === 'Deva') ganaScore = 1;
+
+      // 7. Bhakoot (7 Points)
+      const diff = ((gSign - bSign + 12) % 12) + 1;
+      const isBhakootDosha = [2, 12, 6, 8, 5, 9].includes(diff);
+      let bhakootScore = (!isBhakootDosha || bLord === gLord) ? 7 : 0;
+
+      // 8. Nadi (8 Points)
+      const AdiNaks = [0, 5, 6, 11, 12, 17, 18, 23, 24];
+      const MadhyaNaks = [1, 4, 7, 10, 13, 16, 19, 22, 25];
+      const getNadi = (n) => (AdiNaks.includes(n) ? 'Adi' : MadhyaNaks.includes(n) ? 'Madhya' : 'Antya');
+      const bNadi = getNadi(bNak);
+      const gNadi = getNadi(gNak);
+      const nadiScore = (bNadi !== gNadi) ? 8 : 0;
+
+      // Total Ashtakoota Sum (Strictly out of 36)
+      const total = varnaScore + vashyaScore + taraScore + yoniScore + maitriScore + ganaScore + bhakootScore + nadiScore;
+
+      const verdict = total >= 28 ? 'အလွန်မင်္ဂလာရှိသော ဇာတာတွဲဖက်မှု (Excellent — ၂၈ မှတ်နှင့်အထက်)'
+                    : total >= 18 ? 'အိမ်ထောင်ပြုရန် သင့်တင့်လျောက်ပတ်သော ဇာတာ (Compatible — ၁၈ မှ ၂၇ မှတ်)'
+                    : 'သတိပြုစိစစ်ရမည့် ဇာတာ (Low Compatibility / Doshas Exist — ၁၈ မှတ်အောက်)';
+
+      const breakdown = [
+        { k: '၁။ ဝဏ္ဏ (Varna)', score: varnaScore, max: 1, desc: 'ဝိညာဉ်အဆင့်အတန်းနှင့် စရိုက်သဟဇာတဖြစ်မှု' },
+        { k: '၂။ ဝသျှ (Vashya)', score: vashyaScore, max: 2, desc: 'တစ်ဦးပေါ်တစ်ဦး သြဇာလွှမ်းမိုးမှုနှင့် အပြန်အလှန်လိုက်လျောမှု' },
+        { k: '၃။ တာရာ (Tara/Dina)', score: taraScore, max: 3, desc: 'ကံကြမ္မာအထောက်အပံ့နှင့် ကျန်းမာသက်ရှည်မှု' },
+        { k: '၄။ ယောနိ (Yoni)', score: yoniScore, max: 4, desc: 'ကာမသဟဇာတနှင့် ရုပ်ပိုင်းဆိုင်ရာ နွေးထွေးမှု' },
+        { k: '၅။ ဂြဟမိတ် (Graha Maitri)', score: maitriScore, max: 5, desc: 'စိတ်နေစိတ်ထား၊ မိတ်ဆွေသဘောနှင့် ခံယူချက်တူညီမှု' },
+        { k: '၆။ ဂဏ (Gana)', score: ganaScore, max: 6, desc: 'စရိုက်ဗီဇနှင့် လူနေမှုအဆင့်အတန်း လိုက်ဖက်မှု' },
+        { k: '၇။ ဘကုတ (Bhakoot)', score: bhakootScore, max: 7, desc: 'မိသားစုသုခ၊ ဓနဥစ္စာနှင့် ချစ်ခင်မြတ်နိုးမှု' },
+        { k: '၈။ နာဒီ (Nadi)', score: nadiScore, max: 8, desc: 'မျိုးဆက်သန့်စင်မှု၊ မျိုးရိုးဗီဇနှင့် သွေးသားသဟဇာတ' }
+      ];
+
+      // Physical & Psychological Affinities
+      const bMoonDeg = norm360(bPlanets.Moon);
+      const gMoonDeg = norm360(gPlanets.Moon);
+      const moonDist = Math.abs(bMoonDeg - gMoonDeg);
+      const moonAspect = Math.min(moonDist, 360 - moonDist);
+      const attraction = Math.min(95, Math.max(35, Math.round(50 + (yoniScore * 7) + (moonAspect < 60 ? 15 : 0))));
+      const love = Math.min(95, Math.max(35, Math.round(45 + (maitriScore * 6) + (bhakootScore * 3))));
+      const sexual = Math.min(95, Math.max(35, Math.round(40 + (yoniScore * 10) + (vashyaScore * 5))));
+
+      // Relationship Timing & Future Synergy Window
+      const bDashas = calculateDashaTree(bPlanets.Moon, bDate);
+      const gDashas = calculateDashaTree(gPlanets.Moon, gDate);
+      const curDateStr = new Date().toISOString().split('T')[0];
+      const bActive = bDashas.find(d => d.start <= curDateStr && d.end >= curDateStr) || bDashas[0];
+      const gActive = gDashas.find(d => d.start <= curDateStr && d.end >= curDateStr) || gDashas[0];
+
+      const b7Lord = _lordOfHouse(bPlanets, 7);
+      const g7Lord = _lordOfHouse(gPlanets, 7);
+      const relLordsB = ['Venus', 'Jupiter', 'Moon', b7Lord];
+      const relLordsG = ['Venus', 'Jupiter', 'Moon', g7Lord];
+
+      const bNowGood = bActive && relLordsB.includes(bActive.lord);
+      const gNowGood = gActive && relLordsG.includes(gActive.lord);
+      let curDashaPct = 48 + (bNowGood ? 22 : 0) + (gNowGood ? 22 : 0);
+      curDashaPct = Math.min(95, Math.max(35, curDashaPct));
+
+      // Scan future 2–6 years for an upcoming alignment
+      const curYear = new Date().getFullYear();
+      let futureWindow = null;
+
+      if (curDashaPct <= 76) {
+        for (let yr = curYear + 1; yr <= curYear + 6; yr++) {
+          const testDateStr = `${yr}-06-15`;
+          const bD = bDashas.find(d => d.start <= testDateStr && d.end >= testDateStr);
+          const gD = gDashas.find(d => d.start <= testDateStr && d.end >= testDateStr);
+          let bAntar = null, gAntar = null;
+          if (bD && bD.antars) bAntar = bD.antars.find(a => a.start <= testDateStr && a.end >= testDateStr);
+          if (gD && gD.antars) gAntar = gD.antars.find(a => a.start <= testDateStr && a.end >= testDateStr);
+
+          const bFutureTrigger = (bD && relLordsB.includes(bD.lord)) || (bAntar && relLordsB.includes(bAntar.lord));
+          const gFutureTrigger = (gD && relLordsG.includes(gD.lord)) || (gAntar && relLordsG.includes(gAntar.lord));
+
+          if (bFutureTrigger && gFutureTrigger) {
+            futureWindow = {
+              hasFuture: true,
+              startYear: yr,
+              endYear: yr + 2,
+              futurePotentialPct: Math.min(95, curDashaPct + 32),
+              note: `နောင် ${yr}–${yr + 2} ကာလတွင် နှစ်ဦးစလုံး၏ ဒသာ/အန္တရဒသာ၌ သောကြာ (Venus)၊ ဂျူပီတာနှင့် ၇ တန့်အရှင်များ တစ်ပြိုင်နက် activate ဖြစ်လာမည်ဖြစ်သဖြင့် ထိုအချိန်တွင် မေတ္တာရေးနှင့် အိမ်ထောင်ပြုရန် အခွင့်အလမ်း အထူးပွင့်လန်းလာပါမည်။`
+            };
+            break;
+          } else if ((bFutureTrigger || gFutureTrigger) && !futureWindow) {
+            futureWindow = {
+              hasFuture: true,
+              startYear: yr,
+              endYear: yr + 2,
+              futurePotentialPct: Math.min(88, curDashaPct + 20),
+              note: `နောင် ${yr}–${yr + 2} တွင် ဒသာအထောက်အပံ့ ပြောင်းလဲလာပြီး ချစ်ခြင်းသံယောဇဉ်နှင့် ပေါင်းဖက်နိုင်ခြေ ပိုမိုမြင့်တက်လာနိုင်သည့် အခွင့်အရေးရှိပါသည်။`
+            };
+          }
+        }
+      }
+
+      return {
+        total,
+        verdict,
+        breakdown,
+        attractionPct: attraction,
+        lovePct: love,
+        dashaRelPct: curDashaPct,
+        sexualPct: sexual,
+        datingTiming: `${curYear}–${curYear + 2}`,
+        intimacyTiming: `${curYear + 1}–${curYear + 3}`,
+        marriageTiming: total >= 18 ? `${curYear + 2}–${curYear + 4}` : 'အချိန်ကိုက်မှု လိုအပ် — ဒသာအကူစောင့်ရန်လို',
+        karmicBond: total >= 24 ? 'ရေစက်အထောက်အပံ့ အလွန်ကောင်း' : 'ရေစက်အသင့်အတင့်ရှိ',
+        futureWindow,
+        kpAnalysis: 'KP Sub-Lord စနစ်အရ ဇာတာနှစ်စောင်၏ ၇ တန့် (အိမ်ထောင်ရေး) နှင့် ၁၁ တန့် (ဆန္ဒပြည့်ဝမှု) တို့ကို ချိတ်ဆက်စစ်ဆေးထားပါသည်။'
+      };
     }
 
     function detectPrashnaIntent(q){
@@ -817,7 +1001,7 @@
     }
 
     // ==========================================
-    // 3. CHART & MODAL COMPONENTS (OPAQUE & CRISP)
+    // 3. CHART & MODAL COMPONENTS
     // ==========================================
     function EastChart({ planets, transitPlanets, isOverlay, vargaNum, birthInfo, transitInfo, size = 330 }) {
       const u = size / 3;
@@ -1018,7 +1202,7 @@
       );
     }
 
-    // Fullscreen Chart View Modal (Protected against iOS status-bar overlaps)
+    // Fullscreen Chart View Modal
     function FullscreenChartModal({ isOpen, onClose, chartType, planets, transitPlanets, isOverlay, vargaNum, birthInfo, transitInfo }) {
       const [zoom,setZoom]=useState(1);
       const [pan,setPan]=useState({x:0,y:0});
@@ -1170,13 +1354,42 @@
         setShowSavedModal(false);
       };
 
+      const loadProfileToBoy = (p) => {
+        setBoy({
+          name: p.name,
+          d: p.day,
+          m: p.month,
+          y: p.year,
+          h: p.hour,
+          min: p.minute,
+          ampm: p.ampm,
+          city: p.place,
+          lat: p.lat,
+          lon: p.lon
+        });
+      };
+
+      const loadProfileToGirl = (p) => {
+        setGirl({
+          name: p.name,
+          d: p.day,
+          m: p.month,
+          y: p.year,
+          h: p.hour,
+          min: p.minute,
+          ampm: p.ampm,
+          city: p.place,
+          lat: p.lat,
+          lon: p.lon
+        });
+      };
+
       const deleteProfile = (id) => {
         const updated = savedProfiles.filter((p) => p.id !== id);
         setSavedProfiles(updated);
         try { localStorage.setItem('saved_jyotish_pwa', JSON.stringify(updated)); } catch(e){}
       };
 
-      // Clear input fields
       const clearBirthInputs = () => {
         setBirthName(''); setBirthYear(''); setBirthMonth(''); setBirthDay('');
         setBirthHour('12'); setBirthMinute('0'); setBirthAmPm('AM');
@@ -1259,9 +1472,11 @@
 
       const boyH = to24(safeHour(boy.h, 12), boy.ampm);
       const girlH = to24(safeHour(girl.h, 12), girl.ampm);
+      const boyDateObj = new Date(safeYear(boy.y, curY), safeMonth(boy.m, 1) - 1, safeDay(boy.d, 1), boyH, safeMinute(boy.min, 0));
+      const girlDateObj = new Date(safeYear(girl.y, curY), safeMonth(girl.m, 1) - 1, safeDay(girl.d, 1), girlH, safeMinute(girl.min, 0));
       const boyJD = getJulianDay(safeYear(boy.y, curY), safeMonth(boy.m, 1), safeDay(boy.d, 1), boyH, safeMinute(boy.min, 0), 6.5);
       const girlJD = getJulianDay(safeYear(girl.y, curY), safeMonth(girl.m, 1), safeDay(girl.d, 1), girlH, safeMinute(girl.min, 0), 6.5);
-      const matchResult = calculateSynastry(calculateNASA_JPL_Planets(boyJD, boy.lat, boy.lon, ayanamsa), calculateNASA_JPL_Planets(girlJD, girl.lat, girl.lon, ayanamsa), ayanamsa);
+      const matchResult = calculateSynastry(calculateNASA_JPL_Planets(boyJD, boy.lat, boy.lon, ayanamsa), calculateNASA_JPL_Planets(girlJD, girl.lat, girl.lon, ayanamsa), ayanamsa, boyDateObj, girlDateObj);
 
       const timePad = (n) => (n < 10 ? '0' + n : n);
       const transitTimeStr = `${timePad(transitDate.getHours())}:${timePad(transitDate.getMinutes())}`;
@@ -1610,7 +1825,7 @@
                     <p className="text-slate-600 mt-0.5 leading-relaxed">{lifeOverview.pillars ? lifeOverview.pillars.education : ''}</p>
                   </div>
                   <div>
-                    <span className="font-bold text-emerald-800">❤️️ အချစ်ရေးနှင့် သံယောဇဉ် (Love):</span>
+                    <span className="font-bold text-emerald-800">❤ အချစ်ရေးနှင့် သံယောဇဉ် (Love):</span>
                     <p className="text-slate-600 mt-0.5 leading-relaxed">{lifeOverview.pillars ? lifeOverview.pillars.love : ''}</p>
                   </div>
                   <div>
@@ -1875,7 +2090,7 @@
             </div>
           )}
 
-          {/* TAB 8: MATCHING */}
+          {/* TAB 8: MATCHING (ဇာတာတိုက်စစ်) */}
           {activeTab === 'matching' && (
             <div className="p-3 space-y-3 text-xs">
               <div className="flex justify-between items-center">
@@ -1883,9 +2098,28 @@
                 <button onClick={clearSynastryInputs} className="bg-rose-700 text-white px-2 py-0.5 rounded text-[10px] font-bold">🗑️ Clear</button>
               </div>
 
-              {/* Boy Input */}
-              <div className="bg-white border border-slate-200 p-2.5 rounded space-y-1.5">
-                <span className="font-bold text-emerald-800">သတို့သား အချက်အလက် (Boy)</span>
+              {/* Boy Input Card with Profile Loader */}
+              <div className="bg-white border border-slate-200 p-2.5 rounded space-y-1.5 shadow-sm">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-1">
+                  <span className="font-bold text-emerald-800">သတို့သား အချက်အလက် (Boy)</span>
+                  {savedProfiles.length > 0 && (
+                    <select
+                      onChange={(e) => {
+                        const prof = savedProfiles.find(p => p.id === e.target.value);
+                        if (prof) loadProfileToBoy(prof);
+                        e.target.value = '';
+                      }}
+                      defaultValue=""
+                      className="bg-emerald-50 border border-emerald-300 rounded px-1.5 py-0.5 text-[10px] text-emerald-900 font-medium"
+                    >
+                      <option value="" disabled>📂 မှတ်တမ်းမှရွေး</option>
+                      {savedProfiles.map(p => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+
                 <input value={boy.name} onChange={(e) => setBoy({ ...boy, name: e.target.value })} placeholder="အမည်" className="w-full border p-1 rounded text-xs" />
                 <div className="grid grid-cols-6 gap-1">
                   <input value={boy.d} onChange={(e) => setBoy({ ...boy, d: e.target.value })} placeholder="ရက်" className="border p-1 rounded text-center" />
@@ -1908,9 +2142,28 @@
                 )}
               </div>
 
-              {/* Girl Input */}
-              <div className="bg-white border border-slate-200 p-2.5 rounded space-y-1.5">
-                <span className="font-bold text-emerald-800">သတို့သမီး အချက်အလက် (Girl)</span>
+              {/* Girl Input Card with Profile Loader */}
+              <div className="bg-white border border-slate-200 p-2.5 rounded space-y-1.5 shadow-sm">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-1">
+                  <span className="font-bold text-emerald-800">သတို့သမီး အချက်အလက် (Girl)</span>
+                  {savedProfiles.length > 0 && (
+                    <select
+                      onChange={(e) => {
+                        const prof = savedProfiles.find(p => p.id === e.target.value);
+                        if (prof) loadProfileToGirl(prof);
+                        e.target.value = '';
+                      }}
+                      defaultValue=""
+                      className="bg-emerald-50 border border-emerald-300 rounded px-1.5 py-0.5 text-[10px] text-emerald-900 font-medium"
+                    >
+                      <option value="" disabled>📂 မှတ်တမ်းမှရွေး</option>
+                      {savedProfiles.map(p => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+
                 <input value={girl.name} onChange={(e) => setGirl({ ...girl, name: e.target.value })} placeholder="အမည်" className="w-full border p-1 rounded text-xs" />
                 <div className="grid grid-cols-6 gap-1">
                   <input value={girl.d} onChange={(e) => setGirl({ ...girl, d: e.target.value })} placeholder="ရက်" className="border p-1 rounded text-center" />
@@ -1933,19 +2186,20 @@
                 )}
               </div>
 
-              {/* Total Score */}
-              <div className="bg-amber-100/70 border border-amber-300 p-3 rounded text-center">
-                <div className="text-xl font-bold text-amber-900">{matchResult.total} / ၃၆ မှတ်</div>
+              {/* Total Ashtakoota Score (Strictly out of 36) */}
+              <div className="bg-amber-100/80 border border-amber-300 p-3 rounded text-center shadow-sm">
+                <div className="text-2xl font-bold text-amber-900">{matchResult.total} / ၃၆ မှတ်</div>
                 <div className="font-semibold text-amber-800 text-xs mt-0.5">{matchResult.verdict}</div>
+                <div className="text-[10px] text-slate-500 mt-1">အနည်းဆုံး ၁၈ မှတ်နှင့်အထက် ရရှိပါက အိမ်ထောင်ပြုရန် သင့်တင့်လျောက်ပတ်သည်ဟု သတ်မှတ်ပါသည်။</div>
                 {ayanamsa === 'kp' && (
-                  <div className="text-[11px] text-emerald-800 font-bold mt-1 bg-white p-1 rounded border border-amber-200">
+                  <div className="text-[11px] text-emerald-800 font-bold mt-1.5 bg-white p-1 rounded border border-amber-200">
                     {matchResult.kpAnalysis}
                   </div>
                 )}
               </div>
 
               {/* Deep Synastry Metrics */}
-              <div className="bg-white border border-amber-200 p-3 rounded space-y-1.5">
+              <div className="bg-white border border-amber-200 p-3 rounded space-y-1.5 shadow-sm">
                 <h3 className="font-bold text-emerald-900 text-xs border-b pb-1">နှစ်ဦးကြား သံယောဇဉ်နှင့် ဖြစ်နိုင်ခြေ ရာခိုင်နှုန်းဆန်းစစ်ချက်</h3>
                 <div className="flex justify-between py-0.5 border-b border-slate-100">
                   <span className="text-slate-700">✨ အပြန်အလှန် ဆွဲဆောင်မှုရှိနိုင်ခြေ:</span>
@@ -1956,7 +2210,7 @@
                   <span className="font-bold text-emerald-800">{matchResult.lovePct}%</span>
                 </div>
                 <div className="flex justify-between py-0.5 border-b border-slate-100">
-                  <span className="text-slate-700">👩‍‍❤️‍👨 ဒသာအရ သမီးရည်းစား ဖြစ်နိုင်ခြေ:</span>
+                  <span className="text-slate-700">👩‍❤️‍👨 လက်ရှိ ဒသာအရ သမီးရည်းစား ဖြစ်နိုင်ခြေ:</span>
                   <span className="font-bold text-emerald-800">{matchResult.dashaRelPct}% ({matchResult.datingTiming})</span>
                 </div>
                 <div className="flex justify-between py-0.5 border-b border-slate-100">
@@ -1971,16 +2225,40 @@
                 </div>
               </div>
 
-              {/* 36 Points Table Breakdown */}
-              <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
-                <div className="bg-slate-100 p-2 font-bold text-slate-700 border-b border-slate-200">အဋ္ဌကုတ (၃၆) မှတ် အသေးစိတ် ခွဲခြမ်းစိတ်ဖြာချက်</div>
+              {/* FUTURE SYNERGY WINDOW (Conditional Display: Only appears if there is an upcoming peak period) */}
+              {matchResult.futureWindow && matchResult.futureWindow.hasFuture && (
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-500 p-3 rounded-lg shadow-sm space-y-1.5">
+                  <div className="flex justify-between items-center border-b border-amber-200 pb-1">
+                    <span className="font-bold text-amber-900 text-xs">🔮 နောင်ကာလ အခွင့်အလမ်း ပွင့်နိုင်သည့် အချိန်အပိုင်းအခြား (Future Window)</span>
+                    <span className="bg-amber-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">
+                      {matchResult.futureWindow.startYear} – {matchResult.futureWindow.endYear}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-0.5">
+                    <span className="text-slate-700 text-[11px]">ထိုကာလအတွင်း ဖြစ်နိုင်ခြေ ရာခိုင်နှုန်း:</span>
+                    <span className="font-bold text-emerald-800 text-sm">{matchResult.futureWindow.futurePotentialPct}%</span>
+                  </div>
+                  <p className="text-slate-700 text-[11px] leading-relaxed">
+                    {matchResult.futureWindow.note}
+                  </p>
+                </div>
+              )}
+
+              {/* 36 Points Table Breakdown (အဋ္ဌကုတ ဇယားကွက်) */}
+              <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs shadow-sm">
+                <div className="bg-slate-100 p-2 font-bold text-slate-700 border-b border-slate-200 flex justify-between">
+                  <span>အဋ္ဌကုတ (၃၆) မှတ် အသေးစိတ် ခွဲခြမ်းစိတ်ဖြာချက်</span>
+                  <span className="text-emerald-800">{matchResult.total} / ၃၆ မှတ်</span>
+                </div>
                 {matchResult.breakdown.map((b, idx) => (
                   <div key={idx} className="flex justify-between items-center p-2 border-b last:border-0 border-slate-100">
                     <div className="flex-1 pr-2">
                       <div className="font-bold text-slate-800">{b.k}</div>
                       <div className="text-[10px] text-slate-500">{b.desc}</div>
                     </div>
-                    <div className="font-bold text-amber-800 whitespace-nowrap">{b.score} / {b.max}</div>
+                    <div className="font-bold text-amber-800 whitespace-nowrap bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                      {b.score} / {b.max}
+                    </div>
                   </div>
                 ))}
               </div>
