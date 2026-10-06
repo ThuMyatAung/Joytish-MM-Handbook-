@@ -190,8 +190,53 @@
     };
 
     // ==========================================
-    // 2. MATHEMATICAL & KP EPHEMERIS CORE
+    // 2. MATHEMATICAL, TIMEZONE & KP EPHEMERIS CORE
     // ==========================================
+    function estimateTimezone(lat, lon) {
+      lat = parseFloat(lat) || 0;
+      lon = parseFloat(lon) || 0;
+      // Myanmar: lat 9.5 to 28.5, lon 92.2 to 101.2 -> 6.5
+      if (lat >= 9.5 && lat <= 28.5 && lon >= 92.2 && lon <= 101.2) return 6.5;
+      // India & Sri Lanka -> 5.5
+      if (lat >= 5.8 && lat <= 37.0 && lon >= 68.0 && lon <= 89.5) return 5.5;
+      // Nepal -> 5.75
+      if (lat >= 26.0 && lat <= 31.0 && lon >= 80.0 && lon <= 88.5) return 5.75;
+      // Bangladesh -> 6.0
+      if (lat >= 20.5 && lat <= 26.7 && lon >= 88.0 && lon <= 92.7) return 6.0;
+      // Thailand, Laos, Cambodia, Vietnam, Western Indonesia -> 7.0
+      if (lat >= -10.0 && lat <= 24.0 && lon >= 97.5 && lon <= 109.5) return 7.0;
+      // Singapore, Malaysia, Philippines, Taiwan, Hong Kong, Macau, China (CST), Western Australia -> 8.0
+      if ((lat >= 1.0 && lat <= 7.5 && lon >= 100.0 && lon <= 105.0) || // SG & West MY
+          (lat >= 3.5 && lat <= 21.5 && lon >= 116.0 && lon <= 127.0) || // Philippines
+          (lat >= 18.0 && lat <= 54.0 && lon >= 109.5 && lon <= 125.0) || // Eastern China / HK / TW
+          (lat <= -13.0 && lat >= -35.5 && lon >= 113.0 && lon <= 129.0)) { // Western Australia
+        return 8.0;
+      }
+      // Japan & South Korea -> 9.0
+      if (lat >= 24.0 && lat <= 46.0 && lon >= 123.0 && lon <= 146.0) return 9.0;
+      // UAE, Oman -> 4.0
+      if (lat >= 22.0 && lat <= 26.5 && lon >= 51.0 && lon <= 60.0) return 4.0;
+      // UK, Ireland, Portugal -> 0.0
+      if (lat >= 36.5 && lat <= 60.0 && lon >= -10.5 && lon <= 2.0) return 0.0;
+      // Central Europe (CET) -> 1.0
+      if (lat >= 36.0 && lat <= 70.0 && lon > 2.0 && lon <= 22.0) return 1.0;
+      // Eastern Europe (EET) -> 2.0
+      if (lat >= 30.0 && lat <= 70.0 && lon > 22.0 && lon <= 35.0) return 2.0;
+      // Australia Eastern (Sydney, Melbourne, Brisbane) -> 10.0
+      if (lat <= -10.0 && lat >= -44.0 && lon >= 140.0 && lon <= 154.0) return 10.0;
+      // Australia Central (Adelaide, Darwin) -> 9.5
+      if (lat <= -11.0 && lat >= -38.0 && lon >= 129.0 && lon < 140.0) return 9.5;
+      // USA & Canada
+      if (lat >= 24.0 && lat <= 50.0) {
+        if (lon >= -85.0 && lon <= -65.0) return -5.0; // Eastern
+        if (lon >= -105.0 && lon < -85.0) return -6.0; // Central
+        if (lon >= -115.0 && lon < -105.0) return -7.0; // Mountain
+        if (lon >= -125.0 && lon < -115.0) return -8.0; // Pacific
+      }
+      // Global fallback calculated directly from longitude
+      return Math.round((lon / 15.0) * 2) / 2;
+    }
+
     function norm360(deg) {
       if (typeof deg !== 'number' || isNaN(deg)) return 0;
       let d = deg % 360;
@@ -212,7 +257,8 @@
       let d = parseInt(day, 10) || 1;
       let h = parseInt(hour, 10) || 0;
       let mn = parseInt(minute, 10) || 0;
-      let t = parseFloat(tz) || 6.5;
+      let t = parseFloat(tz);
+      if (isNaN(t)) t = 6.5;
 
       if (m <= 2) { y -= 1; m += 12; }
       const A = Math.floor(y / 100);
@@ -259,10 +305,9 @@
       return { label: 'သမအိမ်', color: 'text-slate-600' };
     }
 
-    // Precise KP Star & Sub-Lord Engine
     function getKPSubLordData(deg) {
       const lon = norm360(deg);
-      const nakSpan = 360 / 27; // 13.333333° = 800'
+      const nakSpan = 360 / 27;
       const nakIndex = Math.floor(lon / nakSpan);
       const nakName = NAKSHATRAS[nakIndex] || 'Ashwini';
       const pada = Math.floor((lon % nakSpan) / (nakSpan / 4)) + 1;
@@ -271,7 +316,7 @@
       const rasiIdx = Math.floor(lon / 30);
       const rasiLord = RASI_LORDS[rasiIdx];
 
-      const remMin = (lon % nakSpan) * 60; // 0 to 800 minutes
+      const remMin = (lon % nakSpan) * 60;
       let acc = 0;
       let subLord = starLord;
       let ssl = starLord;
@@ -513,7 +558,7 @@
     }
 
     // ==========================================
-    // ASTROLOGICAL HELPER FUNCTIONS (CORE FIXES)
+    // ASTROLOGICAL HELPER FUNCTIONS
     // ==========================================
     function _planetHouse(p, name) {
       if (!p || typeof p[name] !== 'number' || typeof p.Lagna !== 'number') return 1;
@@ -848,7 +893,6 @@
         { k: '၈။ နာဒီ (Nadi)', score: nadiScore, max: 8, desc: 'မျိုးဆက်သန့်စင်မှု၊ မျိုးရိုးဗီဇနှင့် သွေးသားသဟဇာတ' }
       ];
 
-      // Physical & Psychological Affinities
       const bMoonDeg = norm360(bPlanets.Moon);
       const gMoonDeg = norm360(gPlanets.Moon);
       const moonDist = Math.abs(bMoonDeg - gMoonDeg);
@@ -874,7 +918,6 @@
       let curDashaPct = 48 + (bNowGood ? 22 : 0) + (gNowGood ? 22 : 0);
       curDashaPct = Math.min(95, Math.max(35, curDashaPct));
 
-      // Scan future 2–6 years for an upcoming alignment
       const curYear = new Date().getFullYear();
       let futureWindow = null;
 
@@ -1313,8 +1356,9 @@
       const [horaryNumber, setHoraryNumber] = useState('108');
       const [prashnaResult, setPrashnaResult] = useState(null);
 
-      const [boy, setBoy] = useState({ name: 'သတို့သား', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735' });
-      const [girl, setGirl] = useState({ name: 'သတို့သမီး', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735' });
+      // Boy & Girl state with specific Timezone
+      const [boy, setBoy] = useState({ name: 'သတို့သား', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
+      const [girl, setGirl] = useState({ name: 'သတို့သမီး', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
 
       const [citySuggestions, setCitySuggestions] = useState([]);
       const [searchTarget, setSearchTarget] = useState(null);
@@ -1327,10 +1371,11 @@
           navigator.geolocation.getCurrentPosition((pos) => {
             const lat = pos.coords.latitude.toFixed(4);
             const lon = pos.coords.longitude.toFixed(4);
+            const autoTz = estimateTimezone(lat, lon).toString();
             setTransitLat(lat); setTransitLon(lon);
-            setBirthLat(lat); setBirthLon(lon);
-            setBoy((prev) => ({ ...prev, lat, lon }));
-            setGirl((prev) => ({ ...prev, lat, lon }));
+            setBirthLat(lat); setBirthLon(lon); setBirthTz(autoTz);
+            setBoy((prev) => ({ ...prev, lat, lon, tz: autoTz }));
+            setGirl((prev) => ({ ...prev, lat, lon, tz: autoTz }));
           }, () => {});
         }
         try {
@@ -1350,7 +1395,7 @@
       const loadProfile = (p) => {
         setBirthName(p.name); setBirthYear(p.year); setBirthMonth(p.month); setBirthDay(p.day);
         setBirthHour(p.hour); setBirthMinute(p.minute); setBirthAmPm(p.ampm);
-        setBirthPlace(p.place); setBirthLat(p.lat); setBirthLon(p.lon); setBirthTz(p.tz);
+        setBirthPlace(p.place); setBirthLat(p.lat); setBirthLon(p.lon); setBirthTz(p.tz || '6.5');
         setShowSavedModal(false);
       };
 
@@ -1365,7 +1410,8 @@
           ampm: p.ampm,
           city: p.place,
           lat: p.lat,
-          lon: p.lon
+          lon: p.lon,
+          tz: p.tz || '6.5'
         });
       };
 
@@ -1380,7 +1426,8 @@
           ampm: p.ampm,
           city: p.place,
           lat: p.lat,
-          lon: p.lon
+          lon: p.lon,
+          tz: p.tz || '6.5'
         });
       };
 
@@ -1397,8 +1444,8 @@
       };
 
       const clearSynastryInputs = () => {
-        setBoy({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '' });
-        setGirl({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '' });
+        setBoy({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5' });
+        setGirl({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5' });
       };
 
       const handleSearchCity = async (text, target) => {
@@ -1406,7 +1453,7 @@
         setSearchTarget(target);
         try {
           const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(text) + '&limit=5', {
-            headers: { 'User-Agent': 'JyotishPWA/17.0' }
+            headers: { 'User-Agent': 'JyotishPWA/18.0' }
           });
           const data = await res.json();
           setCitySuggestions(data);
@@ -1415,18 +1462,21 @@
         }
       };
 
+      // Auto Timezone assignment upon city selection
       const selectCity = (item) => {
         const name = item.display_name.split(',').slice(0, 2).join(', ');
         const lat = parseFloat(item.lat).toFixed(4);
         const lon = parseFloat(item.lon).toFixed(4);
+        const autoTz = estimateTimezone(lat, lon).toString();
+
         if (searchTarget === 'birth') {
-          setBirthPlace(name); setBirthLat(lat); setBirthLon(lon);
+          setBirthPlace(name); setBirthLat(lat); setBirthLon(lon); setBirthTz(autoTz);
         } else if (searchTarget === 'transit') {
           setTransitCity(name); setTransitLat(lat); setTransitLon(lon);
         } else if (searchTarget === 'boy') {
-          setBoy((prev) => ({ ...prev, city: name, lat, lon }));
+          setBoy((prev) => ({ ...prev, city: name, lat, lon, tz: autoTz }));
         } else if (searchTarget === 'girl') {
-          setGirl((prev) => ({ ...prev, city: name, lat, lon }));
+          setGirl((prev) => ({ ...prev, city: name, lat, lon, tz: autoTz }));
         }
         setCitySuggestions([]);
       };
@@ -1474,8 +1524,10 @@
       const girlH = to24(safeHour(girl.h, 12), girl.ampm);
       const boyDateObj = new Date(safeYear(boy.y, curY), safeMonth(boy.m, 1) - 1, safeDay(boy.d, 1), boyH, safeMinute(boy.min, 0));
       const girlDateObj = new Date(safeYear(girl.y, curY), safeMonth(girl.m, 1) - 1, safeDay(girl.d, 1), girlH, safeMinute(girl.min, 0));
-      const boyJD = getJulianDay(safeYear(boy.y, curY), safeMonth(boy.m, 1), safeDay(boy.d, 1), boyH, safeMinute(boy.min, 0), 6.5);
-      const girlJD = getJulianDay(safeYear(girl.y, curY), safeMonth(girl.m, 1), safeDay(girl.d, 1), girlH, safeMinute(girl.min, 0), 6.5);
+      
+      // Dynamic Julian Day calculation using individual timezones
+      const boyJD = getJulianDay(safeYear(boy.y, curY), safeMonth(boy.m, 1), safeDay(boy.d, 1), boyH, safeMinute(boy.min, 0), parseFloat(boy.tz) || 6.5);
+      const girlJD = getJulianDay(safeYear(girl.y, curY), safeMonth(girl.m, 1), safeDay(girl.d, 1), girlH, safeMinute(girl.min, 0), parseFloat(girl.tz) || 6.5);
       const matchResult = calculateSynastry(calculateNASA_JPL_Planets(boyJD, boy.lat, boy.lon, ayanamsa), calculateNASA_JPL_Planets(girlJD, girl.lat, girl.lon, ayanamsa), ayanamsa, boyDateObj, girlDateObj);
 
       const timePad = (n) => (n < 10 ? '0' + n : n);
@@ -1626,7 +1678,7 @@
                 </div>
               )}
 
-              {/* Manual Lat/Lon/TZ Inputs */}
+              {/* Lat/Lon/TZ Inputs (Auto-updated on city select) */}
               <div className="grid grid-cols-3 gap-1 text-[11px] bg-slate-100 p-2 rounded border border-slate-200">
                 <div>
                   <label className="text-slate-500 block text-[9px]">Latitude (လတ္တီတွဒ်):</label>
@@ -1637,8 +1689,8 @@
                   <input value={birthLon} onChange={(e) => setBirthLon(e.target.value)} placeholder="96.1735" className="w-full bg-white border rounded p-1 text-center" />
                 </div>
                 <div>
-                  <label className="text-slate-500 block text-[9px]">Timezone (TZ):</label>
-                  <input value={birthTz} onChange={(e) => setBirthTz(e.target.value)} placeholder="6.5" className="w-full bg-white border rounded p-1 text-center font-bold" />
+                  <label className="text-emerald-800 block text-[9px] font-bold">Timezone (TZ စံတော်ချိန်):</label>
+                  <input value={birthTz} onChange={(e) => setBirthTz(e.target.value)} placeholder="6.5" className="w-full bg-emerald-50 border border-emerald-400 rounded p-1 text-center font-bold text-emerald-900" />
                 </div>
               </div>
 
@@ -1825,7 +1877,7 @@
                     <p className="text-slate-600 mt-0.5 leading-relaxed">{lifeOverview.pillars ? lifeOverview.pillars.education : ''}</p>
                   </div>
                   <div>
-                    <span className="font-bold text-emerald-800">❤ အချစ်ရေးနှင့် သံယောဇဉ် (Love):</span>
+                    <span className="font-bold text-emerald-800">❤️ အချစ်ရေးနှင့် သံယောဇဉ် (Love):</span>
                     <p className="text-slate-600 mt-0.5 leading-relaxed">{lifeOverview.pillars ? lifeOverview.pillars.love : ''}</p>
                   </div>
                   <div>
@@ -2098,7 +2150,7 @@
                 <button onClick={clearSynastryInputs} className="bg-rose-700 text-white px-2 py-0.5 rounded text-[10px] font-bold">🗑️ Clear</button>
               </div>
 
-              {/* Boy Input Card with Profile Loader */}
+              {/* Boy Input Card with Profile Loader and Timezone */}
               <div className="bg-white border border-slate-200 p-2.5 rounded space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center border-b border-slate-100 pb-1">
                   <span className="font-bold text-emerald-800">သတို့သား အချက်အလက် (Boy)</span>
@@ -2140,9 +2192,24 @@
                     ))}
                   </div>
                 )}
+                {/* Boy Coordinates & Timezone Row */}
+                <div className="grid grid-cols-3 gap-1 pt-1 text-[10px]">
+                  <div>
+                    <label className="text-slate-500 block text-[9px]">Lat:</label>
+                    <input value={boy.lat} onChange={(e) => setBoy({ ...boy, lat: e.target.value })} placeholder="16.84" className="w-full border p-0.5 rounded text-center text-xs" />
+                  </div>
+                  <div>
+                    <label className="text-slate-500 block text-[9px]">Lon:</label>
+                    <input value={boy.lon} onChange={(e) => setBoy({ ...boy, lon: e.target.value })} placeholder="96.17" className="w-full border p-0.5 rounded text-center text-xs" />
+                  </div>
+                  <div>
+                    <label className="text-emerald-700 font-bold block text-[9px]">Timezone (TZ):</label>
+                    <input value={boy.tz} onChange={(e) => setBoy({ ...boy, tz: e.target.value })} placeholder="6.5" className="w-full border border-emerald-400 bg-emerald-50/50 p-0.5 rounded text-center text-xs font-bold text-emerald-900" />
+                  </div>
+                </div>
               </div>
 
-              {/* Girl Input Card with Profile Loader */}
+              {/* Girl Input Card with Profile Loader and Timezone */}
               <div className="bg-white border border-slate-200 p-2.5 rounded space-y-1.5 shadow-sm">
                 <div className="flex justify-between items-center border-b border-slate-100 pb-1">
                   <span className="font-bold text-emerald-800">သတို့သမီး အချက်အလက် (Girl)</span>
@@ -2184,9 +2251,24 @@
                     ))}
                   </div>
                 )}
+                {/* Girl Coordinates & Timezone Row */}
+                <div className="grid grid-cols-3 gap-1 pt-1 text-[10px]">
+                  <div>
+                    <label className="text-slate-500 block text-[9px]">Lat:</label>
+                    <input value={girl.lat} onChange={(e) => setGirl({ ...girl, lat: e.target.value })} placeholder="16.84" className="w-full border p-0.5 rounded text-center text-xs" />
+                  </div>
+                  <div>
+                    <label className="text-slate-500 block text-[9px]">Lon:</label>
+                    <input value={girl.lon} onChange={(e) => setGirl({ ...girl, lon: e.target.value })} placeholder="96.17" className="w-full border p-0.5 rounded text-center text-xs" />
+                  </div>
+                  <div>
+                    <label className="text-emerald-700 font-bold block text-[9px]">Timezone (TZ):</label>
+                    <input value={girl.tz} onChange={(e) => setGirl({ ...girl, tz: e.target.value })} placeholder="6.5" className="w-full border border-emerald-400 bg-emerald-50/50 p-0.5 rounded text-center text-xs font-bold text-emerald-900" />
+                  </div>
+                </div>
               </div>
 
-              {/* Total Ashtakoota Score (Strictly out of 36) */}
+              {/* Total Ashtakoota Score */}
               <div className="bg-amber-100/80 border border-amber-300 p-3 rounded text-center shadow-sm">
                 <div className="text-2xl font-bold text-amber-900">{matchResult.total} / ၃၆ မှတ်</div>
                 <div className="font-semibold text-amber-800 text-xs mt-0.5">{matchResult.verdict}</div>
@@ -2225,7 +2307,7 @@
                 </div>
               </div>
 
-              {/* FUTURE SYNERGY WINDOW (Conditional Display: Only appears if there is an upcoming peak period) */}
+              {/* FUTURE SYNERGY WINDOW */}
               {matchResult.futureWindow && matchResult.futureWindow.hasFuture && (
                 <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-500 p-3 rounded-lg shadow-sm space-y-1.5">
                   <div className="flex justify-between items-center border-b border-amber-200 pb-1">
@@ -2244,7 +2326,7 @@
                 </div>
               )}
 
-              {/* 36 Points Table Breakdown (အဋ္ဌကုတ ဇယားကွက်) */}
+              {/* 36 Points Table Breakdown */}
               <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs shadow-sm">
                 <div className="bg-slate-100 p-2 font-bold text-slate-700 border-b border-slate-200 flex justify-between">
                   <span>အဋ္ဌကုတ (၃၆) မှတ် အသေးစိတ် ခွဲခြမ်းစိတ်ဖြာချက်</span>
@@ -2288,7 +2370,7 @@
                     <div key={p.id} className="flex justify-between items-center border-b py-1.5">
                       <div onClick={() => loadProfile(p)} className="cursor-pointer">
                         <div className="font-bold text-emerald-900">{p.name}</div>
-                        <div className="text-[10px] text-slate-500">{p.day}/{p.month}/{p.year} {p.hour}:{p.minute} {p.ampm}</div>
+                        <div className="text-[10px] text-slate-500">{p.day}/{p.month}/{p.year} {p.hour}:{p.minute} {p.ampm} (TZ: {p.tz || '6.5'})</div>
                       </div>
                       <button onClick={() => deleteProfile(p.id)} className="bg-red-600 text-white px-2 py-1 rounded text-[10px]">ဖျက်</button>
                     </div>
