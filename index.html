@@ -616,18 +616,104 @@
       });
     }
 
-    function calculateKPPrashnaResult(queryText, horaryNum, birthPlanets, transitPlanets, dashaTree, cusps) {
+    // ===== Prashna Question Bank (v5) — 12-house engine data =====
+    // entry: { t:title, q:question text, p:primary house, h:[houses], k:karaka, r:rotate house (person) }
+    const PRASHNA_BANK = [
+      { g: '၁ တန့် · ကိုယ် / ကျန်းမာရေး', items: [
+        { t: 'ကျန်းမာ ပြန်ကောင်းမလား', q: 'ကျန်းမာရေး ပြန်ကောင်းလာမလား', p: 1, h: [1, 5, 11], k: 'Sun / Moon' },
+        { t: 'ခွဲစိတ်မှု အဆင်ပြေမလား', q: 'ခွဲစိတ်ကုသမှု အဆင်ပြေမလား', p: 1, h: [1, 8, 11], k: 'Mars / Saturn' },
+        { t: 'စိတ်ဖိစီးမှု သက်သာမလား', q: 'စိတ်ဖိစီးမှု သက်သာလာမလား', p: 1, h: [1, 5, 11], k: 'Moon' },
+        { t: 'အလေ့အကျင့်ဆိုး ဖြတ်နိုင်မလား', q: 'အလေ့အကျင့်ဆိုး ဖြတ်နိုင်မလား', p: 1, h: [1, 6, 11], k: 'Saturn' } ] },
+      { g: '၂ တန့် · ငွေကြေး / မိသားစု', items: [
+        { t: 'အရေးကြီး စကားဝိုင်း အောင်မြင်မလား', q: 'အရေးကြီး စကားဝိုင်း/တွေ့ဆုံမှု အောင်မြင်မလား', p: 2, h: [2, 3, 11], k: 'Mercury' },
+        { t: 'ချေးငွေ ပြန်ရမလား', q: 'ချေးထားတဲ့ ငွေ ပြန်ရမလား', p: 11, h: [2, 6, 11], k: 'Jupiter' },
+        { t: 'ရင်းနှီးမြှုပ်နှံမှု အဆင်ပြေမလား', q: 'စုဆောင်း/ရင်းနှီးမြှုပ်နှံမှု အဆင်ပြေမလား', p: 2, h: [2, 5, 11], k: 'Jupiter' },
+        { t: 'မိသားစု သဘောကွဲတာ ပြေလည်မလား', q: 'မိသားစုထဲ သဘောထားကွဲတာ ပြေလည်မလား', p: 2, h: [2, 4, 11], k: 'Moon' },
+        { t: 'ပစ္စည်းပျောက် ပြန်တွေ့မလား', q: 'ပစ္စည်းပျောက်သွားတာ ပြန်ရှာတွေ့မလား', p: 11, h: [2, 4, 11], k: 'Moon / Mercury' } ] },
+      { g: '၃ တန့် · ဆက်သွယ်ရေး / ကိုယ်အား', items: [
+        { t: 'ညီအစ်ကိုနဲ့ ဆက်ဆံရေး ကောင်းလာမလား', q: 'ညီအစ်ကို မောင်နှမနဲ့ ဆက်ဆံရေး ကောင်းလာမလား', p: 3, h: [3, 11], k: 'Mars', r: 3 },
+        { t: 'စာချုပ်/စာရွက် ကိစ္စ အဆင်ပြေမလား', q: 'စာချုပ်/စာရွက်စာတမ်း ကိစ္စ အဆင်ပြေမလား', p: 3, h: [3, 11], k: 'Mercury' },
+        { t: 'ကိုယ်ပိုင် အလုပ် စနိုင်မလား', q: 'ကိုယ်ပိုင် အလုပ်/ကြိုးစားမှု စနိုင်မလား', p: 3, h: [3, 10, 11], k: 'Mars' },
+        { t: 'ခရီးတို သွားဖြစ်မလား', q: 'ခရီးတို သွားဖြစ်မလား', p: 3, h: [3, 11], k: 'Mercury' } ] },
+      { g: '၄ တန့် · အိမ် / မိခင် / ယာဉ်', items: [
+        { t: 'အိမ် ဝယ်နိုင်မလား', q: 'အိမ် ဝယ်နိုင်မလား', p: 4, h: [2, 4, 11], k: 'Mars / Venus' },
+        { t: 'အိမ်/မြေ ရောင်းထွက်မလား', q: 'အိမ်/မြေ ရောင်းထွက်မလား', p: 4, h: [3, 4, 11], k: 'Mars / Venus' },
+        { t: 'ကား ဝယ်သင့်သလား', q: 'ကား/ယာဉ် ဝယ်သင့်သလား', p: 4, h: [2, 4, 11], k: 'Venus' },
+        { t: 'မိခင် ကျန်းမာရေး', q: 'မိခင် ကျန်းမာရေး ဘယ်လိုရှိလဲ', p: 4, h: [4, 11], k: 'Moon', r: 4 } ] },
+      { g: '၅ တန့် · သားသမီး / ပညာ / အချစ်', items: [
+        { t: 'စာမေးပွဲ အောင်မလား', q: 'စာမေးပွဲ အောင်ပါ့မလား', p: 5, h: [4, 5, 9, 11], k: 'Mercury / Jupiter' },
+        { t: 'ကလေး ရနိုင်မလား', q: 'ကလေး ရနိုင်မလား', p: 5, h: [2, 5, 11], k: 'Jupiter' },
+        { t: 'အချစ်သစ် တွေ့မလား', q: 'အချစ်သစ် တွေ့မလား', p: 5, h: [5, 7, 11], k: 'Venus' },
+        { t: 'ထီ/ကံစမ်း ပေါက်မလား', q: 'ထီပေါက်မလား', p: 5, h: [2, 5, 8, 11], k: 'Jupiter / Rahu' } ] },
+      { g: '၆ တန့် · အမှု / အကြွေး / ရောဂါ', items: [
+        { t: 'တရားရုံး/အမှု နိုင်မလား', q: 'တရားရုံးမှာ နိုင်မလား', p: 6, h: [6, 10, 11], k: 'Mars / Saturn' },
+        { t: 'ပြိုင်ပွဲ နိုင်မလား', q: 'ပြိုင်ပွဲ/ရွေးချယ်ပွဲ နိုင်မလား', p: 6, h: [6, 10, 11], k: 'Mars' },
+        { t: 'အကြွေး ကြေမလား', q: 'အကြွေး ကြေ/လွတ်မြောက်မလား', p: 6, h: [2, 6, 11], k: 'Saturn' },
+        { t: 'နာတာရှည် ရောဂါ သက်သာမလား', q: 'နာတာရှည် ရောဂါ သက်သာလာမလား', p: 6, h: [1, 6, 11], k: 'Saturn' } ] },
+      { g: '၇ တန့် · အိမ်ထောင် / ဖက်တွဲ', items: [
+        { t: 'ဒီလူနဲ့ လက်ထပ် ဖြစ်မလား', q: 'ဒီလူနဲ့ လက်ထပ်/အိမ်ထောင် ကျမလား', p: 7, h: [2, 5, 7, 11], k: 'Venus', r: 7 },
+        { t: 'အိမ်ထောင်ရေး သဟဇာတ ပြန်ဖြစ်မလား', q: 'အိမ်ထောင်ရေး သဟဇာတ ပြန်ဖြစ်မလား', p: 7, h: [2, 7, 11], k: 'Venus / Moon', r: 7 },
+        { t: 'စီးပွားဖက် အဆင်ပြေမလား', q: 'စီးပွားဖက်/လုပ်ငန်းဖက် အဆင်ပြေမလား', p: 7, h: [7, 10, 11], k: 'Mercury', r: 7 },
+        { t: 'ကွာရှင်း ဖြစ်နိုင်မလား', q: 'ကွာရှင်း/ခွဲခွာမှု ဖြစ်လာနိုင်မလား', p: 7, h: [6, 7, 12], k: 'Saturn', r: 7 } ] },
+      { g: '၈ တန့် · ရုတ်တရက် / အမွေ', items: [
+        { t: 'အမွေ ရနိုင်မလား', q: 'အမွေ ရနိုင်မလား', p: 8, h: [2, 8, 11], k: 'Saturn' },
+        { t: 'လျော်ကြေး/အာမခံ ရမလား', q: 'အာမခံ/လျော်ကြေး ရမလား', p: 8, h: [2, 8, 11], k: 'Saturn' },
+        { t: 'ဘဏ်ချေးငွေ ရမလား', q: 'ဘဏ်ချေးငွေ/သူများငွေ ရမလား', p: 8, h: [2, 6, 8, 11], k: 'Saturn / Rahu' },
+        { t: 'လျှို့ဝှက် အရှုပ် ပေါ်လာနိုင်မလား', q: 'လျှို့ဝှက်အရှုပ် ပေါ်လာနိုင်မလား', p: 8, h: [8, 12], k: 'Rahu' } ] },
+      { g: '၉ တန့် · ကံ / ဖခင် / ခရီးရှည်', items: [
+        { t: 'နိုင်ငံခြား ခရီး သွားရမလား', q: 'နိုင်ငံခြား သွားရမလား', p: 9, h: [3, 9, 12], k: 'Rahu / Jupiter' },
+        { t: 'Visa ရမလား', q: 'Visa ရမလား', p: 9, h: [9, 11, 12], k: 'Jupiter' },
+        { t: 'ပညာတော်သင်/ဘွဲ့လွန် တက်နိုင်မလား', q: 'ပညာတော်သင်/ဘွဲ့လွန် ဆက်တက်နိုင်မလား', p: 9, h: [5, 9, 11], k: 'Jupiter' },
+        { t: 'ဖခင် ကျန်းမာရေး', q: 'ဖခင် ကျန်းမာရေး/ကိစ္စ ဘယ်လိုရှိလဲ', p: 9, h: [9, 11], k: 'Sun', r: 9 } ] },
+      { g: '၁၀ တန့် · အလုပ် / ရာထူး', items: [
+        { t: 'အလုပ် ရမလား', q: 'အလုပ် ရမလား', p: 10, h: [2, 6, 10, 11], k: 'Sun / Mercury' },
+        { t: 'ရာထူး တိုးမလား', q: 'ရာထူး တိုးမလား', p: 10, h: [9, 10, 11], k: 'Sun' },
+        { t: 'အလုပ်ပြောင်း သင့်သလား', q: 'အလုပ်ပြောင်း သင့်သလား', p: 10, h: [3, 10, 11], k: 'Mercury' },
+        { t: 'ကိုယ်ပိုင် စီးပွား အောင်မြင်မလား', q: 'ကိုယ်ပိုင် စီးပွား အောင်မြင်မလား', p: 10, h: [7, 10, 11], k: 'Saturn / Mercury' } ] },
+      { g: '၁၁ တန့် · အမြတ် / ဆန္ဒ / မိတ်ဆွေ', items: [
+        { t: 'ဆန္ဒ ပြည့်မလား', q: 'ဆန္ဒ/ရည်မှန်းချက် ပြည့်မလား', p: 11, h: [1, 2, 11], k: 'Jupiter' },
+        { t: 'မိတ်ဆွေ အကူအညီ ရမလား', q: 'မိတ်ဆွေ အကူအညီ ရမလား', p: 11, h: [3, 11], k: 'Jupiter', r: 11 },
+        { t: 'လစာ/ဝင်ငွေ တိုးလာမလား', q: 'လစာ/အပိုဝင်ငွေ တိုးလာမလား', p: 11, h: [2, 11], k: 'Jupiter' },
+        { t: 'အဖွဲ့/အသင်းမှာ နေရာ ရမလား', q: 'အဖွဲ့အစည်း/အသင်းမှာ နေရာ ရမလား', p: 11, h: [10, 11], k: 'Saturn' },
+        { t: 'စျေး ရောင်းကောင်းမလား', q: 'စျေး ရောင်းကောင်းမလား', p: 11, h: [7, 10, 11], k: 'Mercury' } ] },
+      { g: '၁၂ တန့် · နိုင်ငံခြား အခြေချ / ဆုံးရှုံး', items: [
+        { t: 'နိုင်ငံခြား အခြေချ နေနိုင်မလား', q: 'နိုင်ငံခြားမှာ အခြေချ နေနိုင်မလား', p: 12, h: [4, 9, 12], k: 'Rahu' },
+        { t: 'ဆုံးရှုံးမှု ရှောင်နိုင်မလား', q: 'ငွေကြေး ဆုံးရှုံးမှု ရှောင်နိုင်မလား', p: 12, h: [8, 12], k: 'Saturn' },
+        { t: 'ဆေးရုံ ကိစ္စ အဆင်ပြေစွာ ပြီးမလား', q: 'ဆေးရုံတက် ကိစ္စ အဆင်ပြေစွာ ပြီးမလား', p: 12, h: [1, 11, 12], k: 'Saturn / Moon' },
+        { t: 'စိတ်အေးချမ်းမှု လမ်း အဆင်ပြေမလား', q: 'တရား/စိတ်အေးချမ်းမှု လမ်း အဆင်ပြေမလား', p: 12, h: [5, 9, 12], k: 'Ketu / Jupiter' } ] },
+      { g: '💗 အချစ် အထူး (အမေးအများဆုံး)', items: [
+        { t: 'သူ ပြန်ချစ်/ပြန်လာမလား', q: 'သူ ပြန်ချစ်လာ/ပြန်လာမလား', p: 7, h: [5, 7, 11], k: 'Venus', r: 7 },
+        { t: 'သူများ နောက် ပါသွားမလား', q: 'သူများ နောက်ပါသွားမလား', p: 7, h: [5, 7, 8, 12], k: 'Venus / Rahu', r: 7 },
+        { t: 'အသဲကွဲ ကိန်း ရှိလား', q: 'အသဲကွဲ/ခွဲခွာမှု ကိန်း ရှိလား', p: 5, h: [5, 6, 8, 12], k: 'Venus / Saturn', r: 7 } ] }
+    ];
+    // Generic per-house cfg for the manual house chips (override for odd questions)
+    const PRASHNA_HOUSE_INFO = [
+      null,
+      { name: '၁ တန့် · ကိုယ်/ကျန်းမာ', h: [1, 5, 11], k: 'Sun' }, { name: '၂ တန့် · ငွေ/မိသားစု', h: [2, 11], k: 'Jupiter' },
+      { name: '၃ တန့် · ဆက်သွယ်/ညီအစ်ကို', h: [3, 11], k: 'Mars' }, { name: '၄ တန့် · အိမ်/မိခင်', h: [4, 11], k: 'Moon' },
+      { name: '၅ တန့် · သား/ပညာ/အချစ်', h: [5, 11], k: 'Jupiter' }, { name: '၆ တန့် · အမှု/အကြွေး/ရောဂါ', h: [6, 10, 11], k: 'Saturn' },
+      { name: '၇ တန့် · အိမ်ထောင်/ဖက်', h: [7, 11], k: 'Venus' }, { name: '၈ တန့် · ရုတ်တရက်/အမွေ', h: [8, 11], k: 'Saturn' },
+      { name: '၉ တန့် · ကံ/ဖခင်/ခရီး', h: [9, 11], k: 'Jupiter' }, { name: '၁၀ တန့် · အလုပ်/ရာထူး', h: [10, 11], k: 'Saturn' },
+      { name: '၁၁ တန့် · အမြတ်/ဆန္ဒ', h: [11, 2], k: 'Jupiter' }, { name: '၁၂ တန့် · ဆုံးရှုံး/နိုင်ငံခြား', h: [12, 11], k: 'Saturn' }
+    ];
+    const ROT_HOUSE_MEANING = { 1: 'သူ့ ကိုယ်ပိုင် အခြေအနေ/စိတ်ဓာတ်', 2: 'သူ့ ငွေကြေး/မိသားစု', 3: 'သူ့ ဆက်သွယ်လိုစိတ်', 4: 'သူ့ စိတ်အေးချမ်းမှု/အိမ်', 5: 'သူ့ အချစ်စိတ်/နှလုံးသား', 6: 'အတားအဆီး/ပြိုင်ဘက် ဘက်', 7: 'သူ ကိုယ့်ကို ပြန်ကြည့်သည့် ဘက်', 8: 'လျှို့ဝှက်/ပြတ်တောက်မှု ဘက်', 9: 'သူ့ ကံ/အဝေးခရီး', 10: 'သူ့ လုပ်ငန်း/အာရုံစိုက်မှု', 11: 'သူ့ဘက် အကျိုးဆုံမှု/မျှော်လင့်ချက်', 12: 'ဆုံးရှုံး/ဝေးကွာခြင်း ဘက်' };
+
+    function calculateKPPrashnaResult(queryText, horaryNum, birthPlanets, transitPlanets, dashaTree, cusps, cfgOverride) {
       const intent = detectPrashnaIntent(queryText);
-      const cfg = {
+      let cfg = {
         career: { title: 'အလုပ်အကိုင် / Project / ရာထူး', houses: [2, 6, 10, 11], primary: 10, karaka: 'Sun / Mercury' },
         love: { title: 'အချစ်ရေး / Relationship / အိမ်ထောင်', houses: [2, 5, 7, 11], primary: 7, karaka: 'Venus' },
         wealth: { title: 'ငွေကြေး / အကြွေး / ရလဒ်', houses: [2, 5, 8, 11], primary: 2, karaka: 'Jupiter' },
         property: { title: 'အိမ်ခြံမြေ / ပိုင်ဆိုင်မှု', houses: [2, 4, 11], primary: 4, karaka: 'Mars / Venus' },
+        lost: { title: 'ပစ္စည်းပျောက် / ပြန်လည်ရရှိနိုင်ခြေ', houses: [2, 4, 11], primary: 11, karaka: 'Moon / Mercury' },
+        lottery: { title: 'ထီ / ကံထူး ဝင်ငွေ', houses: [2, 5, 8, 11], primary: 5, karaka: 'Jupiter / Rahu' },
+        court: { title: 'တရားရုံး / အမှု အနိုင်-အရှုံး', houses: [6, 10, 11], primary: 6, karaka: 'Mars / Saturn' },
         travel: { title: 'ခရီး / နိုင်ငံခြား / Visa', houses: [3, 9, 12], primary: 9, karaka: 'Rahu / Jupiter' },
         exam: { title: 'ပညာရေး / စာမေးပွဲ', houses: [4, 5, 9, 11], primary: 5, karaka: 'Mercury / Jupiter' },
         health: { title: 'ကျန်းမာရေး', houses: [1, 5, 11], primary: 1, karaka: 'Sun / Moon' },
         general: { title: 'အထွေထွေကိစ္စ', houses: [1, 2, 11], primary: 1, karaka: 'Jupiter' }
       }[intent];
+      if (cfgOverride) cfg = cfgOverride;
       const kp = buildKPData(birthPlanets, cusps);
       const supporting = cfg.houses;
       const negate = supporting.map((h) => (h === 1 ? 12 : h - 1)).filter((h) => supporting.indexOf(h) === -1);
@@ -652,6 +738,19 @@
         const dSig = sigOf(d.lord);
         const dGood = supporting.filter((x) => dSig.indexOf(x) !== -1);
         if (dGood.length) { score += 7; evidence.push(`လက်ရှိ ${d.lord} မဟာဒသာသည် KP အရ အကျိုးပေးအိမ် ${dGood.join(', ')} ကို signify လုပ်၍ ကာလကပါ ထောက်ခံနေသည်။`); }
+      }
+      if (cfg.rotate) {
+        const R = cfg.rotate, cyc = (x) => ((x - 1) % 12) + 1;
+        const rotCheck = (off, label, pts) => {
+          const csl = kp.cuspSubLord[cyc(R + off) - 1];
+          const sig = sigOf(csl);
+          const hits = supporting.filter((x) => sig.indexOf(x) !== -1);
+          if (hits.length) { score += pts; evidence.push(`လှည့်ဖတ်: တစ်ဖက်လူ၏ ${label} Cusp Sub Lord ${csl} သည် အကျိုးပေးအိမ် ${hits.join(', ')} ကို signify လုပ်၍ သူ့ဘက်က ထောက်ခံသည်။`); }
+        };
+        rotCheck(0, 'လဂ် (၁ တန့်)', 3);
+        rotCheck(4, '၅ တန့် (အချစ်စိတ်)', 4);
+        rotCheck(6, '၇ တန့် (ကိုယ့်ကို ပြန်ကြည့်မှု)', 4);
+        rotCheck(10, '၁၁ တန့် (အကျိုးဆုံမှု)', 3);
       }
       score = Math.max(20, Math.min(92, Math.round(score)));
       const verdict = score >= 72 ? 'YES — အကောင်အထည်ဖော်နိုင်ခြေ အားကောင်း' : score >= 58 ? 'CONDITIONAL — ဖြစ်နိုင်သော်လည်း အခြေအနေ/အချိန်လို' : 'NO / DELAY — လက်ရှိအခြေအနေမှာ အတားအဆီးပိုများ';
@@ -1218,6 +1317,9 @@
       if(/အလုပ်|ရာထူး|project|အလုပ်ရ|career|job/.test(s))return'career';
       if(/အချစ်|ချစ်သူ|ရည်းစား|relationship|marry|အိမ်ထောင်|လက်ထပ်/.test(s))return'love';
       if(/ငွေ|ပိုက်ဆံ|အကြွေး|ရမလား|ဝင်ငွေ|အမြတ်/.test(s))return'wealth';
+      if(/ပျောက်|ရှာတွေ့|အခိုးခံ|သူခိုး/.test(s))return'lost';
+      if(/ထီ|lottery|လောင်းကစား|ချဲ|ဂျက်ပက်/.test(s))return'lottery';
+      if(/တရားရုံး|တရားစွဲ|အမှု|တရားခွင်|court|lawsuit|ပြိုင်ပွဲ/.test(s))return'court';
       if(/အိမ်|မြေ|ကား|ပစ္စည်း|ဝယ်|ရောင်း/.test(s))return'property';
       if(/ခရီး|visa|နိုင်ငံခြား|ပြည်ပ/.test(s))return'travel';
       if(/စာမေးပွဲ|ပညာ|သင်တန်း|ကျောင်း/.test(s))return'exam';
@@ -1225,19 +1327,23 @@
       return'general';
     }
 
-    function calculatePrashnaResult(queryText,horaryNum,birthPlanets,transitPlanets,dashaTree){
+    function calculatePrashnaResult(queryText,horaryNum,birthPlanets,transitPlanets,dashaTree,cfgOverride){
       const intent=detectPrashnaIntent(queryText), hNum=Math.max(1,Math.min(249,parseInt(horaryNum,10)||108));
       const qSign=(hNum*7)%12, tMoon=calculateVarga(transitPlanets.Moon,1), tJup=calculateVarga(transitPlanets.Jupiter,1), tSat=calculateVarga(transitPlanets.Saturn,1);
-      const cfg={
+      let cfg={
         career:{title:'အလုပ်အကိုင် / Project / ရာထူး',houses:[2,6,10,11],karaka:'Sun / Mercury'},
         love:{title:'အချစ်ရေး / Relationship / အိမ်ထောင်',houses:[2,5,7,11],karaka:'Venus'},
         wealth:{title:'ငွေကြေး / အကြွေး / ရလဒ်',houses:[2,5,8,11],karaka:'Jupiter'},
         property:{title:'အိမ်ခြံမြေ / ပိုင်ဆိုင်မှု',houses:[2,4,11],karaka:'Mars / Venus'},
+        lost:{title:'ပစ္စည်းပျောက် / ပြန်လည်ရရှိနိုင်ခြေ',houses:[2,4,11],karaka:'Moon / Mercury'},
+        lottery:{title:'ထီ / ကံထူး ဝင်ငွေ',houses:[2,5,8,11],karaka:'Jupiter / Rahu'},
+        court:{title:'တရားရုံး / အမှု အနိုင်-အရှုံး',houses:[1,6,10,11],karaka:'Mars / Saturn'},
         travel:{title:'ခရီး / နိုင်ငံခြား / Visa',houses:[3,9,12],karaka:'Rahu / Jupiter'},
         exam:{title:'ပညာရေး / စာမေးပွဲ',houses:[4,5,9,11],karaka:'Mercury / Jupiter'},
         health:{title:'ကျန်းမာရေး',houses:[1,6,8,12],karaka:'Sun / Moon'},
         general:{title:'အထွေထွေကိစ္စ',houses:[1,2,11],karaka:'Jupiter'}
       }[intent];
+      if(cfgOverride) cfg=cfgOverride;
       let score=50, evidence=[];
       const relevant=cfg.houses;
       relevant.forEach(hh=>{
@@ -1253,10 +1359,50 @@
       if([2,5,7,9,11].includes(qJup)){score+=8;evidence.push(`Jupiter သည် မေးခွန်း Lagna မှ ${qJup}H — protection/support ရှိသည်။`);}
       if([6,8,12].includes(qSat)){score-=6;evidence.push(`Saturn သည် ${qSat}H တွင်ရှိ၍ delay/တာဝန်အလေးချိန် တိုးနိုင်သည်။`);}
       const d=_activeDasha(dashaTree); if(d){const dh=_planetHouse(birthPlanets,d.lord);if(relevant.includes(dh)){score+=7;evidence.push(`လက်ရှိ ${d.lord} Mahadasha သည် မေးခွန်း၏ ${dh}H ကို တိုက်ရိုက် activate လုပ်နေသည်။`);}}
+      if(cfg.rotate){
+        const R=cfg.rotate, rLord=_lordOfHouse(birthPlanets,R);
+        if(rLord&&birthPlanets[rLord]!=null){
+          const rh=((_planetHouse(birthPlanets,rLord)-R+12)%12)+1;
+          const good=[1,3,4,5,7,10,11].includes(rh), bad=[6,8,12].includes(rh);
+          if(good)score+=5; if(bad)score-=5;
+          evidence.push(`လှည့်ဖတ်: ${R} တန့်ကို တစ်ဖက်လူ၏ လဂ် ထားသော် သူ့လဂ်ရှင် ${rLord} သည် သူ့ ${rh} တန့် (${ROT_HOUSE_MEANING[rh]}) တွင် ရှိ၍ ${good?'စိတ်ထား ထောက်ခံဘက် ယိုင်နေသည်':bad?'စိတ်ထား မထောက်ခံဘက် ယိုင်နိုင်သည်':'အလယ်အလတ် အခြေအနေ ဖြစ်သည်'}။`);
+        }
+      }
       score=Math.max(20,Math.min(92,Math.round(score)));
       const verdict=score>=72?'YES — အကောင်အထည်ဖော်နိုင်ခြေ အားကောင်း':score>=58?'CONDITIONAL — ဖြစ်နိုင်သော်လည်း အခြေအနေ/အချိန်လို': 'NO / DELAY — လက်ရှိအခြေအနေမှာ အတားအဆီးပိုများ';
       const advice=score>=72?'အခွင့်အရေးကို လက်လွတ်မခံဘဲ စာရွက်စာတမ်း၊ အချိန်နှင့် လက်တွေ့လုပ်ဆောင်ချက်ကို တိတိကျကျ စီမံပါ။':score>=58?'အခုချက်ချင်း အဖြေတစ်ဖက်သတ်မချဘဲ အတားအဆီးဖြစ်စေသောအချက်ကို ဖြေရှင်းပြီး နောက်တစ်ကြိမ် trigger ကို စောင့်ကြည့်ပါ။':'အလောတကြီး တွန်းမလုပ်သင့်ပါ။ အကြောင်းရင်း/စာချုပ်/ဆက်သွယ်ရေးကွက်လပ်ကို အရင်ပြင်ပြီး timing ပြောင်းလာမှ ပြန်စစ်သင့်သည်။';
       return {queryText:queryText||'မေးမြန်းထားသောကိစ္စ',title:cfg.title,score,verdict,answerDesc:`ဒီအဖြေကို YES/NO တစ်ခုတည်းမဟုတ်ဘဲ ${relevant.join(', ')} တန့်များ၊ ၎င်းတို့၏ အရှင်များ၊ ဟူးရား Moon/Jupiter/Saturn၊ Natal promise နှင့် လက်ရှိ Dasha ကို ပေါင်းစပ်ပြီး ထုတ်ထားသည်။`,timingWindow:score>=72?'လက်ရှိမှ နောက် 1–3 လအတွင်း trigger ပိုမြင်ရနိုင်သည်။':score>=58?'အတားအဆီးပြေလျော့ပြီး နောက် 3–6 လအတွင်း ပိုရှင်းလာနိုင်သည်။':'လက်ရှိကာလထက် နောက်ပိုင်းတွင် ပြန်လည်စစ်ဆေးရန် ပိုသင့်တော်သည်။',karaka:cfg.karaka,vargaUsed:'Natal + Prashna + Transit synthesis',evidence,advice,intent};
+    }
+
+    function calculateCareerBenefitSummary(bp, dashaTree) {
+      const lines = [];
+      const grahas = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
+      const byDeg = grahas.filter((p) => bp[p] != null).map((p) => ({ p, d: ((bp[p] % 30) + 30) % 30 })).sort((a, b) => b.d - a.d);
+      const amk = byDeg.length > 1 ? byDeg[1].p : null;
+      const FIELDS = { Sun: 'အုပ်ချုပ်ရေး/အစိုးရ, ခေါင်းဆောင်မှု, ဆေးပညာ ဘက်', Moon: 'စောင့်ရှောက်မှု, အစားအစာ/အရည် ကုန်သွယ်ရေး, ဧည့်ဝန်ဆောင်မှု', Mars: 'အင်ဂျင်နီယာ/နည်းပညာ, စစ်/ရဲ, ခွဲစိတ်ဆေး, အားကစား', Mercury: 'စာရင်း/ကုန်သွယ်ရေး, IT/ဆက်သွယ်ရေး, စာရေး/သင်ကြားရေး', Jupiter: 'သင်ကြားရေး/တရားစီရင်ရေး, ဘဏ်/ငွေကြေး, အကြံပေး/ဘာသာရေး', Venus: 'အနုပညာ/အလှပြင်, ဖျော်ဖြေရေး, အထည်/အလှကုန်', Saturn: 'ဆောက်လုပ်ရေး/စက်မှု, လုပ်သား စီမံခန့်ခွဲမှု, သတ္တု/မြေယာ' };
+      const l10 = _lordOfHouse(bp, 10), l10h = l10 ? _planetHouse(bp, l10) : null;
+      const l5 = _lordOfHouse(bp, 5), l5h = l5 ? _planetHouse(bp, l5) : null;
+      const vh = _planetHouse(bp, 'Venus'), vStr = _planetStrength(bp, 'Venus');
+      const sign10 = ((Math.floor((bp.Lagna || 0) / 30) % 12) + 9) % 12;
+      const ELEM = ['မီး သဘာဝ (ဦးဆောင်/တက်ကြွ)', 'မြေ သဘာဝ (လက်တွေ့/တည်ဆောက်)', 'လေ သဘာဝ (ဆက်သွယ်/ကုန်သွယ်)', 'ရေ သဘာဝ (စောင့်ရှောက်/ဝန်ဆောင်)'];
+      if (amk) lines.push(`Amatyakaraka (အလုပ်ပြ ဂြိုဟ်) ${amk}: ${FIELDS[amk]}`);
+      if (l10) lines.push(`၁၀ တန့် အရှင် ${l10} သည် ${l10h} တန့်တွင် ရှိ၍ အလုပ်ပုံစံမှာ ${ELEM[sign10 % 4]} ဘက် ယိုင်သည်`);
+      let art = 0;
+      if ([5, 9, 10, 11, 1].includes(vh)) art += 2;
+      if (typeof vStr === 'number' && vStr >= 80) art += 2;
+      if ([5, 10, 11].includes(l5h)) art += 2;
+      if (l5 && l10 && (l5h === 10 || _planetHouse(bp, l10) === 5)) art += 1;
+      lines.push(art >= 4 ? 'အနုပညာ/ဖန်တီးမှု အားသာချက် အားကောင်းသည် (Venus နှင့် ၅ တန့် ဆက်နွယ်မှု အရ)' : art >= 2 ? 'အနုပညာ/ဖန်တီးမှု အားသာချက် အလယ်အလတ် ရှိသည်' : 'အနုပညာ အားသာချက် သိသိသာသာ မရှိပါ — အခြား နယ်ပယ် ပိုကိုက်ညီမည်');
+      const l7 = _lordOfHouse(bp, 7), l6 = _lordOfHouse(bp, 6);
+      let biz = 0, svc = 0;
+      if (l10h === 7 || (l7 && _planetHouse(bp, l7) === 10)) biz += 2;
+      if (l10h === 6 || (l6 && _planetHouse(bp, l6) === 10)) svc += 2;
+      if ([2, 11].includes(l10h)) biz += 1;
+      lines.push(biz > svc ? 'လုပ်ကိုင်ပုံ: ကိုယ်ပိုင် လုပ်ငန်း / ကိုယ်တိုင် ဦးစီးသည့် ပုံစံ ပိုကိုက်ညီသည်' : svc > biz ? 'လုပ်ကိုင်ပုံ: ဌာန/အဖွဲ့အစည်း အတွင်း တာဝန်ယူ လုပ်ရသည့် ပုံစံ ပိုကိုက်ညီသည်' : 'လုပ်ကိုင်ပုံ: ကိုယ်ပိုင် နှင့် ဌာန နှစ်မျိုးလုံး ဖြစ်နိုင်သည် — ကာလ အလိုက် ရွေးရမည်');
+      const d = _activeDasha(dashaTree);
+      if (d && (d.lord === l10 || d.lord === amk || _planetHouse(bp, d.lord) === 10)) lines.push(`လက်ရှိ ${d.lord} ဒဿာသည် အလုပ် အကျိုးပေး ကာလ အဖြစ် ဆက်နွယ်နေသည်`);
+      const verdict = amk ? `ဘဝ အကျိုးပေး နယ်ပယ်: ${FIELDS[amk]}${art >= 4 ? ' — အထူးသဖြင့် အနုပညာ/ဖန်တီးမှု ဘက်ခြမ်း အားသာသည်' : ''}` : '—';
+      return { verdict, lines };
     }
 
     function safeYear(val, fallback) {
@@ -2177,6 +2323,9 @@
       const [prashnaCustomText, setPrashnaCustomText] = useState('စာမေးပွဲ အောင်ပါ့မလား');
       const [horaryNumber, setHoraryNumber] = useState('108');
       const [prashnaResult, setPrashnaResult] = useState(null);
+      const [bankSel, setBankSel] = useState([]);
+      const [bankOpen, setBankOpen] = useState(null);
+      const [houseSel, setHouseSel] = useState(null);
 
       // Boy & Girl state with specific Timezone
       const [boy, setBoy] = useState({ name: 'သတို့သား', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
@@ -2336,16 +2485,35 @@
       const currentRunningDasha = dashaTree.find((d) => d.start <= currentDateStr && d.end >= currentDateStr) || dashaTree[0] || { lord: 'Ketu', start: '2026-01-01', end: '2033-01-01' };
 
       const lifeOverview = generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas);
+      const careerBenefit = calculateCareerBenefitSummary(birthPlanets, dashaTree);
       const lifetimeMilestones = generateLifetimeMilestones(birthDateObj, dashaTree, birthPlanets);
       const annualForecast = generateAnnualForecast(birthDateObj, birthPlanets, transitPlanets, transitDate, transitLat, transitLon, ayanamsa, nodeType);
       const conjunctionsAndAspects = analyzeConjunctionsAndAspects(birthPlanets);
       const liveTransitPredictions = analyzeLiveTransit(birthPlanets, transitPlanets);
 
+      const toggleBank = (item) => {
+        setHouseSel(null);
+        setBankSel((prev) => prev.find((x) => x.t === item.t) ? prev.filter((x) => x.t !== item.t) : [...prev, item].slice(-2));
+        setPrashnaCustomText(item.q);
+      };
       const runPrashna = () => {
-        const res = ayanamsa === 'kp' && kpCusps
-          ? calculateKPPrashnaResult(prashnaCustomText, horaryNumber, birthPlanets, transitPlanets, dashaTree, kpCusps)
-          : calculatePrashnaResult(prashnaCustomText, horaryNumber, birthPlanets, transitPlanets, dashaTree);
-        setPrashnaResult(res);
+        const mk = (e) => {
+          const cfg = e ? { title: e.t, houses: e.h, primary: e.p, karaka: e.k, rotate: e.r } : undefined;
+          const q = e ? e.q : prashnaCustomText;
+          return ayanamsa === 'kp' && kpCusps
+            ? calculateKPPrashnaResult(q, horaryNumber, birthPlanets, transitPlanets, dashaTree, kpCusps, cfg)
+            : calculatePrashnaResult(q, horaryNumber, birthPlanets, transitPlanets, dashaTree, cfg);
+        };
+        if (bankSel.length === 2) {
+          const [A, B] = bankSel;
+          const rA = mk(A), rB = mk(B);
+          const merged = mk({ t: A.t + ' ⟷ ' + B.t, q: A.q + ' ＋ ' + B.q, p: A.p, h: [...new Set([...A.h, ...B.h])], k: A.k + ' / ' + B.k, r: A.r || B.r });
+          setPrashnaResult({ ...merged, parts: [{ t: A.t, s: rA.score, v: rA.verdict }, { t: B.t, s: rB.score, v: rB.verdict }] });
+          return;
+        }
+        if (bankSel.length === 1) { setPrashnaResult(mk(bankSel[0])); return; }
+        if (houseSel) { const hi = PRASHNA_HOUSE_INFO[houseSel]; setPrashnaResult(mk({ t: hi.name, q: prashnaCustomText, p: houseSel, h: hi.h, k: hi.k })); return; }
+        setPrashnaResult(mk(null));
       };
 
       const boyH = to24(safeHour(boy.h, 12), boy.ampm);
@@ -2855,6 +3023,12 @@
                   ))}
                 </div>
               </div>
+              {/* အကျိုးပေး အနှစ်ချုပ် — readings ၏ နောက်ဆုံး ချုပ်ကိုင် အဖတ် (မွေးဇာတာ) */}
+              <div className="bg-indigo-50 border border-indigo-200 p-3 rounded-lg space-y-1.5">
+                <div className="font-bold text-indigo-950 text-xs">🧭 အနှစ်ချုပ် — ဘဝ အကျိုးပေး အလုပ် <span className="text-[9px] font-medium text-indigo-500">(မွေးဇာတာ အရ · ဟူးရားနှင့် မသက်ဆိုင်)</span></div>
+                <div className="text-slate-800 text-[11px] font-semibold leading-relaxed">{careerBenefit.verdict}</div>
+                {careerBenefit.lines.map((ln, j) => (<div key={j} className="text-[10px] text-slate-600 leading-relaxed">• {ln}</div>))}
+              </div>
             </div>
           )}
 
@@ -2868,6 +3042,47 @@
 
               <div className="bg-amber-50 border border-amber-300 p-2.5 rounded text-[11px] text-amber-900 leading-relaxed">
                 <strong>⚠️ မေးမြန်းသူ သိရှိရန်:</strong> ဟူးရားနက္ခတ်စနစ်သည် <em>"ဖြစ်နိုင်သလား / မဖြစ်နိုင်သလား (Yes / No)"</em> တိကျသော မေးခွန်းများအတွက် အထူးမှန်ကန်ပါသည်။ မေးလိုသော မေးခွန်းကို အောက်တွင် တိုက်ရိုက် စာရိုက်ထည့်မေးမြန်းနိုင်ပါသည်။
+              </div>
+
+              <div className="bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2">
+                <div className="flex justify-between items-baseline">
+                  <span className="font-bold text-slate-800">📚 မေးခွန်း Bank — အိမ် အလိုက် (မေးခွန်း ၅၃ ခု)</span>
+                  <span className="text-[9px] text-slate-500">၂ ခု ရွေးလျှင် ပေါင်းဖတ် ပေးသည်</span>
+                </div>
+                {bankSel.length > 0 && (
+                  <div className="flex flex-wrap gap-1 items-center bg-emerald-50 border border-emerald-200 rounded p-1.5">
+                    <span className="text-[10px] font-bold text-emerald-800">ရွေးထားသည်:</span>
+                    {bankSel.map((x) => (<button key={x.t} onClick={() => toggleBank(x)} className="text-[10px] bg-emerald-700 text-white px-2 py-0.5 rounded-full font-bold">{x.t} ✕</button>))}
+                    {bankSel.length === 2 && <span className="text-[9px] text-emerald-700">⟷ ပေါင်းအဖြေ ထုတ်ပေးမည်</span>}
+                  </div>
+                )}
+                <div className="space-y-1">
+                  {PRASHNA_BANK.map((grp) => (
+                    <div key={grp.g} className="border border-slate-100 rounded">
+                      <button onClick={() => setBankOpen(bankOpen === grp.g ? null : grp.g)} className="w-full flex justify-between items-center px-2 py-1.5 bg-slate-50 rounded text-left">
+                        <span className="font-bold text-slate-700 text-[11px]">{grp.g}</span>
+                        <span className="text-slate-400 text-[10px]">{grp.items.length} ခု {bankOpen === grp.g ? '▴' : '▾'}</span>
+                      </button>
+                      {bankOpen === grp.g && (
+                        <div className="flex flex-wrap gap-1 p-1.5">
+                          {grp.items.map((it) => {
+                            const on = !!bankSel.find((x) => x.t === it.t);
+                            return (<button key={it.t} onClick={() => toggleBank(it)} className={`text-[10px] px-2 py-1 rounded-full border font-medium ${on ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-white text-slate-700 border-slate-300'}`}>{it.t}{it.r ? ' ↻' : ''}</button>);
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold text-slate-600 mb-1">သို့ — အိမ် ကို တိုက်ရိုက် ရွေးပါ (ထူးဆန်းသော မေးခွန်းများအတွက်):</div>
+                  <div className="flex flex-wrap gap-1">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hn) => (
+                      <button key={hn} onClick={() => { setHouseSel(houseSel === hn ? null : hn); setBankSel([]); }} className={`text-[10px] w-7 h-7 rounded-full border font-bold ${houseSel === hn ? 'bg-indigo-700 text-white border-indigo-700' : 'bg-white text-slate-600 border-slate-300'}`}>{hn}</button>
+                    ))}
+                    {houseSel && <span className="text-[10px] text-indigo-700 font-bold self-center">{PRASHNA_HOUSE_INFO[houseSel].name}</span>}
+                  </div>
+                </div>
               </div>
 
               <div className="bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2.5">
@@ -2916,6 +3131,15 @@
                     <span className="text-[10px] bg-emerald-700 text-white px-2 py-0.5 rounded font-bold">{prashnaResult.score}% ဖြစ်နိုင်ခြေ</span>
                   </div>
 
+                  <div className="text-[10px] font-bold text-emerald-800">📌 အမျိုးအစား: {prashnaResult.title}</div>
+                    {prashnaResult.parts && (
+                      <div className="bg-emerald-50 border border-emerald-200 rounded p-2 space-y-0.5">
+                        {prashnaResult.parts.map((pt, i) => (
+                          <div key={i} className="flex justify-between text-[11px]"><span className="text-slate-700">{pt.t}</span><span className="font-bold text-emerald-900">{pt.s}% · {pt.v.split(' — ')[0]}</span></div>
+                        ))}
+                        <div className="text-[9px] text-emerald-700">အထက်ပါ အဖြေချုပ်သည် နှစ်ခု၏ အိမ်များ ပေါင်းပြီး တွက်ထားခြင်း ဖြစ်သည်။</div>
+                      </div>
+                    )}
                   <div className="bg-white p-2.5 rounded border border-emerald-200 space-y-1">
                     <div className="font-bold text-emerald-900 text-[13px]">{prashnaResult.verdict}</div>
                     <p className="text-slate-700 leading-relaxed text-[11px]">{prashnaResult.answerDesc}</p>
