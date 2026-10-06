@@ -1634,12 +1634,16 @@
       const [purpose, setPurpose] = useState('general');
       const [cityIdx, setCityIdx] = useState(6);
       const [planetFilter, setPlanetFilter] = useState('ALL');
+      const [customLat, setCustomLat] = useState('');
+      const [customLon, setCustomLon] = useState('');
       const dirs = scoreDirections(p, dashaTree, purpose);
       const fd = foreignDomesticVerdict(p, dashaTree, kpData);
       const climate = climateNote(p);
       const tropical = calculateNASA_JPL_Planets(birthJD, birthLat, birthLon, 'tropical', nodeType);
       const acg = computeACGLines(birthJD, tropical);
-      const city = ACG_CITIES[cityIdx] || ACG_CITIES[0];
+      const parsedLat = parseFloat(customLat), parsedLon = parseFloat(customLon);
+      const hasCustom = !isNaN(parsedLat) && !isNaN(parsedLon) && Math.abs(parsedLat) <= 90 && Math.abs(parsedLon) <= 180;
+      const city = hasCustom ? { n: 'ကိုယ်တိုင် သတ်မှတ်ထားသော နေရာ', en: 'Custom point', lat: parsedLat, lon: parsedLon } : (ACG_CITIES[cityIdx] || ACG_CITIES[0]);
       const report = acgCityReport(acg, city);
       const projX = (lon) => (lon + 180) / 360 * 720;
       const projY = (lat) => (90 - lat) / 180 * 360;
@@ -1696,7 +1700,7 @@
                 <button key={pl} onClick={() => setPlanetFilter(pl)} className={`px-2 py-0.5 rounded-full font-semibold ${planetFilter === pl ? 'bg-indigo-700 text-white' : 'bg-slate-100 text-slate-700'}`}>{pl === 'ALL' ? 'အားလုံး' : pl}</button>
               ))}
             </div>
-            <svg viewBox="0 0 720 360" className="w-full border border-slate-200 rounded bg-sky-50">
+            <svg viewBox="0 0 720 360" className="w-full border border-slate-200 rounded bg-sky-50" onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); if (!r.width) return; const lon = ((e.clientX - r.left) / r.width) * 360 - 180; const lat = 90 - ((e.clientY - r.top) / r.height) * 180; setCustomLat(lat.toFixed(2)); setCustomLon(lon.toFixed(2)); }}>
               <path d={ACG_WORLD_PATH} fill="#dbe7dc" stroke="#94a3b8" strokeWidth="0.6" />
               {[0, 60, 120, 180, 240, 300].map((x) => <line key={'v' + x} x1={x} y1="0" x2={x} y2="360" stroke="#cbd5e1" strokeWidth="0.5" />)}
               {[60, 120, 180, 240, 300].map((y) => <line key={'h' + y} x1="0" y1={y} x2="720" y2={y} stroke="#cbd5e1" strokeWidth="0.5" />)}
@@ -1717,6 +1721,15 @@
                 {ACG_CITIES.map((c, i) => <option key={i} value={i}>{c.n} ({c.en})</option>)}
               </select>
             </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-slate-600 font-medium">သို့ Lat/Lon:</span>
+              <input value={customLat} onChange={(e) => setCustomLat(e.target.value)} placeholder="Lat (ဥပမာ 21.98)" className="flex-1 border p-1 rounded text-center" />
+              <input value={customLon} onChange={(e) => setCustomLon(e.target.value)} placeholder="Lon (ဥပမာ 96.08)" className="flex-1 border p-1 rounded text-center" />
+              {hasCustom && <button onClick={() => { setCustomLat(''); setCustomLon(''); }} className="bg-rose-700 text-white px-2 py-1 rounded font-bold">ရှင်းရန်</button>}
+            </div>
+            {hasCustom
+              ? <div className="text-indigo-700 font-medium">📍 {city.n} (Lat {parsedLat}, Lon {parsedLon}) မှ တိုင်းနေသည် — မြို့ dropdown ကို လျစ်လျူရှုထားသည်။ မြေပုံပေါ် ထောက်လိုက်လျှင်လည်း ထို နေရာ ပြောင်းသွားမည်။</div>
+              : <div className="text-slate-500">မြေပုံပေါ် ထောက်လိုက်လျှင် လည်း ထိုနေရာကို ကိုယ်တိုင် အမှတ် အဖြစ် သတ်မှတ်ပေးမည်။</div>}
             {report.length === 0 && <div className="text-slate-600">{city.n} အနီးတွင် သက်ရောက်မှု ရှိသော လိုင်း မရှိပါ (၇၅၀ ကီလိုမီတာ အတွင်း)။</div>}
             <div className="space-y-1.5">
               {report.map((r, i) => (
@@ -1741,11 +1754,23 @@
       { n: 'ဒူဘိုင်း', lat: '25.2048', lon: '55.2708', tz: '4' }, { n: 'လန်ဒန်', lat: '51.5074', lon: '-0.1278', tz: '0' },
       { n: 'နယူးယောက်', lat: '40.7128', lon: '-74.0060', tz: '-5' }, { n: 'ဆစ်ဒနီ', lat: '-33.8688', lon: '151.2093', tz: '10' }
     ];
-    function RelPersonForm({ title, person, setPerson }) {
+    function RelPersonForm({ title, person, setPerson, savedProfiles, onLoadProfile }) {
       const set = (k, v) => setPerson({ ...person, [k]: v });
       return (
         <div className="bg-white border border-slate-200 p-2.5 rounded space-y-1.5 shadow-sm">
-          <div className="font-bold text-emerald-800 border-b border-slate-100 pb-1">{title}</div>
+          <div className="flex justify-between items-center border-b border-slate-100 pb-1">
+            <span className="font-bold text-emerald-800">{title}</span>
+            {savedProfiles && savedProfiles.length > 0 && (
+              <select
+                onChange={(e) => { const prof = savedProfiles.find(p => p.id === e.target.value); if (prof && onLoadProfile) onLoadProfile(prof); e.target.value = ''; }}
+                defaultValue=""
+                className="bg-emerald-50 border border-emerald-300 rounded px-1.5 py-0.5 text-[10px] text-emerald-900 font-medium"
+              >
+                <option value="" disabled>📂 မှတ်တမ်းမှရွေး</option>
+                {savedProfiles.map(p => (<option key={p.id} value={p.id}>{p.name}</option>))}
+              </select>
+            )}
+          </div>
           <input value={person.name} onChange={(e) => set('name', e.target.value)} placeholder="အမည်" className="w-full border p-1 rounded text-xs" />
           <div className="grid grid-cols-6 gap-1">
             <input value={person.d} onChange={(e) => set('d', e.target.value)} placeholder="ရက်" className="border p-1 rounded text-center" />
@@ -1769,7 +1794,8 @@
       );
     }
 
-    function RelateTab({ ayanamsa, nodeType }) {
+    function RelateTab({ ayanamsa, nodeType, savedProfiles }) {
+      const fillFromProfile = (setter) => (prof) => setter({ name: prof.name, d: prof.day, m: prof.month, y: prof.year, h: prof.hour, min: prof.minute, ampm: prof.ampm, city: prof.place, lat: prof.lat, lon: prof.lon, tz: prof.tz || '6.5' });
       const [personA, setPersonA] = useState({ name: 'လူ (က)', d: '15', m: '5', y: '1990', h: '8', min: '30', ampm: 'AM', city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
       const [personB, setPersonB] = useState({ name: 'လူ (ခ)', d: '20', m: '8', y: '1992', h: '6', min: '15', ampm: 'PM', city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
       const [mode, setMode] = useState('business');
@@ -1790,8 +1816,8 @@
         <div className="p-3 space-y-3 text-xs">
           <h2 className="font-bold text-emerald-900 text-sm">🤝 ပေါင်းသင်း ဆက်ဆံရေး — လူ နှစ်ယောက် သဟဇာတ</h2>
           <div className="text-slate-600">ဇာတာတိုက် (Ashtakoota) နှင့် မရောပါ — ဤနေရာမှာ ရည်ရွယ်ချက် အလိုက် ကြည့်ရမည့် အိမ်များ ခွဲ၍ ဖတ်သည်။</div>
-          <RelPersonForm title="လူ (က) အချက်အလက်" person={personA} setPerson={setPersonA} />
-          <RelPersonForm title="လူ (ခ) အချက်အလက်" person={personB} setPerson={setPersonB} />
+          <RelPersonForm title="လူ (က) အချက်အလက်" person={personA} setPerson={setPersonA} savedProfiles={savedProfiles} onLoadProfile={fillFromProfile(setPersonA)} />
+          <RelPersonForm title="လူ (ခ) အချက်အလက်" person={personB} setPerson={setPersonB} savedProfiles={savedProfiles} onLoadProfile={fillFromProfile(setPersonB)} />
           <div className="flex flex-wrap gap-1">
             {Object.keys(REL_MODES).map((k) => (
               <button key={k} onClick={() => setMode(k)} className={`px-2.5 py-1 rounded-full font-semibold ${mode === k ? 'bg-emerald-800 text-white' : 'bg-slate-100 text-slate-700'}`}>{REL_MODES[k].label}</button>
@@ -3010,7 +3036,7 @@
           {/* TAB 8: MATCHING (ဇာတာတိုက်စစ်) */}
           {activeTab === 'place' && <PlaceTab p={birthPlanets} dashaTree={dashaTree} kpData={kpData} birthJD={birthJD} birthLat={parseFloat(birthLat) || 16.84} birthLon={parseFloat(birthLon) || 96.17} nodeType={nodeType} birthPlace={birthPlace} birthName={birthName} />}
 
-          {activeTab === 'relate' && <RelateTab ayanamsa={ayanamsa} nodeType={nodeType} />}
+          {activeTab === 'relate' && <RelateTab ayanamsa={ayanamsa} nodeType={nodeType} savedProfiles={savedProfiles} />}
 
           {activeTab === 'matching' && (
             <div className="p-3 space-y-3 text-xs">
