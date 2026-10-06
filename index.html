@@ -449,6 +449,215 @@
       };
     }
 
+    // Placidus house cusps (tropical geometry + selected ayanamsa), returned as
+    // 12 sidereal longitudes [H1..H12]. Used only by KP mode. Falls back to
+    // equal houses from the Ascendant where Placidus is undefined (circumpolar).
+    function calculatePlacidusCusps(jd, lat, lon, ayanamsaType) {
+      lat = parseFloat(lat) || 0;
+      lon = parseFloat(lon) || 0;
+      const d = jd - 2451545.0;
+      const T = d / 36525.0;
+      const ayanamsa = getAyanamsa(jd, ayanamsaType || 'kp');
+      const rad = Math.PI / 180;
+      const deg = 180 / Math.PI;
+      const eps = (23.439291 - 0.000130042 * T) * rad;
+      const phi = lat * rad;
+      const ramc = norm360(280.46061837 + 360.98564736629 * d + lon);
+
+      const ascT = norm360(Math.atan2(Math.cos(ramc * rad), -Math.sin(ramc * rad) * Math.cos(eps) - Math.tan(phi) * Math.sin(eps)) * deg);
+      const mcT = norm360(Math.atan2(Math.sin(ramc * rad), Math.cos(ramc * rad) * Math.cos(eps)) * deg);
+
+      const lonFromRA = (ra) => norm360(Math.atan2(Math.sin(ra * rad), Math.cos(ra * rad) * Math.cos(eps)) * deg);
+      const semiArc = (eclLon) => {
+        const decl = Math.asin(Math.sin(eps) * Math.sin(eclLon * rad));
+        const c = -Math.tan(phi) * Math.tan(decl);
+        if (c < -1 || c > 1) return null;
+        return Math.acos(c) * deg;
+      };
+      const intermediate = (raGuessOffset, offsetFn) => {
+        let ecl = lonFromRA(norm360(ramc + raGuessOffset));
+        for (let it = 0; it < 50; it++) {
+          const dsa = semiArc(ecl);
+          if (dsa === null) return null;
+          const nsa = 180 - dsa;
+          const next = lonFromRA(norm360(ramc + offsetFn(dsa, nsa)));
+          const diff = Math.abs(((next - ecl + 540) % 360) - 180);
+          ecl = next;
+          if (diff < 1e-7) break;
+        }
+        return ecl;
+      };
+
+      const c11 = intermediate(30, (dsa) => dsa / 3);
+      const c12 = intermediate(60, (dsa) => 2 * dsa / 3);
+      const c2 = intermediate(120, (dsa, nsa) => dsa + nsa / 3);
+      const c3 = intermediate(150, (dsa, nsa) => dsa + 2 * nsa / 3);
+
+      const toSid = (x) => norm360(x - ayanamsa);
+      if (c11 === null || c12 === null || c2 === null || c3 === null) {
+        return Array.from({ length: 12 }, (_, i) => norm360(toSid(ascT) + i * 30));
+      }
+      const trop = [ascT, c2, c3, norm360(mcT + 180), norm360(c11 + 180), norm360(c12 + 180),
+        norm360(ascT + 180), norm360(c2 + 180), norm360(c3 + 180), mcT, c11, c12];
+      return trop.map(toSid);
+    }
+
+    // ==========================================
+    // KP LAYER — Krishnamurti Paddhati (used ONLY when ayanamsa === 'kp')
+    // Houses begin at the Placidus cusp; verdicts come from cusp sub lords
+    // and significator chains. Other ayanamsa modes never call these.
+    // ==========================================
+    const KP_HOUSE_THEMES = ['ကိုယ်ခန္ဓာ · စရိုက် · ကျန်းမာရေး', 'ဓန · မိသားစု · စကား', 'မွေးချင်း · ရဲရင့်မှု · ဆက်သွယ်ရေး', 'မိခင် · နေအိမ် · ပစ္စည်း', 'သားသမီး · ပညာ · ဖန်တီးမှု', 'ရန်သူ · ရောဂါ · အကြွေး', 'အိမ်ထောင် · စီးပွားဖက်', 'အသက်ရှည် · အမွေ · လျှို့ဝှက်', 'ကံကြမ္မာ · ဖခင် · ဓမ္မ', 'အလုပ် · ဂုဏ်သိက္ခာ · အာဏာ', 'လာဘ် · မိတ်ဆွေ · ဆန္ဒပြည့်ဝမှု', 'နိုင်ငံခြား · ဆုံးရှုံးမှု · တရားကျင့်မှု'];
+    const KP_FRUIT_SETS = { 1: [1, 2, 11], 2: [2, 11], 3: [3, 11], 4: [4, 11], 5: [5, 9, 11], 6: [6, 10, 11], 7: [2, 7, 11], 8: [8], 9: [9, 11], 10: [2, 6, 10, 11], 11: [2, 11], 12: [3, 9, 12] };
+
+    function buildKPData(p, cusps) {
+      const GRAHAS = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
+      const bhavaOf = (lon) => {
+        const x = norm360(lon);
+        for (let h = 0; h < 12; h++) {
+          const start = cusps[h];
+          const span = norm360(cusps[(h + 1) % 12] - start);
+          const rel = norm360(x - start);
+          if (span > 0 && (rel < span || rel > 360 - 1e-7)) return h + 1;
+        }
+        return 1;
+      };
+      const starLordOf = (name) => (typeof p[name] === 'number') ? getKPSubLordData(p[name]).starLord : null;
+      const occupants = Array.from({ length: 12 }, () => []);
+      GRAHAS.forEach((n) => { if (typeof p[n] === 'number') occupants[bhavaOf(p[n]) - 1].push(n); });
+      const cuspSign = cusps.map((c) => Math.floor(norm360(c) / 30) % 12);
+      const cuspSignLord = cuspSign.map((s) => RASI_LORDS[s]);
+      const cuspSubLord = cusps.map((c) => getKPSubLordData(c).subLord);
+      const ownedBy = {};
+      GRAHAS.forEach((n) => { ownedBy[n] = []; });
+      cuspSignLord.forEach((lord, i) => { if (ownedBy[lord]) ownedBy[lord].push(i + 1); });
+      const planetSig = {};
+      GRAHAS.forEach((n) => {
+        if (typeof p[n] !== 'number') return;
+        const strong = new Set([bhavaOf(p[n])].concat(ownedBy[n] || []));
+        const all = new Set(strong);
+        const sl = starLordOf(n);
+        if (sl && sl !== n && typeof p[sl] === 'number') {
+          all.add(bhavaOf(p[sl]));
+          (ownedBy[sl] || []).forEach((h) => all.add(h));
+        }
+        planetSig[n] = { strong: [...strong].sort((a, b) => a - b), all: [...all].sort((a, b) => a - b) };
+      });
+      const houseSig = [];
+      for (let h = 1; h <= 12; h++) {
+        const occ = occupants[h - 1];
+        houseSig.push({
+          house: h,
+          occupants: occ,
+          inStarOfOcc: GRAHAS.filter((n) => occ.indexOf(starLordOf(n)) !== -1),
+          signLord: cuspSignLord[h - 1],
+          inStarOfLord: GRAHAS.filter((n) => starLordOf(n) === cuspSignLord[h - 1]),
+          cuspSubLord: cuspSubLord[h - 1]
+        });
+      }
+      return { bhavaOf, occupants, cuspSign, cuspSignLord, cuspSubLord, ownedBy, planetSig, houseSig, cusps };
+    }
+
+    function generateKPReading(p, cusps, dashaTree) {
+      const data = buildKPData(p, cusps);
+      const houses = data.houseSig.map((hs) => {
+        const csl = hs.cuspSubLord;
+        const signifies = data.planetSig[csl] ? data.planetSig[csl].all : [];
+        const fruit = KP_FRUIT_SETS[hs.house];
+        const hits = fruit.filter((h) => signifies.indexOf(h) !== -1);
+        const promise = hits.length >= Math.min(2, fruit.length) ? 'အားကောင်း' : (hits.length === 1 ? 'အလယ်အလတ်' : 'အားနည်း');
+        return { house: hs.house, theme: KP_HOUSE_THEMES[hs.house - 1], csl, signifies, fruit, hits, promise };
+      });
+      let dasha = null;
+      const active = _activeDasha(dashaTree);
+      if (active) {
+        const today = new Date().toISOString().split('T')[0];
+        const antar = (active.antars || []).find((a) => a.start <= today && a.end >= today) || null;
+        dasha = {
+          maha: active.lord,
+          mahaSig: data.planetSig[active.lord] ? data.planetSig[active.lord].all : [],
+          antar: antar ? antar.lord : null,
+          antarSig: antar && data.planetSig[antar.lord] ? data.planetSig[antar.lord].all : []
+        };
+      }
+      return { houses, dasha, data };
+    }
+
+    function calculateKPPrashnaResult(queryText, horaryNum, birthPlanets, transitPlanets, dashaTree, cusps) {
+      const intent = detectPrashnaIntent(queryText);
+      const cfg = {
+        career: { title: 'အလုပ်အကိုင် / Project / ရာထူး', houses: [2, 6, 10, 11], primary: 10, karaka: 'Sun / Mercury' },
+        love: { title: 'အချစ်ရေး / Relationship / အိမ်ထောင်', houses: [2, 5, 7, 11], primary: 7, karaka: 'Venus' },
+        wealth: { title: 'ငွေကြေး / အကြွေး / ရလဒ်', houses: [2, 5, 8, 11], primary: 2, karaka: 'Jupiter' },
+        property: { title: 'အိမ်ခြံမြေ / ပိုင်ဆိုင်မှု', houses: [2, 4, 11], primary: 4, karaka: 'Mars / Venus' },
+        travel: { title: 'ခရီး / နိုင်ငံခြား / Visa', houses: [3, 9, 12], primary: 9, karaka: 'Rahu / Jupiter' },
+        exam: { title: 'ပညာရေး / စာမေးပွဲ', houses: [4, 5, 9, 11], primary: 5, karaka: 'Mercury / Jupiter' },
+        health: { title: 'ကျန်းမာရေး', houses: [1, 5, 11], primary: 1, karaka: 'Sun / Moon' },
+        general: { title: 'အထွေထွေကိစ္စ', houses: [1, 2, 11], primary: 1, karaka: 'Jupiter' }
+      }[intent];
+      const kp = buildKPData(birthPlanets, cusps);
+      const supporting = cfg.houses;
+      const negate = supporting.map((h) => (h === 1 ? 12 : h - 1)).filter((h) => supporting.indexOf(h) === -1);
+      const sigOf = (planet) => (kp.planetSig[planet] ? kp.planetSig[planet].all : []);
+      let score = 50;
+      const evidence = [];
+      supporting.forEach((h) => {
+        const csl = kp.cuspSubLord[h - 1];
+        const sig = sigOf(csl);
+        const good = supporting.filter((x) => sig.indexOf(x) !== -1);
+        const bad = negate.filter((x) => sig.indexOf(x) !== -1);
+        const w = (h === cfg.primary) ? 2 : 1;
+        if (good.length) { score += 3 * w * Math.min(2, good.length); evidence.push(`${h} တန့် Cusp Sub Lord ${csl} သည် အကျိုးပေးအိမ် ${good.join(', ')} ကို signify လုပ်၍ ထောက်ခံသည်။`); }
+        if (bad.length) { score -= 3 * w * Math.min(2, bad.length); evidence.push(`${h} တန့် Cusp Sub Lord ${csl} သည် ငြင်းအိမ် ${bad.join(', ')} ကို signify လုပ်၍ အတားအဆီး ဖြစ်စေနိုင်သည်။`); }
+      });
+      const tMoonKP = getKPSubLordData(transitPlanets.Moon);
+      const moonSubSig = sigOf(tMoonKP.subLord);
+      const moonGood = supporting.filter((x) => moonSubSig.indexOf(x) !== -1);
+      if (moonGood.length) { score += 8; evidence.push(`ဟူးရား Moon Sub Lord ${tMoonKP.subLord} သည် အကျိုးပေးအိမ် ${moonGood.join(', ')} ကို signify လုပ်၍ မေးခွန်း၏ flow ကို ထောက်ခံသည်။`); }
+      const d = _activeDasha(dashaTree);
+      if (d) {
+        const dSig = sigOf(d.lord);
+        const dGood = supporting.filter((x) => dSig.indexOf(x) !== -1);
+        if (dGood.length) { score += 7; evidence.push(`လက်ရှိ ${d.lord} မဟာဒသာသည် KP အရ အကျိုးပေးအိမ် ${dGood.join(', ')} ကို signify လုပ်၍ ကာလကပါ ထောက်ခံနေသည်။`); }
+      }
+      score = Math.max(20, Math.min(92, Math.round(score)));
+      const verdict = score >= 72 ? 'YES — အကောင်အထည်ဖော်နိုင်ခြေ အားကောင်း' : score >= 58 ? 'CONDITIONAL — ဖြစ်နိုင်သော်လည်း အခြေအနေ/အချိန်လို' : 'NO / DELAY — လက်ရှိအခြေအနေမှာ အတားအဆီးပိုများ';
+      const advice = score >= 72 ? 'အခွင့်အရေးကို လက်လွတ်မခံဘဲ စာရွက်စာတမ်း၊ အချိန်နှင့် လက်တွေ့လုပ်ဆောင်ချက်ကို တိတိကျကျ စီမံပါ။' : score >= 58 ? 'အခုချက်ချင်း အဖြေတစ်ဖက်သတ်မချဘဲ အတားအဆီးဖြစ်စေသောအချက်ကို ဖြေရှင်းပြီး နောက်တစ်ကြိမ် trigger ကို စောင့်ကြည့်ပါ။' : 'အလောတကြီး တွန်းမလုပ်သင့်ပါ။ အကြောင်းရင်း/စာချုပ်/ဆက်သွယ်ရေးကွက်လပ်ကို အရင်ပြင်ပြီး timing ပြောင်းလာမှ ပြန်စစ်သင့်သည်။';
+      return {
+        queryText: queryText || 'မေးမြန်းထားသောကိစ္စ', title: cfg.title, score, verdict,
+        answerDesc: `ဒီအဖြေကို KP နည်းဖြင့် သက်ဆိုင်ရာ Cusp Sub Lord များ၊ ၎င်းတို့ signify လုပ်သော အိမ်များ၊ ဟူးရား Moon Sub Lord နှင့် လက်ရှိ Dasha Signification ကို ပေါင်းစပ်ပြီး ထုတ်ထားသည်။ (အကျိုးပေးအိမ်: ${supporting.join(', ')} / ငြင်းအိမ်: ${negate.join(', ') || '—'})`,
+        timingWindow: score >= 72 ? 'လက်ရှိမှ နောက် 1–3 လအတွင်း trigger ပိုမြင်ရနိုင်သည်။' : score >= 58 ? 'အတားအဆီးပြေလျော့ပြီး နောက် 3–6 လအတွင်း ပိုရှင်းလာနိုင်သည်။' : 'လက်ရှိကာလထက် နောက်ပိုင်းတွင် ပြန်လည်စစ်ဆေးရန် ပိုသင့်တော်သည်။',
+        karaka: cfg.karaka, vargaUsed: 'KP Prashna — Cusp Sub-Lord + Significators', evidence, advice, intent
+      };
+    }
+
+    function calculateKPMatching(bP, gP, bCusps, gCusps) {
+      const bK = buildKPData(bP, bCusps);
+      const gK = buildKPData(gP, gCusps);
+      const bMoon = getKPSubLordData(bP.Moon);
+      const gMoon = getKPSubLordData(gP.Moon);
+      const b7 = bK.cuspSubLord[6];
+      const g7 = gK.cuspSubLord[6];
+      const b7sig = bK.planetSig[b7] ? bK.planetSig[b7].all : [];
+      const g7sig = gK.planetSig[g7] ? gK.planetSig[g7].all : [];
+      const marriageSet = [2, 7, 11];
+      const bPromise = marriageSet.filter((h) => b7sig.indexOf(h) !== -1).length;
+      const gPromise = marriageSet.filter((h) => g7sig.indexOf(h) !== -1).length;
+      let score = 40;
+      const lines = [];
+      lines.push(`သတို့သား Moon: ${bMoon.nakshatra} — Star Lord ${bMoon.starLord}, Sub Lord ${bMoon.subLord}`);
+      lines.push(`သတို့သမီး Moon: ${gMoon.nakshatra} — Star Lord ${gMoon.starLord}, Sub Lord ${gMoon.subLord}`);
+      if (bMoon.starLord === gMoon.starLord) { score += 15; lines.push('Moon Star Lord တူညီ — စိတ်ထား/စရိုက် ညီညွတ်မှု အားကောင်းသည်။'); }
+      if (bMoon.subLord === gMoon.subLord) { score += 15; lines.push('Moon Sub Lord တူညီ — စိတ်ခံစားမှု ဆက်နွယ်မှု နက်ရှိုင်းသည်။'); }
+      if (bMoon.subLord === gMoon.starLord || gMoon.subLord === bMoon.starLord) { score += 10; lines.push('တစ်ဦး၏ Moon Sub Lord နှင့် အခြားတစ်ဦး၏ Moon Star Lord ဆက်နွယ် — အပြန်အလှန် ဆွဲဆောင်မှု ရှိသည်။'); }
+      lines.push(`သတို့သား 7th Cusp Sub Lord: ${b7} → signify [${b7sig.join(', ') || '—'}] — အိမ်ထောင် promise ${bPromise}/3`);
+      lines.push(`သတို့သမီး 7th Cusp Sub Lord: ${g7} → signify [${g7sig.join(', ') || '—'}] — အိမ်ထောင် promise ${gPromise}/3`);
+      score += bPromise * 5 + gPromise * 5;
+      score = Math.max(5, Math.min(98, score));
+      const verdict = score >= 75 ? 'KP အရ အလွန် သဟဇာတ' : score >= 60 ? 'KP အရ သဟဇာတ ကောင်း' : score >= 45 ? 'KP အရ အလယ်အလတ်' : 'KP အရ အားစိုက်ညှိရန် လို';
+      return { score, verdict, lines };
+    }
+
     function calculateVarga(longitude, v) {
       const safeLon = norm360(longitude);
       const sign = Math.floor(safeLon / 30) % 12;
@@ -1499,12 +1708,15 @@
 
       const birthJD = getJulianDay(sY, sM, sD, sH, sMin, birthTz);
       const birthPlanets = calculateNASA_JPL_Planets(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
+      const kpCusps = ayanamsa === 'kp' ? calculatePlacidusCusps(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa) : null;
       const tJD = getJulianDay(transitDate.getFullYear(), transitDate.getMonth() + 1, transitDate.getDate(), transitDate.getHours(), transitDate.getMinutes(), 6.5);
       const transitPlanets = calculateNASA_JPL_Planets(tJD, parseFloat(transitLat) || 16.84, parseFloat(transitLon) || 96.17, ayanamsa, nodeType);
 
       const dashaTree = calculateDashaTree(birthPlanets.Moon, birthDateObj);
       const bhavaBala = calculateBhavaBala(birthPlanets);
       const yogas = checkAllYogas(birthPlanets);
+      const kpReading = ayanamsa === 'kp' && kpCusps ? generateKPReading(birthPlanets, kpCusps, dashaTree) : null;
+      const kpData = kpReading ? kpReading.data : null;
 
       const currentDateStr = now.toISOString().split('T')[0];
       const currentRunningDasha = dashaTree.find((d) => d.start <= currentDateStr && d.end >= currentDateStr) || dashaTree[0] || { lord: 'Ketu', start: '2026-01-01', end: '2033-01-01' };
@@ -1516,7 +1728,9 @@
       const liveTransitPredictions = analyzeLiveTransit(birthPlanets, transitPlanets);
 
       const runPrashna = () => {
-        const res = calculatePrashnaResult(prashnaCustomText, horaryNumber, birthPlanets, transitPlanets, dashaTree);
+        const res = ayanamsa === 'kp' && kpCusps
+          ? calculateKPPrashnaResult(prashnaCustomText, horaryNumber, birthPlanets, transitPlanets, dashaTree, kpCusps)
+          : calculatePrashnaResult(prashnaCustomText, horaryNumber, birthPlanets, transitPlanets, dashaTree);
         setPrashnaResult(res);
       };
 
@@ -1528,7 +1742,10 @@
       // Dynamic Julian Day calculation using individual timezones
       const boyJD = getJulianDay(safeYear(boy.y, curY), safeMonth(boy.m, 1), safeDay(boy.d, 1), boyH, safeMinute(boy.min, 0), parseFloat(boy.tz) || 6.5);
       const girlJD = getJulianDay(safeYear(girl.y, curY), safeMonth(girl.m, 1), safeDay(girl.d, 1), girlH, safeMinute(girl.min, 0), parseFloat(girl.tz) || 6.5);
-      const matchResult = calculateSynastry(calculateNASA_JPL_Planets(boyJD, boy.lat, boy.lon, ayanamsa), calculateNASA_JPL_Planets(girlJD, girl.lat, girl.lon, ayanamsa), ayanamsa, boyDateObj, girlDateObj);
+      const boyPlanets = calculateNASA_JPL_Planets(boyJD, boy.lat, boy.lon, ayanamsa);
+      const girlPlanets = calculateNASA_JPL_Planets(girlJD, girl.lat, girl.lon, ayanamsa);
+      const matchResult = calculateSynastry(boyPlanets, girlPlanets, ayanamsa, boyDateObj, girlDateObj);
+      const kpMatch = ayanamsa === 'kp' ? calculateKPMatching(boyPlanets, girlPlanets, calculatePlacidusCusps(boyJD, boy.lat, boy.lon, 'kp'), calculatePlacidusCusps(girlJD, girl.lat, girl.lon, 'kp')) : null;
 
       const timePad = (n) => (n < 10 ? '0' + n : n);
       const transitTimeStr = `${timePad(transitDate.getHours())}:${timePad(transitDate.getMinutes())}`;
@@ -1737,17 +1954,18 @@
 
                   <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
                     <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">KP Planetary Details (RN / NL / SL / SSL)</div>
-                    <div className="grid grid-cols-7 bg-slate-50 p-1.5 font-bold text-[10px] text-slate-600 border-b">
-                      <span>ဂြိုဟ်</span><span>ဒီဂရီ</span><span>ရာသီ</span><span>NL(Star)</span><span>SL(Sub)</span><span>SSL</span><span>နက္ခတ်</span>
+                    <div className="grid grid-cols-8 bg-slate-50 p-1.5 font-bold text-[10px] text-slate-600 border-b">
+                      <span>ဂြိုဟ်</span><span>ဒီဂရီ</span><span>ရာသီ</span><span>ဘာဝ</span><span>NL(Star)</span><span>SL(Sub)</span><span>SSL</span><span>နက္ခတ်</span>
                     </div>
                     {Object.keys(birthPlanets).filter((k) => k !== 'ayanamsaVal').map((k) => {
                       const deg = birthPlanets[k];
                       const kp = getKPSubLordData(deg);
                       return (
-                        <div key={k} className="grid grid-cols-7 p-1.5 border-t border-slate-100 text-[10px] items-center">
+                        <div key={k} className="grid grid-cols-8 p-1.5 border-t border-slate-100 text-[10px] items-center">
                           <span className="font-bold text-emerald-900">{PLANET_SHORT[k]} ({k})</span>
                           <span>{(deg % 30).toFixed(2)}°</span>
                           <span>{kp.rasi.slice(0,3)}</span>
+                          <span className="font-semibold text-emerald-800">{kpData ? 'H' + kpData.bhavaOf(deg) : '-'}</span>
                           <span className="font-semibold text-blue-700">{kp.starLord.slice(0,3)}</span>
                           <span className="font-bold text-amber-700">{kp.subLord.slice(0,3)}</span>
                           <span className="text-slate-500">{kp.ssl.slice(0,3)}</span>
@@ -1763,7 +1981,7 @@
                       <span>Cusp</span><span>အစ ဒီဂရီ</span><span>ရာသီ</span><span>Sign Lord</span><span>Star Lord</span><span>Sub Lord</span>
                     </div>
                     {Array.from({ length: 12 }, (_, i) => {
-                      const cuspDeg = norm360(birthPlanets.Lagna + i * 30);
+                      const cuspDeg = kpCusps ? kpCusps[i] : norm360(birthPlanets.Lagna + i * 30);
                       const kp = getKPSubLordData(cuspDeg);
                       return (
                         <div key={i} className="grid grid-cols-6 p-1.5 border-t border-slate-100 text-[10px] items-center">
@@ -1782,7 +2000,7 @@
                 /* LAHIRI STANDARD TABLES */
                 <div className="space-y-3">
                   <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
-                    <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">ဂြိုဟ်အလိုက် နက္ခတ်နှင့် အဆင့်အတန်း (Lahiri Planetary Positions)</div>
+                    <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">ဂြိုဟ်အလိုက် နက္ခတ်နှင့် အဆင့်အတန်း ({ayanamsa.charAt(0).toUpperCase() + ayanamsa.slice(1)} Planetary Positions)</div>
                     <div className="grid grid-cols-6 bg-slate-50 p-1.5 font-bold text-[10px] text-slate-600 border-b">
                       <span>ဂြိုဟ်</span><span>ဒီဂရီ</span><span>ရာသီ</span><span>ဘာဝ</span><span>အဆင့်</span><span>နက္ခတ် (Lord)</span>
                     </div>
@@ -1839,6 +2057,30 @@
                 <h2 className="font-bold text-emerald-900 text-sm">ဇာတာ အဟောစာတမ်း ({ayanamsa.toUpperCase()} Method)</h2>
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Layered Synthesis</span>
               </div>
+
+              {/* KP EXCLUSIVE READING */}
+              {ayanamsa === 'kp' && kpReading && (
+                <div className="bg-amber-50 border-2 border-amber-500 p-3 rounded-lg shadow-sm space-y-2">
+                  <div className="font-bold text-amber-950 text-xs border-b border-amber-200 pb-1">👑 KP အဟော — Cusp Sub-Lord ဆန်းစစ်ချက်</div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">အိမ်တစ်ခုချင်းကို ၎င်း၏ Cusp Sub Lord (CSL) ဖြင့် ဆုံးဖြတ်ထားသည်။ CSL signify လုပ်သော အိမ်များထဲတွင် ထိုအိမ်၏ အကျိုးပေးအိမ် (Fruit) များ ပါဝင်မှုပေါ် မူတည်၍ promise အဆင့် သတ်မှတ်သည်။</p>
+                  <div className="space-y-1">
+                    {kpReading.houses.map((h) => (
+                      <div key={h.house} className="bg-white rounded border border-amber-100 p-2">
+                        <div className="flex justify-between items-center">
+                          <span className="font-bold text-emerald-900">H{h.house} · {h.theme}</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${h.promise === 'အားကောင်း' ? 'bg-emerald-100 text-emerald-800' : h.promise === 'အလယ်အလတ်' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-700'}`}>{h.promise}</span>
+                        </div>
+                        <div className="text-[11px] text-slate-600 mt-0.5">Cusp Sub Lord: <strong className="text-amber-700">{h.csl}</strong> → signify [{h.signifies.join(', ') || '—'}] · Fruit: [{h.fruit.join(', ')}]</div>
+                      </div>
+                    ))}
+                  </div>
+                  {kpReading.dasha && (
+                    <div className="bg-white rounded border border-amber-100 p-2 text-[11px] text-slate-700 leading-relaxed">
+                      <strong className="text-emerald-900">လက်ရှိ ဒသာ (KP Signification):</strong> {kpReading.dasha.maha} မဟာဒသာ signify [{kpReading.dasha.mahaSig.join(', ') || '—'}]{kpReading.dasha.antar ? ` · ${kpReading.dasha.antar} အန္တရ signify [${kpReading.dasha.antarSig.join(', ') || '—'}]` : ''} — ဤကာလတွင် အဆိုပါ အိမ်ကိစ္စများ အဓိက activate ဖြစ်မည်။
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* 1. Life Overview */}
               <div className="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-3.5 rounded-lg shadow space-y-2">
@@ -2106,8 +2348,23 @@
           {/* TAB 6: BHAVA BALA */}
           {activeTab === 'bhava' && (
             <div className="p-3 space-y-2 text-xs">
-              <h2 className="font-bold text-emerald-900 text-sm">ဘာဝ ၁၂ ပါး အားဗလ (Bhava Bala)</h2>
-              {bhavaBala.sorted.map((b) => (
+              <h2 className="font-bold text-emerald-900 text-sm">{ayanamsa === 'kp' && kpData ? 'ဘာဝ ၁၂ ပါး (KP Cusp မြင်ကွင်း)' : 'ဘာဝ ၁၂ ပါး အားဗလ (Bhava Bala)'}</h2>
+              {ayanamsa === 'kp' && kpData && (
+                <div className="space-y-2">
+                  {kpData.houseSig.map((hs) => (
+                    <div key={hs.house} className="bg-white border border-amber-200 p-2.5 rounded shadow-sm">
+                      <div className="flex justify-between items-center">
+                        <span className="font-bold text-emerald-900">House {hs.house} — {RASI_NAMES_EN[kpData.cuspSign[hs.house - 1]]} {(kpData.cusps[hs.house - 1] % 30).toFixed(2)}°</span>
+                        <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded">CSL: {hs.cuspSubLord}</span>
+                      </div>
+                      <div className="text-[11px] text-slate-600 mt-0.5">တည်ရှိဂြိုဟ်: {hs.occupants.join(', ') || '—'} · Sign Lord: {hs.signLord}</div>
+                      <div className="text-[11px] text-slate-600">Significators: {[...new Set([...hs.occupants, ...hs.inStarOfOcc, hs.signLord, ...hs.inStarOfLord])].join(', ') || '—'}</div>
+                    </div>
+                  ))}
+                  <p className="text-[10px] text-slate-500 leading-relaxed">KP စနစ်တွင် ဘာဝကို Placidus cusp မှ စတင် ရေတွက်သည်။ Bhava Bala သည် Parashari စနစ်ဖြစ်၍ KP mode တွင် cusp အခြေခံ မြင်ကွင်း ပြထားသည်။</p>
+                </div>
+              )}
+              {!(ayanamsa === 'kp' && kpData) && bhavaBala.sorted.map((b) => (
                 <div key={b.house} className="bg-white border border-slate-200 p-2.5 rounded shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
@@ -2130,8 +2387,20 @@
           {/* TAB 7: YOGAS */}
           {activeTab === 'yogas' && (
             <div className="p-3 space-y-2 text-xs">
-              <h2 className="font-bold text-emerald-900 text-sm mb-1">ပါဝင်သော ယောဂများ ({yogas.length})</h2>
-              {yogas.map((y, idx) => (
+              <h2 className="font-bold text-emerald-900 text-sm mb-1">{ayanamsa === 'kp' && kpData ? 'KP Significators (ယောဂ အစား)' : `ပါဝင်သော ယောဂများ (${yogas.length})`}</h2>
+              {ayanamsa === 'kp' && kpData && (
+                <div className="space-y-2">
+                  <p className="text-[11px] text-slate-600 leading-relaxed bg-amber-50 border border-amber-200 rounded p-2">KP စနစ်တွင် ရှေးဟောင်း ယောဂများကို အဓိက မသုံးဘဲ အိမ်အလိုက် Significator စနစ်ဖြင့် ဖတ်သည်။ A = အိမ်တွင်း တည်ရှိဂြိုဟ်၊ B = ၎င်းတို့၏ နက္ခတ်တွင် ရှိသောဂြိုဟ်၊ C = Cusp Sign Lord၊ D = Sign Lord ၏ နက္ခတ်တွင် ရှိသောဂြိုဟ်။</p>
+                  {kpData.houseSig.map((hs) => (
+                    <div key={hs.house} className="bg-white border border-amber-200 p-2.5 rounded">
+                      <div className="font-bold text-emerald-900">House {hs.house} Significators</div>
+                      <div className="text-[11px] text-slate-600 mt-0.5">A: {hs.occupants.join(', ') || '—'} · B: {hs.inStarOfOcc.join(', ') || '—'}</div>
+                      <div className="text-[11px] text-slate-600">C: {hs.signLord} · D: {hs.inStarOfLord.join(', ') || '—'} · CSL: <strong className="text-amber-700">{hs.cuspSubLord}</strong></div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {!(ayanamsa === 'kp' && kpData) && yogas.map((y, idx) => (
                 <div key={idx} className="bg-white border border-emerald-200 p-2.5 rounded">
                   <div className="font-bold text-emerald-800 text-[13px]">{y.name}</div>
                   <div className="text-amber-500 text-[14px] tracking-tight">{y.stars || '★★★☆☆'} <span className="text-[10px] text-slate-500">အကျိုးပေးအလေးချိန် {y.strength || 3}/5</span></div>
@@ -2323,6 +2592,19 @@
                   <p className="text-slate-700 text-[11px] leading-relaxed">
                     {matchResult.futureWindow.note}
                   </p>
+                </div>
+              )}
+
+              {ayanamsa === 'kp' && kpMatch && (
+                <div className="bg-white border border-amber-300 p-3 rounded space-y-1 shadow-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-emerald-900">KP ဇာတာတိုက် (Sub-Lord Matching)</span>
+                    <span className="font-bold text-amber-700">{kpMatch.score}/100</span>
+                  </div>
+                  <div className="text-[11px] font-semibold text-emerald-800">{kpMatch.verdict}</div>
+                  {kpMatch.lines.map((l, i) => (
+                    <div key={i} className="text-[11px] text-slate-600">• {l}</div>
+                  ))}
                 </div>
               )}
 
