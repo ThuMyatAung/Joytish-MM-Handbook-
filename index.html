@@ -583,6 +583,39 @@
       return { houses, dasha, data };
     }
 
+    const KP_PLANET_NATURE = { Sun: 'အာဏာ · ဖခင် · အစိုးရဆက်ဆံရေး', Moon: 'စိတ်ခံစားမှု · မိခင် · အပြောင်းအလဲ', Mars: 'ရဲရင့်မှု · စွမ်းအင် · မြေ/အင်ဂျင်နီယာ', Mercury: 'ဉာဏ် · စီးပွားရေး · ဆက်သွယ်ရေး', Jupiter: 'ပညာ · ကံ · တိုးပွားမှု · လမ်းညွှန်သူ', Venus: 'သာယာမှု · စည်းစိမ် · အချစ်/အနုပညာ', Saturn: 'တာဝန် · ကြိုးစားမှု · နှောင့်နှေးမှု', Rahu: 'ကြီးမားသောဆန္ဒ · နိုင်ငံခြား · ထူးခြားသောလမ်း', Ketu: 'ခွဲခွာမှု · တရား · လျှို့ဝှက်သုတေသန' };
+
+    // Per-house effect text for the KP Bhava / Significator views: what each
+    // occupant planet's presence implies, and a CSL-based summary per house.
+    function kpHouseEffects(data) {
+      return data.houseSig.map((hs) => {
+        const fruit = KP_FRUIT_SETS[hs.house];
+        const occupantLines = hs.occupants.map((name) => {
+          const sig = data.planetSig[name] || { strong: [], all: [] };
+          const hits = fruit.filter((h) => sig.all.indexOf(h) !== -1);
+          let tone;
+          if (hits.length >= 2) tone = 'ဤအိမ်ကိစ္စကို အကျိုးပေး အားကောင်း';
+          else if (hits.length === 1) tone = 'အကျိုးပေး ရှိ';
+          else tone = 'ဤအိမ်အတွက် တိုက်ရိုက် အကျိုးပေး အားနည်း';
+          if (hits.length === 0 && (sig.all.indexOf(8) !== -1 || sig.all.indexOf(12) !== -1)) tone += ' · 8/12 ဆက်နွယ်မှုကြောင့် အတားအဆီး/အသုံးစရိတ် သတိပြု';
+          return { planet: name, text: `${KP_PLANET_NATURE[name]} · signify [${sig.strong.join(', ') || '—'}] — ${tone}` };
+        });
+        const csl = hs.cuspSubLord;
+        const cslSig = data.planetSig[csl] ? data.planetSig[csl].all : [];
+        const cslHits = fruit.filter((h) => cslSig.indexOf(h) !== -1);
+        let verdict;
+        if (cslHits.length >= 2) verdict = 'အိမ်ကိစ္စ အကောင်အထည် ပေါ်နိုင်ခြေ အားကောင်း';
+        else if (cslHits.length === 1) verdict = 'အလယ်အလတ် — ဆက်နွယ်အိမ်များမှတစ်ဆင့် အကျိုးပေးနိုင်';
+        else verdict = 'တိုက်ရိုက် promise အားနည်း — သက်ဆိုင်ရာ ဒသာ အလှည့် လိုအပ်';
+        const booster = hs.occupants.find((name) => {
+          const s = data.planetSig[name];
+          return s && fruit.filter((h) => s.all.indexOf(h) !== -1).length >= 2;
+        });
+        const summary = `CSL ${csl} signify [${cslSig.join(', ') || '—'}] — ${verdict}${booster ? ` · တည်ရှိဂြိုဟ် ${booster} ကပါ အကျိုးပေးအိမ် signify လုပ်၍ အားဖြည့်` : ''}`;
+        return { house: hs.house, occupantLines, summary };
+      });
+    }
+
     function calculateKPPrashnaResult(queryText, horaryNum, birthPlanets, transitPlanets, dashaTree, cusps) {
       const intent = detectPrashnaIntent(queryText);
       const cfg = {
@@ -1717,6 +1750,7 @@
       const yogas = checkAllYogas(birthPlanets);
       const kpReading = ayanamsa === 'kp' && kpCusps ? generateKPReading(birthPlanets, kpCusps, dashaTree) : null;
       const kpData = kpReading ? kpReading.data : null;
+      const kpEffects = kpData ? kpHouseEffects(kpData) : null;
 
       const currentDateStr = now.toISOString().split('T')[0];
       const currentRunningDasha = dashaTree.find((d) => d.start <= currentDateStr && d.end >= currentDateStr) || dashaTree[0] || { lord: 'Ketu', start: '2026-01-01', end: '2033-01-01' };
@@ -2359,6 +2393,9 @@
                       </div>
                       <div className="text-[11px] text-slate-600 mt-0.5">တည်ရှိဂြိုဟ်: {hs.occupants.join(', ') || '—'} · Sign Lord: {hs.signLord}</div>
                       <div className="text-[11px] text-slate-600">Significators: {[...new Set([...hs.occupants, ...hs.inStarOfOcc, hs.signLord, ...hs.inStarOfLord])].join(', ') || '—'}</div>
+                      {kpEffects && kpEffects[hs.house - 1].occupantLines.map((ol) => (
+                        <div key={ol.planet} className="text-[11px] text-emerald-800 mt-0.5">• <strong>{ol.planet}</strong> — {ol.text}</div>
+                      ))}
                     </div>
                   ))}
                   <p className="text-[10px] text-slate-500 leading-relaxed">KP စနစ်တွင် ဘာဝကို Placidus cusp မှ စတင် ရေတွက်သည်။ Bhava Bala သည် Parashari စနစ်ဖြစ်၍ KP mode တွင် cusp အခြေခံ မြင်ကွင်း ပြထားသည်။</p>
@@ -2396,6 +2433,9 @@
                       <div className="font-bold text-emerald-900">House {hs.house} Significators</div>
                       <div className="text-[11px] text-slate-600 mt-0.5">A: {hs.occupants.join(', ') || '—'} · B: {hs.inStarOfOcc.join(', ') || '—'}</div>
                       <div className="text-[11px] text-slate-600">C: {hs.signLord} · D: {hs.inStarOfLord.join(', ') || '—'} · CSL: <strong className="text-amber-700">{hs.cuspSubLord}</strong></div>
+                      {kpEffects && (
+                        <div className="text-[11px] text-emerald-800 mt-1 bg-emerald-50/60 rounded p-1.5"><strong>အနှစ်ချုပ်:</strong> {kpEffects[hs.house - 1].summary}</div>
+                      )}
                     </div>
                   ))}
                 </div>
