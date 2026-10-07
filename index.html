@@ -621,14 +621,20 @@
     // ===== v6: Birth-time rectification =====
     const RECT_EVENT_DEFS={
       marriage:{label:'💍 အိမ်ထောင် ကျခဲ့သည်',houses:[2,7,11],primary:7},
-      job:{label:'💼 အလုပ် စလုပ်ခဲ့သည် / အလုပ်ရ',houses:[2,10,11],primary:10},
-      business:{label:'🏢 လုပ်ငန်း စထောင်ခဲ့သည်',houses:[7,10,11],primary:10},
+      love:{label:'💗 ရည်းစား စထားခဲ့သည်',houses:[5,7],primary:5},
       child:{label:'👶 သားသမီး ရခဲ့သည်',houses:[5,9],primary:5},
+      job:{label:'💼 အလုပ် စလုပ်ခဲ့သည် / အလုပ်ရ',houses:[2,10,11],primary:10},
+      promotion:{label:'📈 ရာထူး တက် / အလုပ် ပြောင်း (ကောင်း)',houses:[6,10,11],primary:10},
+      business:{label:'🏢 ကိုယ်ပိုင် လုပ်ငန်း စထောင်ခဲ့သည်',houses:[7,10,11],primary:10},
+      inherit:{label:'🏠 မိဘ လုပ်ငန်း ဆက်ခံ / အမွေ ဆက်ခံ',houses:[4,8,9,10],primary:10},
+      debut:{label:'🎨 ပွဲဦးထွက် / ပထမ လက်ရာ ထုတ်ခဲ့သည်',houses:[3,5,10],primary:5},
+      fame:{label:'🌟 နာမည်ပေါက် / အောင်မြင် ထင်ရှား',houses:[5,10,11],primary:10},
+      rise:{label:'🚀 ကြီးပွား / စီးပွား ပေါက်',houses:[9,10,11],primary:10},
+      house:{label:'🏡 အိမ်/ခြံ ဝယ် / နေအိမ် ပြောင်း',houses:[4,11],primary:4},
       abroad:{label:'✈️ နိုင်ငံခြား ထွက်/ပြောင်း နေခဲ့သည်',houses:[3,9,12],primary:12},
       education:{label:'🎓 ပညာ အရေးပါ အောင်မြင်/ပြီး',houses:[4,5,9],primary:5},
-      rise:{label:'📈 ကြီးပွား/ဆု/ရာထူး တက်',houses:[9,10,11],primary:10},
-      hardship:{label:'⚠️ မတော်တဆ/နာမကျန်း/အခက်အခဲကြီး',houses:[6,8,12],primary:8},
-      love:{label:'💗 ရည်းစား စထားခဲ့သည်',houses:[5,7],primary:5}
+      jobloss:{label:'📉 အလုပ် ပြုတ် / လုပ်ငန်း ပိတ်',houses:[6,8,10],primary:10},
+      hardship:{label:'⚠️ မတော်တဆ/နာမကျန်း/အခက်အခဲကြီး',houses:[6,8,12],primary:8}
     };
     const APPEARANCE_BY_SIGN=['မိဿ: အရပ် အလတ်, ကိုယ် သွယ်လျ, မျက်နှာ ရှည်သွယ်, လှုပ်ရှား မြန်','ပြိဿ: အရပ် အလတ်/နိမ့်, ကိုယ် တောင့်တင်း, လည်ပင်း/ပခုံး ကြီး, ငြိမ်','မေထုန်: အရပ် ရှည်, ကိုယ် ပိန်, လက် ရှည်, နုပျို ရုပ်','ကရကဋ်: အရပ် အလတ်, ကိုယ် ပြည့်, မျက်နှာ လုံး/ပြည့်, အသား ဖြူစင်','သိဟ်: ကိုယ် တောင့်, ပခုံး ကျယ်, ဦးခေါင်း ကြီး, ဟန် ခန့်ညား','ကန်: အရပ် အလတ်, ကိုယ် သွယ်, မျက်နှာ သန့် ပြတ်, စနစ် ကျ','တူ: အရပ် အလတ်, ကိုယ် ချော လှ, မျက်နှာ ညီညာ, ပြုံး များ','ဗြိစ္ဆာ: အရပ် အလတ်, ကိုယ် တောင့်, မျက်လုံး နက် စူး, ကြည့် ထက်မြက်','ဓနု: အရပ် ရှည်, ကိုယ် တောင့်လျ, မျက်နှာ ရှည်, ပွင့်လင်း ဟန်','မကာရ: အရပ် အလတ်/ရှည်, ကိုယ် ပိန် တောင့်, ရင့်ကျက် ရုပ်','ကုံ: အရပ် ရှည်, ကိုယ် တောင့်, မျက်နှာ ကျယ်, ဆန်းသစ် ဟန်','မိန်: အရပ် အလတ်/နိမ့်, ကိုယ် ပြည့် နူး, မျက်လုံး အိပ်မက် ဆန်, နူးညံ့'];
     function _rectConnection(bp,kpData,def,planet){
@@ -2993,7 +2999,7 @@
               <div className="bg-white rounded-xl shadow-sm border border-violet-100 overflow-hidden mt-3">
                 <div className="bg-violet-50 px-3 py-2 border-b border-violet-100">
                   <h3 className="font-bold text-slate-800 text-xs">🕵️ မွေးချိန် ပြန်ရှာရန် (Birth Time Rectification)</h3>
-                  <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">မွေးရက်/နှစ် သိပြီး အချိန် မသေချာသူများအတွက် — ဘဝ ဖြစ်စဉ် ရက်စွဲများ ထည့်ပါ။ အချိန် အကွာအဝေး အတွင်း ဒဿာ/Transit ဆက်နွယ်မှု အကိုက်ဆုံး အချိန်များကို ရှာပေးမည်။ ရလဒ်သည် အကူ ကိရိယာ မျှသာ ဖြစ်သည်။</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">မွေးရက်/နှစ် သိပြီး အချိန် မသေချာသူများအတွက် — ဘဝ ဖြစ်စဉ် ရက်စွဲများ ထည့်ပါ။ အချိန် အကွာအဝေး အတွင်း ဒဿာ/Transit ဆက်နွယ်မှု အကိုက်ဆုံး အချိန်များကို ရှာပေးမည်။ ဖြစ်စဉ် အချက်အလက် စေ့စပ် များများ ထည့်လေ ရှာရ ပိုလွယ် ပိုမှန်လေ — လုပ်ငန်း တစ်ခုတည်း အတွက်လည်း စထောင် ရက်စွဲ နဲ့ ပေါက်/ပြေလာတဲ့ ရက်စွဲ ကို သီးခြား ခွဲထည့်နိုင်သည်။ ရလဒ်သည် အကူ ကိရိယာ မျှသာ ဖြစ်သည်။</p>
                 </div>
                 <div className="p-3 space-y-2">
                   <div className="grid grid-cols-2 gap-2">
@@ -3010,7 +3016,7 @@
                       <button onClick={() => setRectEvents(rectEvents.filter((_, j) => j !== i))} className="px-2 text-slate-400">✕</button>
                     </div>
                   ))}
-                  {rectEvents.length < 6 && (<button onClick={() => setRectEvents([...rectEvents, { type: 'rise', date: '' }])} className="text-[11px] text-violet-700 font-semibold">➕ ဖြစ်စဉ် ထပ်ထည့်</button>)}
+                  {rectEvents.length < 8 && (<button onClick={() => setRectEvents([...rectEvents, { type: 'rise', date: '' }])} className="text-[11px] text-violet-700 font-semibold">➕ ဖြစ်စဉ် ထပ်ထည့်</button>)}
                   <label className="block text-[10px] text-slate-500">လဂ် ရုပ်ရည် နှင့် ထပ်တိုက်ရန် (သေချာမှ ရွေးပါ — မသေချာလျှင် ကျော်ထားပါ)
                     <select value={rectAppSign} onChange={(e) => setRectAppSign(e.target.value)} className="w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]">
                       <option value="">— မရွေးပါ —</option>
