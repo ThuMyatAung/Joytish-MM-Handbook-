@@ -577,44 +577,61 @@
       if(def.karakas.includes(planet)) sc+=1;
       return sc;
     }
+    let _ewCache = { key: null, val: null };
     function calculateEventWindows(birthPlanets,dashaTree,opts){
-      if(!birthPlanets||!dashaTree) return {};
-      const out={}; const today=new Date();
+      if(!birthPlanets||!dashaTree||!dashaTree.length) return {};
+      const ckey = [birthPlanets.Lagna, birthPlanets.Moon, opts.ayanamsa, opts.nodeType, opts.lat, opts.lon].join('|');
+      if(_ewCache.key === ckey) return _ewCache.val;
       const moonSign=calculateVarga(birthPlanets.Moon,1), lagnaSign=calculateVarga(birthPlanets.Lagna,1);
+      const relFrom=(sign,ref)=>((sign-ref+12)%12)+1;
+      const y0=parseInt(dashaTree[0].start.slice(0,4),10);
+      const curY=new Date().getFullYear();
+      // per-year facts (computed once): dasha pair at mid-year + transit signs at mid-year
+      const yearFacts=[];
+      for(let Y=y0; Y<=y0+90; Y++){
+        const midStr=Y+'-07-01';
+        let maha=null, antar=null;
+        for(const m of dashaTree){ if(midStr>=m.start&&midStr<m.end){ maha=m.lord; const a=(m.antars||[]).find(x=>midStr>=x.start&&midStr<x.end); antar=a?a.lord:null; break; } }
+        let signs=null;
+        try{ const tp=calculateNASA_JPL_Planets(_jdFromDate(new Date(Y,6,1,12,0)),opts.lat,opts.lon,opts.ayanamsa,opts.nodeType); signs={}; ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'].forEach(k=>signs[k]=calculateVarga(tp[k],1)); }catch(e){}
+        yearFacts.push({Y,maha,antar,signs});
+      }
+      const out={};
       EVENT_WINDOW_DEFS.forEach(def=>{
-        const raw=[];
-        dashaTree.forEach(m=>{
-          (m.antars||[]).forEach(a=>{
-            const linkM=_lordLinkScore(birthPlanets,def,m.lord), linkA=_lordLinkScore(birthPlanets,def,a.lord);
-            let sc=linkM*1.0+linkA*1.5;
-            if(sc<2.5) return;
-            raw.push({start:a.start,end:a.end,maha:m.lord,antar:a.lord,score:sc});
-          });
+        const hits=[];
+        yearFacts.forEach(f=>{
+          if(!f.maha||!f.antar||!f.signs) return;
+          const linkM=_lordLinkScore(birthPlanets,def,f.maha), linkA=_lordLinkScore(birthPlanets,def,f.antar);
+          if(linkA<2||linkM<1) return;
+          let trig=false, trigNote='ဒဿာ နှစ်လွှာ သာ ဆုံ (ကောဇာ မပါ)';
+          if(!def.negative){
+            if(def.houses.includes(relFrom(f.signs.Jupiter,moonSign))||def.houses.includes(relFrom(f.signs.Jupiter,lagnaSign))){ trig=true; trigNote='Jupiter ကောဇာ ဆုံ'; }
+            else { for(const k of def.karakas){ if(def.houses.includes(relFrom(f.signs[k],moonSign))||def.houses.includes(relFrom(f.signs[k],lagnaSign))){ trig=true; trigNote=k+' ကောဇာ ဆုံ'; break; } } }
+          } else {
+            if([12,1,2].includes(relFrom(f.signs.Saturn,moonSign))){ trig=true; trigNote='Sade Sati ကာလ'; }
+            else if(def.houses.includes(relFrom(f.signs.Saturn,moonSign))||def.houses.includes(relFrom(f.signs.Saturn,lagnaSign))){ trig=true; trigNote='Saturn ကောဇာ ဆုံ'; }
+          }
+          const score=linkM+linkA*1.5+(trig?2:0);
+          if(!trig&&score<5) return;
+          hits.push({Y:f.Y,score,maha:f.maha,antar:f.antar,note:trigNote,trig,
+            grade:(trig&&score>=8)?'အားကောင်း':(score>=5.5?'အလယ်အလတ်':'ဖြစ်တန်စွမ်း ရှိ')});
         });
-        // merge consecutive periods
-        raw.sort((x,y)=>x.start<y.start?-1:1);
-        const merged=[];
-        raw.forEach(r=>{
-          const last=merged[merged.length-1];
-          if(last && r.start<=last.end){ if(r.score>last.score){last.score=r.score;last.maha=r.maha;last.antar=r.antar;} last.end=r.end>last.end?r.end:last.end; }
-          else merged.push({...r});
+        // pick the strongest years, then group consecutive same-grade years
+        const picked=hits.sort((a,b)=>b.score-a.score).slice(0,6).sort((a,b)=>a.Y-b.Y);
+        const grouped=[];
+        picked.forEach(h=>{
+          const last=grouped[grouped.length-1];
+          if(last && h.Y===last.y2+1 && h.grade===last.grade){ last.y2=h.Y; if(h.score>last.score){ last.score=h.score; last.maha=h.maha; last.antar=h.antar; last.note=h.note; } }
+          else grouped.push({y1:h.Y,y2:h.Y,score:h.score,maha:h.maha,antar:h.antar,note:h.note,grade:h.grade});
         });
-        // transit confirmation at midpoint for promising windows
-        merged.forEach(w=>{
-          const mid=new Date((new Date(w.start).getTime()+new Date(w.end).getTime())/2);
-          try{
-            const tp=calculateNASA_JPL_Planets(_jdFromDate(mid),opts.lat,opts.lon,opts.ayanamsa,opts.nodeType);
-            const jFromMoon=((calculateVarga(tp.Jupiter,1)-moonSign+12)%12)+1, jFromLagna=((calculateVarga(tp.Jupiter,1)-lagnaSign+12)%12)+1;
-            const sFromMoon=((calculateVarga(tp.Saturn,1)-moonSign+12)%12)+1;
-            if(!def.negative && (def.houses.includes(jFromMoon)||def.houses.includes(jFromLagna))){ w.score+=1.5; w.note='Jupiter transit trigger ဆုံ'; }
-            if(def.negative && [12,1,2].includes(sFromMoon)){ w.score+=1.5; w.note='Sade Sati / Saturn trigger ဆုံ'; }
-            else if(def.negative && def.houses.includes(sFromMoon)){ w.score+=1; w.note='Saturn transit trigger ဆုံ'; }
-          }catch(e){}
-          w.grade=w.score>=7?'အားကောင်း':(w.score>=4.5?'အလယ်အလတ်':'ဖြစ်တန်စွမ်း ရှိ');
-          w.when=(new Date(w.end)<today)?'ကုန်လွန်':((new Date(w.start)<=today)?'လက်ရှိ':'လာမည့်');
+        grouped.forEach(g=>{
+          g.isYear=true;
+          g.yearLabel = g.y1===g.y2 ? (''+g.y1) : (g.y1+'–'+g.y2);
+          g.when = g.y2<curY ? 'ကုန်လွန်' : (g.y1<=curY ? 'လက်ရှိ' : 'လာမည့်');
         });
-        out[def.key]=merged.filter(w=>w.score>=3).sort((a,b)=>b.score-a.score).slice(0,4).sort((a,b)=>a.start<b.start?-1:1);
+        out[def.key]=grouped;
       });
+      _ewCache={key:ckey,val:out};
       return out;
     }
 
@@ -3235,7 +3252,7 @@
                   <div className="bg-white rounded-xl shadow-sm border border-indigo-100 overflow-hidden">
                     <div className="bg-indigo-50 px-3 py-2 border-b border-indigo-100">
                       <h3 className="font-bold text-slate-800 text-xs">🎯 ဖြစ်စဉ် အချိန် ပြတင်းပေါက်များ (Trigger Windows)</h3>
-                      <p className="text-[10px] text-slate-500 mt-0.5">ဒဿာ/အန္တရ အရှင်များ၏ သက်ဆိုင်ရာ အိမ် ဆက်နွယ်မှု + Jupiter/Saturn transit trigger ဆုံမှု ဖြင့် တွက်ထားသည်။ ဖြစ်စဉ် တစ်ခုအတွက် ပြတင်းပေါက် တစ်ခုထက် ပိုရှိနိုင်သည် — ဖြစ်တန်စွမ်း အဆင့် ချိန်ပြထားသည်။</p>
+                      <p className="text-[10px] text-slate-500 mt-0.5">မဟာဒဿာ + အန္တရဒဿာ + ကောဇာ စီးနင်းမှု — သုံးလွှာ လုံး ဆုံရာ ကာလ ကိုသာ အဓိက ပြသည် (ထို့ကြောင့် နှစ် တို/နှစ် အတိအကျ ထွက်သည်)။ ဒဿာ နှစ်လွှာ သာ ဆုံပြီး ကောဇာ မပါလျှင် အဆင့် နိမ့်၍ ပြသည်။ ဖြစ်စဉ် တစ်ခုအတွက် အကြိမ် တစ်ခုထက် ပို ကျနိုင်သည်။</p>
                     </div>
                     <div className="p-3 space-y-3">
                       {EVENT_WINDOW_DEFS.map(def => { const ws = eventWindows[def.key] || []; return (
@@ -3243,7 +3260,7 @@
                           <div className="text-[11px] font-bold text-slate-700">{def.icon} {def.title}</div>
                           {ws.length === 0 ? <div className="text-[10px] text-slate-400 mt-0.5">ထင်ရှားသော ပြတင်းပေါက် မတွေ့ပါ။</div> : ws.map((w, i) => (
                             <div key={i} className="flex flex-wrap items-center gap-1.5 mt-1 text-[10px]">
-                              <span className="font-semibold text-slate-700">{w.start} → {w.end}</span>
+                              <span className="font-bold text-slate-800 text-[11px]">{w.yearLabel}</span>{!w.isYear && (<span className="text-slate-400">{w.startStr} → {w.endStr}</span>)}
                               <span className={`px-1.5 py-0.5 rounded-full font-bold ${w.grade === 'အားကောင်း' ? 'bg-emerald-100 text-emerald-700' : (w.grade === 'အလယ်အလတ်' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500')}`}>{w.grade}</span>
                               <span className={`px-1.5 py-0.5 rounded-full ${w.when === 'လက်ရှိ' ? 'bg-indigo-100 text-indigo-700 font-bold' : 'bg-slate-50 text-slate-400'}`}>{w.when}</span>
                               <span className="text-slate-500">{w.maha}/{w.antar} ကာလ</span>
