@@ -559,7 +559,7 @@
     }
 
 
-    function _jdFromDate(d){ return getJulianDay(d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), 6.5); }
+    function _jdFromDate(d, tz){ return getJulianDay(d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), (tz == null || isNaN(tz)) ? 6.5 : tz); }
     // ===== v6: Life-event Trigger Windows =====
     const EVENT_WINDOW_DEFS=[
       {key:'marriage',icon:'💍',title:'အိမ်ထောင် ကျချိန်',houses:[2,7,11],extra:[5],karakas:['Venus','Jupiter'],negative:false},
@@ -593,7 +593,7 @@
         let maha=null, antar=null;
         for(const m of dashaTree){ if(midStr>=m.start&&midStr<m.end){ maha=m.lord; const a=(m.antars||[]).find(x=>midStr>=x.start&&midStr<x.end); antar=a?a.lord:null; break; } }
         let signs=null;
-        try{ const tp=calculateNASA_JPL_Planets(_jdFromDate(new Date(Y,6,1,12,0)),opts.lat,opts.lon,opts.ayanamsa,opts.nodeType); signs={}; ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'].forEach(k=>signs[k]=calculateVarga(tp[k],1)); }catch(e){}
+        try{ const tp=calculateNASA_JPL_Planets(_jdFromDate(new Date(Y,6,1,12,0),opts.tz),opts.lat,opts.lon,opts.ayanamsa,opts.nodeType); signs={}; ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'].forEach(k=>signs[k]=calculateVarga(tp[k],1)); }catch(e){}
         yearFacts.push({Y,maha,antar,signs});
       }
       const out={};
@@ -669,12 +669,12 @@
       const results=[]; const evDefs=opts.events.map(e=>({...e,def:RECT_EVENT_DEFS[e.type]})).filter(e=>e.def&&e.date);
       // event-date transits computed once per event
       evDefs.forEach(e=>{
-        try{ const tp=calculateNASA_JPL_Planets(_jdFromDate(new Date(e.date+'T12:00:00')),opts.lat,opts.lon,opts.ayanamsa,opts.nodeType); e.tJup=calculateVarga(tp.Jupiter,1); e.tSat=calculateVarga(tp.Saturn,1);}catch(err){}
+        try{ const tp=calculateNASA_JPL_Planets(_jdFromDate(new Date(e.date+'T12:00:00'),opts.tz),opts.lat,opts.lon,opts.ayanamsa,opts.nodeType); e.tJup=calculateVarga(tp.Jupiter,1); e.tSat=calculateVarga(tp.Saturn,1);}catch(err){}
       });
       const scan=(from,to,step)=>{
         for(let mins=from;mins<=to;mins+=step){
           const d=new Date(opts.dateStr+'T00:00:00'); d.setMinutes(mins);
-          const jd=_jdFromDate(d);
+          const jd=_jdFromDate(d, opts.tz);
           let bp; try{ bp=calculateNASA_JPL_Planets(jd,opts.lat,opts.lon,opts.ayanamsa,opts.nodeType); }catch(err){ continue; }
           const tree=calculateDashaTree(bp.Moon,d);
           let kpData=null;
@@ -2862,7 +2862,7 @@
         if (evs.length === 0) { setRectResults([]); return; }
         setRectBusy(true);
         setTimeout(() => {
-          try { setRectResults(rectifyBirthTime({ dateStr, fromMin, toMin, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17, ayanamsa, nodeType, events: evs, appearanceSign: rectAppSign === '' ? null : parseInt(rectAppSign, 10) })); }
+          try { setRectResults(rectifyBirthTime({ dateStr, fromMin, toMin, tz: parseFloat(birthTz) || 6.5, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17, ayanamsa, nodeType, events: evs, appearanceSign: rectAppSign === '' ? null : parseInt(rectAppSign, 10) })); }
           catch (e) { setRectResults([]); }
           setRectBusy(false);
         }, 30);
@@ -3031,7 +3031,7 @@
 
       const lifeOverview = generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas);
       const careerBenefit = calculateCareerBenefitSummary(birthPlanets, dashaTree);
-      const eventWindows = calculateEventWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
+      const eventWindows = calculateEventWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, tz: parseFloat(birthTz) || 6.5, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
       const placementReading = buildPlacementReading(birthPlanets, placementPlanet, birthPlanetsNext);
       const lifetimeMilestones = generateLifetimeMilestones(birthDateObj, dashaTree, birthPlanets);
       const annualForecast = generateAnnualForecast(birthDateObj, birthPlanets, transitPlanets, transitDate, transitLat, transitLon, ayanamsa, nodeType);
