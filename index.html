@@ -1607,14 +1607,14 @@
       return out.slice(0,12);
     }
 
-    function generateAnnualForecast(birthDate,birthPlanets,transitPlanets,transitDate,lat,lon,ayanamsa,nodeType) {
+    function generateAnnualForecast(birthDate,birthPlanets,transitPlanets,transitDate,lat,lon,ayanamsa,nodeType,tz) {
       const now=new Date(), start=new Date(now.getFullYear(),now.getMonth(),1), months=[];
       const names=['ဇန်နဝါရီ','ဖေဖော်ဝါရီ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူလိုင်','သြဂုတ်','စက်တင်ဘာ','အောက်တိုဘာ','နိုဝင်ဘာ','ဒီဇင်ဘာ'];
       for(let i=0;i<12;i++){
         const d=new Date(start.getFullYear(),start.getMonth()+i,1);
         let tp=transitPlanets;
         try {
-          const jd=getJulianDay(d.getFullYear(),d.getMonth()+1,15,12,0,6.5);
+          const jd=getJulianDay(d.getFullYear(),d.getMonth()+1,15,12,0,(tz==null||isNaN(tz))?6.5:tz);
           tp=calculateNASA_JPL_Planets(jd,parseFloat(lat)||16.84,parseFloat(lon)||96.17,ayanamsa,nodeType);
         } catch(e){}
         const scores={career:0,wealth:0,love:0,travel:0,pressure:0};
@@ -2825,6 +2825,7 @@
       const [transitCity, setTransitCity] = useState('ရန်ကုန်');
       const [transitLat, setTransitLat] = useState('16.8409');
       const [transitLon, setTransitLon] = useState('96.1735');
+      const [transitTz, setTransitTz] = useState('6.5');
 
       const initH = now.getHours();
       const initAmPm = initH >= 12 ? 'PM' : 'AM';
@@ -2887,7 +2888,7 @@
             const lat = pos.coords.latitude.toFixed(4);
             const lon = pos.coords.longitude.toFixed(4);
             const autoTz = estimateTimezone(lat, lon).toString();
-            setTransitLat(lat); setTransitLon(lon);
+            setTransitLat(lat); setTransitLon(lon); setTransitTz(autoTz);
             setBirthLat(lat); setBirthLon(lon); setBirthTz(autoTz);
             setBoy((prev) => ({ ...prev, lat, lon, tz: autoTz }));
             setGirl((prev) => ({ ...prev, lat, lon, tz: autoTz }));
@@ -2987,7 +2988,7 @@
         if (searchTarget === 'birth') {
           setBirthPlace(name); setBirthLat(lat); setBirthLon(lon); setBirthTz(autoTz);
         } else if (searchTarget === 'transit') {
-          setTransitCity(name); setTransitLat(lat); setTransitLon(lon);
+          setTransitCity(name); setTransitLat(lat); setTransitLon(lon); setTransitTz(autoTz);
         } else if (searchTarget === 'boy') {
           setBoy((prev) => ({ ...prev, city: name, lat, lon, tz: autoTz }));
         } else if (searchTarget === 'girl') {
@@ -3016,7 +3017,7 @@
       const birthPlanets = calculateNASA_JPL_Planets(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
       const birthPlanetsNext = calculateNASA_JPL_Planets(birthJD + 1, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
       const kpCusps = ayanamsa === 'kp' ? calculatePlacidusCusps(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa) : null;
-      const tJD = getJulianDay(transitDate.getFullYear(), transitDate.getMonth() + 1, transitDate.getDate(), transitDate.getHours(), transitDate.getMinutes(), 6.5);
+      const tJD = getJulianDay(transitDate.getFullYear(), transitDate.getMonth() + 1, transitDate.getDate(), transitDate.getHours(), transitDate.getMinutes(), parseFloat(transitTz) || 6.5);
       const transitPlanets = calculateNASA_JPL_Planets(tJD, parseFloat(transitLat) || 16.84, parseFloat(transitLon) || 96.17, ayanamsa, nodeType);
 
       const dashaTree = calculateDashaTree(birthPlanets.Moon, birthDateObj);
@@ -3034,7 +3035,7 @@
       const eventWindows = calculateEventWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, tz: parseFloat(birthTz) || 6.5, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
       const placementReading = buildPlacementReading(birthPlanets, placementPlanet, birthPlanetsNext);
       const lifetimeMilestones = generateLifetimeMilestones(birthDateObj, dashaTree, birthPlanets);
-      const annualForecast = generateAnnualForecast(birthDateObj, birthPlanets, transitPlanets, transitDate, transitLat, transitLon, ayanamsa, nodeType);
+      const annualForecast = generateAnnualForecast(birthDateObj, birthPlanets, transitPlanets, transitDate, transitLat, transitLon, ayanamsa, nodeType, parseFloat(transitTz) || 6.5);
       const conjunctionsAndAspects = analyzeConjunctionsAndAspects(birthPlanets);
       const liveTransitPredictions = analyzeLiveTransit(birthPlanets, transitPlanets);
 
