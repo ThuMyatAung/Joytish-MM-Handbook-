@@ -3017,7 +3017,7 @@
       const birthPlanets = calculateNASA_JPL_Planets(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
       const birthPlanetsNext = calculateNASA_JPL_Planets(birthJD + 1, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
       const kpCusps = ayanamsa === 'kp' ? calculatePlacidusCusps(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa) : null;
-      const tJD = getJulianDay(transitDate.getFullYear(), transitDate.getMonth() + 1, transitDate.getDate(), transitDate.getHours(), transitDate.getMinutes(), parseFloat(transitTz) || 6.5);
+      const tJD = transitDate.getTime() / 86400000 + 2440587.5;
       const transitPlanets = calculateNASA_JPL_Planets(tJD, parseFloat(transitLat) || 16.84, parseFloat(transitLon) || 96.17, ayanamsa, nodeType);
 
       const dashaTree = calculateDashaTree(birthPlanets.Moon, birthDateObj);
@@ -3078,7 +3078,8 @@
       const kpMatch = ayanamsa === 'kp' ? calculateKPMatching(boyPlanets, girlPlanets, calculatePlacidusCusps(boyJD, boy.lat, boy.lon, 'kp'), calculatePlacidusCusps(girlJD, girl.lat, girl.lon, 'kp')) : null;
 
       const timePad = (n) => (n < 10 ? '0' + n : n);
-      const transitTimeStr = `${timePad(transitDate.getHours())}:${timePad(transitDate.getMinutes())}`;
+      const _tzDisp = new Date(transitDate.getTime() + (((parseFloat(transitTz) || 6.5) * 60) + transitDate.getTimezoneOffset()) * 60000);
+      const transitTimeStr = `${timePad(_tzDisp.getHours())}:${timePad(_tzDisp.getMinutes())}`;
 
       // KP Ruling Planets
       const lagnaKP = getKPSubLordData(birthPlanets.Lagna);
