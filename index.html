@@ -1912,6 +1912,78 @@
     const RP_SIGN_MM = ['မိဿ', 'ပြိဿ', 'မေထုန်', 'ကရကဋ်', 'သိဟ်', 'ကန်', 'တူ', 'ဗြိစ္ဆာ', 'ဓနု', 'မကာရ', 'ကုံ', 'မိန်'];
     function rpSignOf(deg) { return ((Math.floor((((deg % 360) + 360) % 360) / 30)) % 12 + 12) % 12; }
     function rpSignLord(sign) { return ['Mars', 'Venus', 'Mercury', 'Moon', 'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Saturn', 'Jupiter'][((sign % 12) + 12) % 12]; }
+    const _ayuSignOf = (deg) => Math.floor((((deg % 360) + 360) % 360) / 30);
+    const AYU_REGION = ['ဦးခေါင်း', 'မျက်နှာ/လည်ပင်း', 'ပခုံး/လက်/အဆုတ်', 'ရင်/အစာအိမ်', 'နှလုံး/ကျော', 'အူ/အစာခြေ စနစ်', 'ခါး/ကျောက်ကပ်', 'မျိုးပွား/ဆီး လမ်းကြောင်း', 'တင်ပါး/ပေါင်', 'ဒူး/အရိုး အဆစ်', 'ခြေသလုံး/သွေးလည်ပတ်မှု', 'ခြေဖဝါး/ကိုယ်ခံအား စနစ်'];
+    const AYU_SYSTEM = { Sun: 'နှလုံး/မျက်စိ/အရိုး', Moon: 'စိတ်/အရည် မျှတ မှု/သွေး', Mars: 'သွေး/ဒဏ်ရာ/ရောင်ရမ်း', Mercury: 'အာရုံကြော/အရေပြား', Jupiter: 'အသည်း/အဆီ/သကြား မျှတ မှု', Venus: 'ကျောက်ကပ်/သကြား/ဟော်မုန်း', Saturn: 'အရိုး အဆစ်/နာတာရှည်/သွား', Rahu: 'ဓာတ်မတည့်/အဆိပ် အတောက်', Ketu: 'အဖြေ မထင်ရှားတဲ့ အားနည်း မှု' };
+    function generateAyuReading(p, tree) {
+      let score = 50;
+      const lagLord = _lordOfHouse(p, 1), hLord8 = _lordOfHouse(p, 8), hLord6 = _lordOfHouse(p, 6);
+      const stLag = _planetStrength(p, lagLord), st8 = _planetStrength(p, hLord8), stSat = _planetStrength(p, 'Saturn'), stMoon = _planetStrength(p, 'Moon');
+      const llHouse = _planetHouse(p, lagLord), l8House = _planetHouse(p, hLord8);
+      if (typeof stLag === 'number') score += (stLag - 55) * 0.45;
+      if ([1, 4, 5, 7, 9, 10].includes(llHouse)) score += 6; if ([6, 8, 12].includes(llHouse)) score -= 8;
+      if ([1, 4, 5, 7, 9, 10].includes(l8House)) score += 8; if ([6, 8, 12].includes(l8House)) score -= 8;
+      if (typeof st8 === 'number') score += (st8 - 55) * 0.25;
+      if (typeof stSat === 'number' && stSat >= 70) score += 6;
+      if ([1, 4, 7, 10, 5, 9].includes(_planetHouse(p, 'Saturn'))) score += 4;
+      if (_planetHouse(p, 'Saturn') === 8) score += 6;
+      if (typeof stMoon === 'number' && stMoon >= 70) score += 4;
+      if ([6, 8, 12].includes(_planetHouse(p, 'Moon'))) score -= 4;
+      if ([1, 5, 9].includes(_planetHouse(p, 'Jupiter'))) score += 4;
+      ['Jupiter', 'Venus', 'Mercury', 'Moon'].forEach((pl) => { if (_planetHouse(p, pl) === 8) score += 3; });
+      ['Mars', 'Rahu', 'Ketu'].forEach((pl) => { if (_planetHouse(p, pl) === 8) score -= 3; });
+      if (typeof _planetStrength(p, hLord6) === 'number' && _planetStrength(p, hLord6) >= 70) score += 3;
+      score = Math.max(5, Math.min(97, Math.round(score)));
+      const tier = score >= 80 ? 'အလွန် အားကောင်း' : score >= 65 ? 'အားကောင်း' : score >= 50 ? 'အလယ်အလတ်' : score >= 35 ? 'အားနည်း' : 'အထူး ဂရုစိုက်ရန်';
+      const lines = [];
+      if (score >= 80) lines.push('အိုဇာတာ ကောင်း၊ သက်ရှည် ကျန်းမာ၊ နောင်ရေး စိတ်မပူရ တဲ့ အခြေခံ မျိုး ဖြစ်တယ်။ လဂ် အရှင် နဲ့ အာယု အချက် တွေ က အပြန် အလှန် ထောက်ထား ကြတယ်။');
+      else if (score >= 65) lines.push('အိုဇာတာ ကောင်း တဲ့ ဘက်မှာ ရှိတယ် — သက်ရှည် ကျန်းမာ ဖို့ အခြေခံ ခိုင်ခိုင် မာမာ ပါတယ်။ ပုံမှန် စည်းကမ်း လေး နဲ့ နေရင် နောင်ရေး စိတ်အေး ရမယ့် ပုံစံပဲ။');
+      else if (score >= 50) lines.push('အိုဇာတာ အလယ်အလတ် ပုံစံ ဖြစ်တယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ အသက်ကြီးပိုင်း ခံနိုင်ရည် က မွေးရာ ပါ အချက် ထပ် ကိုယ့် နေထိုင် စည်းကမ်း အပေါ် ပို မူတည် နေတယ်။');
+      else lines.push('အိုဇာတာ အားနည်း တဲ့ ဘက် ယိုင် တယ်။ အဲ့ဒါ ကြောင့် အသက်ကြီးပိုင်း အတွက် ပြင်ဆင်မှု ကို စောစော ကတည်းက လုပ်ထား ဖို့ အထူး ကိုက်တယ် — ဒီမှာ အားကောင်းတဲ့ ကာလ တွေ နဲ့ ပြင်ဆင်နည်း ကို အဓိက ပြ ထား တယ်။');
+      // life bands from dasha (his standard: <30 / 30-40 / 40-60 / 60+)
+      const bands = [{ label: 'အသက် ၃၀ အောက်', from: 0, to: 30 }, { label: 'အသက် ၃၀–၄၀', from: 30, to: 40 }, { label: 'အသက် ၄၀–၆၀', from: 40, to: 60 }, { label: 'အသက် ၆၀ ကျော်', from: 60, to: 110 }];
+      const birthYear = tree && tree[0] ? parseInt(tree[0].start.slice(0, 4), 10) : null;
+      const bandNotes = [];
+      if (birthYear && tree) {
+        bands.forEach((b) => {
+          let good = 0, hard = 0, years = 0;
+          tree.forEach((m) => {
+            const ms = parseInt(m.start.slice(0, 4), 10) - birthYear, me = parseInt(m.end.slice(0, 4), 10) - birthYear;
+            const ov = Math.max(0, Math.min(b.to, me) - Math.max(b.from, ms));
+            if (ov <= 0) return;
+            years += ov;
+            const owns = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].filter((h) => _lordOfHouse(p, h) === m.lord);
+            if (owns.some((h) => [1, 5, 9, 10, 11].includes(h))) good += ov;
+            if (owns.some((h) => [6, 8, 12].includes(h))) hard += ov;
+          });
+          if (!years) return;
+          const q = good - hard;
+          bandNotes.push({ label: b.label, level: q >= 4 ? 'အားကောင်း' : q <= -4 ? 'ဂရုစိုက်' : 'အလယ်အလတ်', text: q >= 4 ? 'ခံနိုင်ရည် အားကောင်း တဲ့ အပိုင်း' : q <= -4 ? 'ကျန်းမာရေး အထူး ဂရုစိုက် ရမယ့် အပိုင်း — အလုပ် အလွန် မတိုး၊ စစ်ဆေးမှု ပုံမှန် လုပ် သင့်' : 'ပုံမှန် စည်းကမ်း နဲ့ ထိန်းသွား လို့ ရတဲ့ အပိုင်း' });
+        });
+      }
+      if (score < 50 && bandNotes.length) {
+        const best = bandNotes.reduce((a, b) => ((a.level === 'အားကောင်း' ? 2 : a.level === 'အလယ်အလတ်' ? 1 : 0) >= (b.level === 'အားကောင်း' ? 2 : b.level === 'အလယ်အလတ်' ? 1 : 0) ? a : b));
+        lines.push(`အားအကောင်းဆုံး အပိုင်း က ${best.label} ပဲ — အဲ့ဒီ ကာလ မှာ ကျန်းမာ အခြေခံ တည်ဆောက် ပြီး နောင်ရေး ပြင်ဆင် ထားတာ အကိုက်ဆုံးပဲ။`);
+      }
+      // early rise with weak sustaining base — counsel only, no label
+      if (birthYear && tree && score < 62) {
+        const earlyRise = tree.some((m) => (parseInt(m.start.slice(0, 4), 10) - birthYear) < 32 && [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].some((h) => _lordOfHouse(p, h) === m.lord && [10, 11, 5].includes(h)));
+        if (earlyRise) lines.push('အောင်မြင်မှု က စောစော/ကြီးကြီး လာတတ်တဲ့ မျဉ်း ရှိတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ အမြင့် ရောက်တဲ့ ကာလ မှာ စိတ်လိုက် မာန်ပါ လုပ်တာ၊ စိတ် အလိုလိုက် လွန်တာ ကို လျော့ဖို့ အထူး အရေးကြီးတယ် — စည်းကမ်း နဲ့ ထိန်းနိုင် ရင် အဲ့ဒီ အောင်မြင်မှု က ရေရှည် တည်တံ့မယ်။');
+      }
+      // health watch-outs (care advice, never diagnosis)
+      const watch = [];
+      const h6sign = (_ayuSignOf(p.Lagna) + 5) % 12;
+      watch.push(`${AYU_REGION[h6sign]} ပိုင်း ကို သတိထား စောင့်ကြည့် သင့် တယ်`);
+      ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach((pl) => {
+        const st = _planetStrength(p, pl);
+        if (_planetHouse(p, pl) === 6 || _planetHouse(p, pl) === 8 || _planetHouse(p, pl) === 12 || (typeof st === 'number' && st < 45)) watch.push(`${pl} အရ ${AYU_SYSTEM[pl]} သတိထား ရမယ်`);
+      });
+      const watchLines = watch.slice(0, 3);
+      // counsel
+      if (score < 50) lines.push('နောင်ရေး အတွက် ငွေကို စောစော ကတည်းက သီးသန့် ခွဲစု ထားဖို့ အထူး ကိုက်တယ် — ဝင်ငွေ ကောင်းတဲ့ ကာလ မှာ ကုန်ကျ လွယ် တတ် လို့ ကောင်းတဲ့ အချိန် မှာ စုထား မှ နောက်ပိုင်း စိတ်အေး ရမယ်။ ကျန်းမာရေး စစ်ဆေးမှု ကို လည်း ပုံမှန် လုပ်တဲ့ အလေ့ တည်ဆောက် ထား သင့် တယ်။');
+      else if (score < 65) lines.push('နောင်ရေး အတွက် ပုံမှန် စုဆောင်းမှု ရှိထား ရင် ပို စိတ်ချရမယ်။ ကျန်းမာရေး စစ်ဆေးမှု ပုံမှန် လုပ်တာ ကလည်း ဒီ ပုံစံ အတွက် လက်ကိုင် ကောင်း တစ်ခု ပဲ။');
+      return { score, tier, lines, bandNotes, watchLines };
+    }
     function rpDarakaraka(bp) {
       const g = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
       let best = null, bd = 999;
@@ -3363,6 +3435,7 @@
       const lifeOverview = generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas);
       const careerBenefit = calculateCareerBenefitSummary(birthPlanets, dashaTree);
       const spouseProfile = buildSpouseProfile(birthPlanets, dashaTree);
+      const ayuReading = generateAyuReading(birthPlanets, dashaTree);
       const eventWindows = calculateEventWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, tz: parseFloat(birthTz) || 6.5, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
       const placementReading = buildPlacementReading(birthPlanets, placementPlanet, birthPlanetsNext);
       const lifetimeMilestones = generateLifetimeMilestones(birthDateObj, dashaTree, birthPlanets);
@@ -3999,6 +4072,26 @@
                     </div>
                   </div>
                 )}
+              {/* အိုဇာတာ — သက်ရှည် ကျန်းမာ အဆင့် (သက်တမ်း ဂဏန်း မဟော၊ ကျင့်ဝတ် စည်း အတိုင်း) */}
+              <div className="bg-teal-50 border border-teal-200 p-3 rounded-lg space-y-1.5">
+                <div className="font-bold text-teal-950 text-xs flex items-center gap-2 flex-wrap">🕯️ အိုဇာတာ — သက်ရှည် ကျန်းမာ <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${ayuReading.tier === 'အလွန် အားကောင်း' || ayuReading.tier === 'အားကောင်း' ? 'bg-emerald-100 text-emerald-700' : ayuReading.tier === 'အလယ်အလတ်' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>{ayuReading.tier}</span></div>
+                {ayuReading.lines.map((ln, j) => (<div key={j} className="text-[10px] text-slate-700 leading-relaxed">• {ln}</div>))}
+                {ayuReading.bandNotes.length > 0 && (
+                  <div className="grid grid-cols-2 gap-1.5 pt-1">
+                    {ayuReading.bandNotes.map((b, j) => (
+                      <div key={j} className={`p-1.5 rounded border ${b.level === 'အားကောင်း' ? 'bg-emerald-50 border-emerald-200' : b.level === 'ဂရုစိုက်' ? 'bg-rose-50 border-rose-200' : 'bg-white border-teal-100'}`}>
+                        <div className="text-[10px] font-bold text-slate-800">{b.label} · {b.level}</div>
+                        <div className="text-[9px] text-slate-500 leading-relaxed">{b.text}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="pt-1">
+                  <div className="text-[10px] font-bold text-teal-900">🩺 ကျန်းမာရေး သတိထားရန် (ဂရုစိုက် အကြံ သာ — ရောဂါ ဟောချက် မဟုတ်)</div>
+                  {ayuReading.watchLines.map((ln, j) => (<div key={j} className="text-[10px] text-slate-600 leading-relaxed">• {ln}</div>))}
+                </div>
+                <div className="text-[9px] text-slate-400 leading-relaxed">သက်တမ်း ကို ဂဏန်း နဲ့ မဟောပါ — အားသာချက် အဆင့် နဲ့ ကာလ အလိုက် ဂရုစိုက် ရမယ့် အချက် များ သာ ပြပါတယ်။</div>
+              </div>
               {/* အကျိုးပေး အနှစ်ချုပ် — readings ၏ နောက်ဆုံး ချုပ်ကိုင် အဖတ် (မွေးဇာတာ) */}
               <div className="bg-indigo-50 border border-indigo-200 p-3 rounded-lg space-y-1.5">
                 <div className="font-bold text-indigo-950 text-xs">🧭 အနှစ်ချုပ် — ဘဝ အကျိုးပေး အလုပ် <span className="text-[9px] font-medium text-indigo-500">(မွေးဇာတာ အရ · ဟူးရားနှင့် မသက်ဆိုင်)</span></div>
