@@ -1137,6 +1137,13 @@
     // ===== Prashna Question Bank (v5) — 12-house engine data =====
     // entry: { t:title, q:question text, p:primary house, h:[houses], k:karaka, r:rotate house (person) }
     const PRASHNA_BANK = [
+      { g: '⚖️ ဆုံးဖြတ်ချက် · လုပ်သင့်/မလုပ်သင့်', items: [
+        { t: 'ဒီကိစ္စ လုပ်သင့်လား', q: 'ဒီကိစ္စကို လုပ်သင့်လား', p: 11, h: [1, 5, 10, 11], k: 'Jupiter / Moon' },
+        { t: 'ဒီ အလုပ် လက်ခံသင့်လား', q: 'ဒီ အလုပ်အကိုင် လက်ခံသင့်လား', p: 10, h: [1, 6, 10, 11], k: 'Sun / Saturn' },
+        { t: 'ဒီ တင်ဒါ လိုက်သင့်လား', q: 'ဒီ တင်ဒါ လိုက်သင့်လား', p: 6, h: [6, 10, 11], k: 'Mars / Saturn' },
+        { t: 'ဒီ ပစ္စည်း ဝယ်သင့်လား', q: 'ဒီ ပစ္စည်း ဝယ်သင့်လား', p: 11, h: [2, 4, 11], k: 'Venus / Jupiter' },
+        { t: 'ဒီ ခရီး သွားသင့်လား', q: 'ဒီ ခရီး သွားသင့်လား', p: 9, h: [3, 9, 11], k: 'Moon / Jupiter' },
+        { t: 'ဒီ ရင်းနှီးမြှုပ်နှံမှု လုပ်သင့်လား', q: 'ဒီ ရင်းနှီးမြှုပ်နှံမှု လုပ်သင့်လား', p: 5, h: [2, 5, 11], k: 'Jupiter' } ] },
       { g: '၁ တန့် · ကိုယ် / ကျန်းမာရေး', items: [
         { t: 'ကျန်းမာ ပြန်ကောင်းမလား', q: 'ကျန်းမာရေး ပြန်ကောင်းလာမလား', p: 1, h: [1, 5, 11], k: 'Sun / Moon' },
         { t: 'ခွဲစိတ်မှု အဆင်ပြေမလား', q: 'ခွဲစိတ်ကုသမှု အဆင်ပြေမလား', p: 1, h: [1, 8, 11], k: 'Mars / Saturn' },
@@ -1219,6 +1226,7 @@
     function calculateKPPrashnaResult(queryText, horaryNum, birthPlanets, transitPlanets, dashaTree, cusps, cfgOverride) {
       const intent = detectPrashnaIntent(queryText);
       let cfg = {
+        decision: { title: 'ဆုံးဖြတ်ချက် — လုပ်သင့် / မလုပ်သင့်', houses: [1, 5, 10, 11], primary: 11, karaka: 'Jupiter / Moon' },
         career: { title: 'အလုပ်အကိုင် / Project / ရာထူး', houses: [2, 6, 10, 11], primary: 10, karaka: 'Sun / Mercury' },
         love: { title: 'အချစ်ရေး / Relationship / အိမ်ထောင်', houses: [2, 5, 7, 11], primary: 7, karaka: 'Venus' },
         wealth: { title: 'ငွေကြေး / အကြွေး / ရလဒ်', houses: [2, 5, 8, 11], primary: 2, karaka: 'Jupiter' },
@@ -1832,6 +1840,8 @@
 
     function detectPrashnaIntent(q){
       const s=(q||'').toLowerCase();
+      if(/လုပ်သင့်|လိုက်ရမလား|လိုက်သင့်|လက်ခံရမလား|လက်ခံသင့်|ဝယ်သင့်|ဝယ်ရမလား|ရောင်းသင့်|သွားရမလား|သွားသင့်|စရမလား|စသင့်|ရင်းနှီးရမလား|ပြောင်းရမလား|ပြောင်းသင့်|သင့်သလား/.test(s))return'decision';
+      if(/လုပ်ရမလား/.test(s)&&!/အလုပ်ရမလား/.test(s))return'decision';
       if(/အလုပ်|ရာထူး|project|အလုပ်ရ|career|job/.test(s))return'career';
       if(/အချစ်|ချစ်သူ|ရည်းစား|relationship|marry|အိမ်ထောင်|လက်ထပ်/.test(s))return'love';
       if(/ငွေ|ပိုက်ဆံ|အကြွေး|ရမလား|ဝင်ငွေ|အမြတ်/.test(s))return'wealth';
@@ -1849,6 +1859,7 @@
       const intent=detectPrashnaIntent(queryText), hNum=Math.max(1,Math.min(249,parseInt(horaryNum,10)||108));
       const qSign=(hNum*7)%12, tMoon=calculateVarga(transitPlanets.Moon,1), tJup=calculateVarga(transitPlanets.Jupiter,1), tSat=calculateVarga(transitPlanets.Saturn,1);
       let cfg={
+        decision:{title:'ဆုံးဖြတ်ချက် — လုပ်သင့် / မလုပ်သင့်',houses:[1,5,10,11],karaka:'Jupiter / Moon'},
         career:{title:'အလုပ်အကိုင် / Project / ရာထူး',houses:[2,6,10,11],karaka:'Sun / Mercury'},
         love:{title:'အချစ်ရေး / Relationship / အိမ်ထောင်',houses:[2,5,7,11],karaka:'Venus'},
         wealth:{title:'ငွေကြေး / အကြွေး / ရလဒ်',houses:[2,5,8,11],karaka:'Jupiter'},
@@ -1893,6 +1904,145 @@
       const verdict=score>=72?'YES — အကောင်အထည်ဖော်နိုင်ခြေ အားကောင်း':score>=58?'CONDITIONAL — ဖြစ်နိုင်သော်လည်း အခြေအနေ/အချိန်လို': 'NO / DELAY — လက်ရှိအခြေအနေမှာ အတားအဆီးပိုများ';
       const advice=score>=72?'အခွင့်အရေးကို လက်လွတ်မခံဘဲ စာရွက်စာတမ်း၊ အချိန်နှင့် လက်တွေ့လုပ်ဆောင်ချက်ကို တိတိကျကျ စီမံပါ။':score>=58?'အခုချက်ချင်း အဖြေတစ်ဖက်သတ်မချဘဲ အတားအဆီးဖြစ်စေသောအချက်ကို ဖြေရှင်းပြီး နောက်တစ်ကြိမ် trigger ကို စောင့်ကြည့်ပါ။':'အလောတကြီး တွန်းမလုပ်သင့်ပါ။ အကြောင်းရင်း/စာချုပ်/ဆက်သွယ်ရေးကွက်လပ်ကို အရင်ပြင်ပြီး timing ပြောင်းလာမှ ပြန်စစ်သင့်သည်။';
       return {queryText:queryText||'မေးမြန်းထားသောကိစ္စ',title:cfg.title,score,verdict,answerDesc:`ဒီအဖြေကို YES/NO တစ်ခုတည်းမဟုတ်ဘဲ ${relevant.join(', ')} တန့်များ၊ ၎င်းတို့၏ အရှင်များ၊ ဟူးရား Moon/Jupiter/Saturn၊ Natal promise နှင့် လက်ရှိ Dasha ကို ပေါင်းစပ်ပြီး ထုတ်ထားသည်။`,timingWindow:score>=72?'လက်ရှိမှ နောက် 1–3 လအတွင်း trigger ပိုမြင်ရနိုင်သည်။':score>=58?'အတားအဆီးပြေလျော့ပြီး နောက် 3–6 လအတွင်း ပိုရှင်းလာနိုင်သည်။':'လက်ရှိကာလထက် နောက်ပိုင်းတွင် ပြန်လည်စစ်ဆေးရန် ပိုသင့်တော်သည်။',karaka:cfg.karaka,vargaUsed:'Natal + Prashna + Transit synthesis',evidence,advice,intent};
+    }
+
+    // ===== Right Person (ဖူးစာရှင်) engine — v6.8 =====
+    // Gate 1: profile promised in one chart (DK / UL / Venus / 7th lord). Gate 2: identity fit, both directions.
+    // Gate 3: dasha timing for both. Graded alignment only — never certifies a person's choice.
+    const RP_SIGN_MM = ['မိဿ', 'ပြိဿ', 'မေထုန်', 'ကရကဋ်', 'သိဟ်', 'ကန်', 'တူ', 'ဗြိစ္ဆာ', 'ဓနု', 'မကာရ', 'ကုံ', 'မိန်'];
+    function rpSignOf(deg) { return ((Math.floor((((deg % 360) + 360) % 360) / 30)) % 12 + 12) % 12; }
+    function rpSignLord(sign) { return ['Mars', 'Venus', 'Mercury', 'Moon', 'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Saturn', 'Jupiter'][((sign % 12) + 12) % 12]; }
+    function rpDarakaraka(bp) {
+      const g = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
+      let best = null, bd = 999;
+      g.forEach((p) => { if (bp && typeof bp[p] === 'number') { const d = ((bp[p] % 30) + 30) % 30; if (d < bd) { bd = d; best = p; } } });
+      return best;
+    }
+    function rpUpapada(bp) {
+      const lag = rpSignOf(bp.Lagna);
+      const lord = rpSignLord(lag);
+      const lordSign = rpSignOf(bp[lord]);
+      const d = ((lordSign - lag) + 12) % 12;
+      let ul = (lordSign + d) % 12;
+      if (ul === lag || ul === (lag + 6) % 12) ul = (ul + 9) % 12;
+      return ul;
+    }
+    const RP_DK_TRAITS = [
+      'အိမ်ထောင်ဖက်က သွက်လက် တိုက်ရိုက်ဖြစ်ပြီး ကိုယ့်ခြေလှမ်း ကိုယ်ပိုင်တဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က တည်ငြိမ် လက်တွေ့ကျပြီး မိသားစုဘဝကို တန်ဖိုးထားတဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က စကားပြောကောင်း သိချင်စိတ်များပြီး အပေါင်းအသင်း ကျယ်တဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က စိတ်ထားနူးညံ့ အိမ်ကိုချစ်ပြီး ဂရုစိုက်တတ်တဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က ကိုယ့်ကိုယ်ကိုယ် ယုံကြည်မှုရှိပြီး လူအများကြား ထင်ရှားတဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က စနစ်တကျ စီစဉ်တတ် အသေးစိတ် ဂရုစိုက်တတ်တဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က ချိန်ညှိ ညှိနှိုင်းတတ်ပြီး အပေါင်းအသင်းနဲ့ အဆင်ပြေအောင် နေတတ်တဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က စိတ်နက်ရှိုင်း လျှို့ဝှက်ထားတတ်ပြီး သစ္စာရှိရှိ ချစ်တတ်တဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က ပွင့်လင်း ရိုးဖြောင့်ပြီး ခရီးနဲ့ ပညာကို နှစ်သက်တဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က ရည်မှန်းချက်ကြီး ဇွဲရှိပြီး ဘဝကို အဆင့်ဆင့် တက်လှမ်းတတ်တဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က အတွေးအခေါ် သီးခြား လူမှုအသိုင်းအဝိုင်း ကျယ်ပြီး ပုံစံမတူတဲ့ လူမျိုး ဖြစ်တတ်တယ်',
+      'အိမ်ထောင်ဖက်က စာနာတတ် စိတ်ကူးကြွယ်ဝပြီး အနုပညာဘက် ယိုင်တဲ့ လူမျိုး ဖြစ်တတ်တယ်'
+    ];
+    const RP_MEET_TEXTS = [
+      'ကိုယ့် ပတ်ဝန်းကျင် အနီးအနားကပဲ ဆုံရတတ်ပြီး အသိမိတ်ဆွေကို ဖြတ်ပြီး သိရတာ များတယ်',
+      'မိသားစု/ငွေကြေး ကိစ္စတွေကြားမှာ ဆုံရတတ်ပြီး အိမ်ဘက်က မိတ်ဆက်ပေးတာ များတယ်',
+      'ညီအစ်ကိုမောင်နှမ အိမ်နီးချင်း ဆက်သွယ်ရေး/online ပတ်ဝန်းကျင်ကနေ ဆုံရတတ်တယ်',
+      'ကိုယ့် ဇာတိမြေ/အိမ်ရပ်ဘက်က လူဖြစ်တတ်ပြီး အိမ်အနီး ပတ်ဝန်းကျင်မှာ ဆုံတယ်',
+      'အပေါင်းအသင်း ပျော်ပျော်ပါးပါး စုတဲ့နေရာ အနုပညာ/ဖျော်ဖြေ ပတ်ဝန်းကျင်ကနေ ဆုံရတတ်တယ်',
+      'အလုပ်/နေ့စဉ် လုပ်ဖော်ကိုင်ဖက် ပတ်ဝန်းကျင်ကနေ ဆုံရတတ်ပြီး အလုပ်ကိစ္စက စတာ များတယ်',
+      'ခရီး/အများနဲ့ ဆက်ဆံရတဲ့ နေရာမှာ ဆုံရတတ်ပြီး မျက်နှာချင်းဆိုင် မိတ်ဆက်ပုံစံနဲ့ စတယ်',
+      'ရုတ်တရက်/မမျှော်လင့်တဲ့ အခြေအနေမှာ ဆုံရတတ်ပြီး ဆက်ဆံရေးက နက်နက်ရှိုင်းရှိုင်း စတတ်တယ်',
+      'အဝေး/နိုင်ငံခြား ပညာရေး/ခရီးရှည် ပတ်ဝန်းကျင်ကနေ ဆုံရတတ်ပြီး အရပ်ဝေးတဲ့လူ ဖြစ်တတ်တယ်',
+      'အလုပ်/လုပ်ငန်း ပတ်ဝန်းကျင် နာမည်ရပြီးသား နေရာတွေမှာ ဆုံရတတ်တယ်',
+      'မိတ်ဆွေအုပ်စု/အသင်းအဖွဲ့ လူမှုကွန်ရက်ကနေ ဆုံရတတ်ပြီး မိတ်ဆွေက မိတ်ဆက်ပေးတာ များတယ်',
+      'နိုင်ငံခြား/အဝေးတစ်နေရာ ဆေးရုံ/ဘာသာရေး/တိတ်ဆိတ်တဲ့ ပတ်ဝန်းကျင်ကနေ ဆုံရတတ်တယ်'
+    ];
+    const RP_VENUS_TEXTS = [
+      'တိုက်ရိုက် ပွင့်လင်းတဲ့ ချစ်ခြင်းကို တန်ဖိုးထားတယ်', 'တည်ငြိမ်ပြီး ထိတွေ့နွေးထွေးမှုကို တန်ဖိုးထားတယ်',
+      'စကားပြော ဉာဏ်ရွှင်တဲ့ ဆက်ဆံရေးကို တန်ဖိုးထားတယ်', 'ဂရုစိုက် ကာကွယ်တဲ့ နွေးထွေးမှုကို တန်ဖိုးထားတယ်',
+      'ချီးကျူး မြှောက်စားခံရတဲ့ စတိုင်ကို နှစ်သက်တယ်', 'လက်တွေ့ ဂရုစိုက်ပေးတဲ့ အသေးစိတ် ချစ်ခြင်းကို တန်ဖိုးထားတယ်',
+      'လှပ ညီညွတ်တဲ့ အတူနေထိုင်မှုကို တန်ဖိုးထားတယ်', 'နက်ရှိုင်း သစ္စာရှိတဲ့ စွဲလမ်းမှုကို တန်ဖိုးထားတယ်',
+      'ပွင့်လင်း လွတ်လပ်တဲ့ အတူခရီးသွား ဆက်ဆံရေးကို နှစ်သက်တယ်', 'ရည်မှန်းချက် မျှဝေတဲ့ လက်တွေ့ ဆက်ဆံရေးကို တန်ဖိုးထားတယ်',
+      'မိတ်ဆွေလို နားလည်တဲ့ သီးခြားစတိုင်ကို နှစ်သက်တယ်', 'စာနာ စိတ်ကူးပါတဲ့ သနားချစ်ခြင်းကို တန်ဖိုးထားတယ်'
+    ];
+    function buildSpouseProfile(bp, dashaTree) {
+      const lines = [];
+      const dk = rpDarakaraka(bp);
+      const dkSign = dk ? rpSignOf(bp[dk]) : null;
+      const l7 = _lordOfHouse(bp, 7);
+      const l7h = l7 ? _planetHouse(bp, l7) : null;
+      const ul = rpUpapada(bp);
+      const ulLord = rpSignLord(ul);
+      const ulLordHouse = _planetHouse(bp, ulLord);
+      const venSign = rpSignOf(bp.Venus);
+      if (dk) lines.push(`Dararakaraka (အိမ်ထောင်ဖက်ပြ ဂြိုဟ်) မှာ ${dk} ဖြစ်ပြီး ${RP_SIGN_MM[dkSign]} ရာသီတွင် ရပ်တယ် — ${RP_DK_TRAITS[dkSign]}`);
+      if (l7) lines.push(`၇ တန့် အရှင် ${l7} သည် ${l7h} တန့်တွင် ရှိတယ် — ${RP_MEET_TEXTS[l7h - 1]}`);
+      lines.push(`Upapada (ဖူးစာ တန့်) မှာ ${RP_SIGN_MM[ul]} ရာသီ ဖြစ်ပြီး ၎င်းအရှင် ${ulLord} သည် ${ulLordHouse} တန့်တွင် ရပ်တယ် — ${[1, 4, 5, 7, 9, 10, 11].includes(ulLordHouse) ? 'အိမ်ထောင် တည်ငြိမ်ဖို့ အခြေခံ ကောင်းတယ်' : 'အိမ်ထောင်ရေးမှာ ကြိုးစား ထိန်းသိမ်းရတာ များတတ်တယ် — မဖြစ်နိုင်တာ မဟုတ် အားထုတ်မှု ပိုလိုတာ'}`);
+      lines.push(`သောကြာသည် ${RP_SIGN_MM[venSign]} ရာသီတွင် ရပ်တယ် — ချစ်ခြင်းမှာ ${RP_VENUS_TEXTS[venSign]}`);
+      try {
+        const vD9 = calculateVarga(bp.Venus, 9), dkD9 = dk ? calculateVarga(bp[dk], 9) : null;
+        if (dkD9 != null && (vD9 === dkD9 || ((vD9 - dkD9 + 12) % 12) === 4 || ((vD9 - dkD9 + 12) % 12) === 8)) lines.push('D9 (Navamsa) အရ သောကြာနှင့် Dararakaraka ဆက်နွယ်မှု ရှိလို့ ဆက်ဆံရေး အတွင်းပိုင်း အရည်အသွေး ကောင်းဖို့ အလားအလာ ရှိတယ်');
+      } catch (e) {}
+      const verdict = dk ? `ဖူးစာ ပုံစံ အကျဉ်း: ${RP_DK_TRAITS[dkSign]}${l7 ? ` · ဆုံရမယ့် ပတ်ဝန်းကျင်က ${l7h} တန့် အချက် အရ ခန့်မှန်းနိုင်တယ် (အောက်မှာ အသေးစိတ်)` : ''}` : '—';
+      return { verdict, lines, dk, dkSign, ul };
+    }
+    function rpCurrentLords(tree) {
+      if (!Array.isArray(tree) || !tree.length) return null;
+      const today = new Date().toISOString().split('T')[0];
+      const m = tree.find((d) => d.start <= today && d.end >= today) || tree[0];
+      let antar = null;
+      if (m && Array.isArray(m.antars)) { const a = m.antars.find((x) => x.start <= today && x.end >= today); if (a) antar = a.lord; }
+      return { maha: m ? m.lord : null, antar };
+    }
+    function rpTiming(bp, tree) {
+      const cur = rpCurrentLords(tree);
+      if (!cur) return { score: 0, note: '' };
+      const links = new Set([_lordOfHouse(bp, 7), 'Venus', rpDarakaraka(bp), rpSignLord(rpUpapada(bp))]);
+      let s = 0; const hit = [];
+      if (cur.maha && links.has(cur.maha)) { s += 12; hit.push(cur.maha + ' မဟာဒဿာ'); }
+      if (cur.antar && links.has(cur.antar)) { s += 8; hit.push(cur.antar + ' အန္တရ'); }
+      return { score: Math.min(20, s), note: hit.length ? `လက်ရှိ ${hit.join(' + ')} က အိမ်ထောင်/ချစ်ခြင်း အချက်တွေကို နှိုးနေတဲ့ ကာလ ဖြစ်တယ်` : 'လက်ရှိ ဒဿာက အိမ်ထောင် အချက်တွေနဲ့ တိုက်ရိုက် မဆက်နွယ်သေးဘူး' };
+    }
+    function rpFitDir(bpX, bpY, nameX, nameY) {
+      // Does Y fit the spouse pattern promised in X's chart? Returns raw score (max 72) + evidence lines.
+      let s = 0; const lines = [];
+      const yLag = rpSignOf(bpY.Lagna), yMoon = rpSignOf(bpY.Moon);
+      const dkS = rpSignOf(bpX[rpDarakaraka(bpX)]);
+      if (yLag === dkS || yMoon === dkS) { s += 18; lines.push(`${nameY} ၏ ${yLag === dkS ? 'လဂ်' : 'လ'} ရာသီ (${RP_SIGN_MM[yLag === dkS ? yLag : yMoon]}) က ${nameX} ၏ Dararakaraka ရာသီနှင့် ကိုက်သည်`); }
+      const ulS = rpUpapada(bpX);
+      if (yLag === ulS || yMoon === ulS) { s += 14; lines.push(`${nameY} ၏ ရာသီက ${nameX} ၏ Upapada (${RP_SIGN_MM[ulS]}) နှင့် ကိုက်သည်`); }
+      const venS = rpSignOf(bpX.Venus);
+      if (yLag === venS || yMoon === venS) { s += 12; lines.push(`${nameY} ၏ ရာသီက ${nameX} ၏ သောကြာ ရာသီ (${RP_SIGN_MM[venS]}) နှင့် ကိုက်သည် — ဆွဲဆောင်မှု ရှိဖို့ အလားအလာ`); }
+      const l7 = _lordOfHouse(bpX, 7); const l7s = rpSignOf(bpX[l7]);
+      if (yLag === l7s || yMoon === l7s) { s += 10; lines.push(`${nameY} ၏ ရာသီက ${nameX} ၏ ၇ တန့် အရှင် ရပ်ရာ ရာသီနှင့် ကိုက်သည်`); }
+      const xMoon = rpSignOf(bpX.Moon), xLag = rpSignOf(bpX.Lagna), yVen = rpSignOf(bpY.Venus);
+      if (yVen === xMoon || yVen === xLag) { s += 8; lines.push(`${nameY} ၏ သောကြာသည် ${nameX} ၏ ${yVen === xLag ? 'လဂ်' : 'လ'} ရာသီတွင် ရပ်သည် — အပြန်အလှန် ဆွဲဆောင်မှု အချက်`); }
+      const x7sign = (rpSignOf(bpX.Lagna) + 6) % 12;
+      const occ = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'].filter((p) => rpSignOf(bpY[p]) === x7sign).length;
+      if (occ >= 2) { s += 10; lines.push(`${nameY} ၏ ဂြိုဟ် ${occ} လုံး ${nameX} ၏ ၇ တန့် ရာသီတွင် ရပ်သည်`); }
+      else if (occ === 1) { s += 6; lines.push(`${nameY} ၏ ဂြိုဟ် ၁ လုံး ${nameX} ၏ ၇ တန့် ရာသီတွင် ရပ်သည်`); }
+      return { score: s, lines };
+    }
+    function calculateRightPerson(bpA, bpB, treeA, treeB, context, kootaTotal, nameA, nameB, kpScore) {
+      const fitAB = rpFitDir(bpA, bpB, nameA, nameB); // B vs A's pattern
+      const fitBA = rpFitDir(bpB, bpA, nameB, nameA); // A vs B's pattern
+      const fitNorm = ((fitAB.score + fitBA.score) / 2) / 72 * 100;
+      const tA = rpTiming(bpA, treeA), tB = rpTiming(bpB, treeB);
+      const timingAvg = (tA.score + tB.score) / 2 / 20 * 100;
+      const harmony = (typeof kootaTotal === 'number' ? kootaTotal : 0) / 36 * 100;
+      const marriage = context !== 'dating';
+      const score = Math.round(fitNorm * (marriage ? 0.60 : 0.55) + timingAvg * (marriage ? 0.20 : 0.15) + harmony * (marriage ? 0.20 : 0.30));
+      const lines = [];
+      lines.push(`ပုံစံ ကိုက်ညီမှု: ${nameB} → ${nameA} အတွက် ${fitAB.score}/72 · ${nameA} → ${nameB} အတွက် ${fitBA.score}/72 (နှစ်ဖက် လုံး ကိုက်မှ အပြည့် နီးပါး ရသည်)`);
+      fitAB.lines.forEach((l) => lines.push('• ' + l));
+      fitBA.lines.forEach((l) => lines.push('• ' + l));
+      if (!fitAB.lines.length && !fitBA.lines.length) lines.push('• ပုံစံ ကိုက်တဲ့ တိုက်ရိုက် အချက် မတွေ့ပါ — ဒီ အပိုင်းက အားနည်းတယ်');
+      lines.push(`အချိန်: ${nameA} — ${tA.note}`);
+      lines.push(`အချိန်: ${nameB} — ${tB.note}`);
+      if (typeof kpScore === 'number') lines.push(`KP Sub-Lord Matching: ${kpScore}/100 — ${kpScore >= 60 ? 'ပုံစံ ကိုက်ညီမှုကို ထောက်ခံတဲ့ ဘက်' : kpScore >= 40 ? 'အလယ်အလတ်' : 'KP ဘက်က အားမပေးဘူး'}`);
+      lines.push('မှတ်ချက်: ဒီကတ်က ဇာတာ ပုံစံ ကိုက်ညီမှုနှင့် အချိန်ကိုပဲ တိုင်းတာပါ — လူတစ်ယောက်၏ ရွေးချယ်မှုကို အာမ မခံပါ');
+      const verdict = score >= 68 ? (marriage ? 'ဖူးစာ ပုံစံနှင့် ကိုက်ညီမှု အားကောင်းတယ် — ဇာတာပါ ပုံစံ၊ အချိန်၊ ကိုက်ညီမှု သုံးခု လုံး တစ်ဖက် ညွန့်နေတယ်' : 'သမီးရည်းစား အဆင့်အတွက် ကိုက်ညီမှု အားကောင်းတယ် — ဆွဲဆောင်မှုနဲ့ ပုံစံ နှစ်ခု လုံး ညွန့်တယ်')
+        : score >= 42 ? 'ကိုက်ညီမှု အလယ်အလတ် — ကိုက်တဲ့ အချက် ရှိသလို လွဲတဲ့ အချက်လည်း ရှိတယ်၊ အချိန်နဲ့ လက်တွေ့ ဆက်ဆံရေးကို ထပ်ကြည့်သင့်တယ်'
+        : 'ကိုက်ညီမှု အားနည်းတယ် — ဇာတာပါ ဖူးစာ ပုံစံက ဒီ ဆက်ဆံရေးကို သိပ် အားမပေးဘူး';
+      return { score, verdict, lines, fitAB: fitAB.score, fitBA: fitBA.score, timingA: tA, timingB: tB };
     }
 
     function calculateCareerBenefitSummary(bp, dashaTree) {
@@ -2297,6 +2447,131 @@
       return (<div className="flex items-center space-x-2"><div className="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden"><div className={`h-2 rounded-full ${color || 'bg-emerald-600'}`} style={{ width: Math.max(2, Math.min(100, score)) + '%' }}></div></div><span className="font-bold text-slate-700 w-10 text-right">{score}</span></div>);
     }
 
+    // ===== Job Choice (အလုပ် ရွေးချယ်မှု) — component model, v6.9 =====
+    // Modern jobs are bundles of work components, not single houses. Each component maps to
+    // houses + karakas; a job scores as the weighted blend of its components.
+    const JOB_COMPONENTS = [
+      { id: 'visual', name: 'မြင်ကွင်း ဖန်တီး', en: 'Visual', houses: [5, 1], karakas: ['Venus', 'Sun'] },
+      { id: 'hand', name: 'လက်အသုံးပြု', en: 'Manual / Craft', houses: [3, 6], karakas: ['Mars', 'Saturn'] },
+      { id: 'perform', name: 'ဖျော်ဖြေ', en: 'Performance', houses: [5, 3], karakas: ['Venus', 'Moon'] },
+      { id: 'voice', name: 'အသံ / စကား', en: 'Voice', houses: [2, 3], karakas: ['Mercury', 'Moon'] },
+      { id: 'language', name: 'ဘာသာစကား / အရေး', en: 'Language', houses: [2, 5], karakas: ['Mercury', 'Jupiter'] },
+      { id: 'digital', name: 'Digital / Online', en: 'Digital', houses: [3, 11], karakas: ['Mercury', 'Rahu'] },
+      { id: 'compete', name: 'ပြိုင် / အားကစား', en: 'Competition', houses: [6, 3], karakas: ['Mars'] },
+      { id: 'trade', name: 'ကုန်သွယ်', en: 'Trade', houses: [7, 10], karakas: ['Mercury', 'Venus'] },
+      { id: 'manage', name: 'စီမံ / ဦးဆောင်', en: 'Manage', houses: [10, 1], karakas: ['Sun', 'Jupiter'] },
+      { id: 'care', name: 'စောင့်ရှောက်', en: 'Care', houses: [4, 5], karakas: ['Moon'] },
+      { id: 'tech', name: 'နည်းပညာ / စက်', en: 'Technical', houses: [6, 10], karakas: ['Mars', 'Saturn', 'Rahu'] },
+      { id: 'finance', name: 'ငွေကြေး', en: 'Finance', houses: [2, 11], karakas: ['Jupiter'] }
+    ];
+    const JOB_PRESETS = [
+      { name: 'ပန်းချီဆရာ / Visual Artist', comps: [['visual', 3], ['hand', 1]] },
+      { name: 'ပန်းပု / Sculptor', comps: [['visual', 2], ['hand', 3]] },
+      { name: 'Graphic Designer', comps: [['visual', 3], ['digital', 2]] },
+      { name: 'Fashion Designer', comps: [['visual', 3], ['trade', 1], ['hand', 1]] },
+      { name: 'အဆိုတော် / Singer', comps: [['perform', 3], ['voice', 2]] },
+      { name: 'သရုပ်ဆောင် / Actor', comps: [['perform', 3], ['visual', 1]] },
+      { name: 'စာရေးဆရာ / Content Writer', comps: [['language', 3], ['digital', 2]] },
+      { name: 'ဘာသာပြန် / Translator', comps: [['language', 3], ['digital', 1]] },
+      { name: 'Gamer / Streamer', comps: [['compete', 3], ['digital', 2], ['hand', 1]] },
+      { name: 'အားကစားသမား / Athlete', comps: [['compete', 3], ['hand', 1]] },
+      { name: 'စက်ရုံ / ထုတ်လုပ်ရေး', comps: [['tech', 3], ['manage', 2]] },
+      { name: 'သွင်းကုန် / ဖြန့်ချိရေး', comps: [['trade', 3], ['digital', 1], ['finance', 1]] },
+      { name: 'ဆိုင် / လက်လီ ရောင်းဝယ်ရေး', comps: [['trade', 3], ['visual', 1]] },
+      { name: 'စတော့ / ရင်းနှီးမြှုပ်နှံမှု', comps: [['finance', 3], ['digital', 1]] },
+      { name: 'တင်ဒါ / ကန်ထရိုက်', comps: [['compete', 2], ['manage', 2], ['finance', 1]] },
+      { name: 'ဆရာ / သင်ကြားရေး', comps: [['language', 2], ['care', 2]] },
+      { name: 'စားဖိုမှူး / စားသောက်ဆိုင်', comps: [['hand', 2], ['care', 2], ['trade', 1]] },
+      { name: 'ဓာတ်ပုံ / Video Creator', comps: [['visual', 3], ['digital', 2]] }
+    ];
+    function jobComponentById(id) { return JOB_COMPONENTS.find((c) => c.id === id); }
+    function scoreJobComponent(bp, dashaTree, comp) {
+      let s = 50; const lines = [];
+      comp.houses.forEach((h) => {
+        const L = _lordOfHouse(bp, h);
+        if (!L) return;
+        const lh = _planetHouse(bp, L);
+        if ([1, 4, 5, 7, 9, 10, 11].includes(lh)) s += 7;
+        else if ([2, 3].includes(lh)) s += 3;
+        else s -= 5;
+        const st = _planetStrength(bp, L);
+        if (typeof st === 'number' && st >= 80) { s += 4; lines.push(`${h} တန့် အရှင် ${L} အားကောင်း (${st})`); }
+      });
+      comp.karakas.forEach((k) => {
+        const st = _planetStrength(bp, k);
+        if (typeof st === 'number') { s += Math.round((st - 55) / 4); if (st >= 80) lines.push(`ကာရက ${k} အားကောင်း (${st})`); }
+      });
+      const cur = (typeof rpCurrentLords === 'function') ? rpCurrentLords(dashaTree) : null;
+      if (cur) {
+        const sig = new Set([...comp.houses.map((h) => _lordOfHouse(bp, h)), ...comp.karakas]);
+        if (cur.maha && sig.has(cur.maha)) { s += 8; lines.push(`လက်ရှိ ${cur.maha} မဟာဒဿာ က ဒီ အစိတ်အပိုင်း ကို နှိုးနေတယ်`); }
+        if (cur.antar && sig.has(cur.antar)) { s += 5; lines.push(`အန္တရ ${cur.antar} လည်း ဆက်နွယ်နေတယ်`); }
+      }
+      return { id: comp.id, name: comp.name, score: Math.max(5, Math.min(97, Math.round(s))), lines };
+    }
+    function scoreJob(bp, dashaTree, preset) {
+      const parts = preset.comps.map(([id, w]) => ({ w, r: scoreJobComponent(bp, dashaTree, jobComponentById(id)) }));
+      const tw = parts.reduce((a, x) => a + x.w, 0) || 1;
+      const score = Math.round(parts.reduce((a, x) => a + x.r.score * x.w, 0) / tw);
+      return { name: preset.name, score, parts: parts.map((x) => x.r) };
+    }
+    function JobChoiceCard({ p, dashaTree, kpData }) {
+      const [selJobs, setSelJobs] = useState([]);
+      const [selComps, setSelComps] = useState([]);
+      const toggleJob = (i) => setSelJobs((prev) => prev.includes(i) ? prev.filter((x) => x !== i) : (prev.length >= 4 ? prev : [...prev, i]));
+      const toggleComp = (id) => setSelComps((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : (prev.length >= 3 ? prev : [...prev, id]));
+      const results = selJobs.map((i) => scoreJob(p, dashaTree, JOB_PRESETS[i]));
+      if (selComps.length) results.push(scoreJob(p, dashaTree, { name: 'ကိုယ်တိုင် တွဲထားသော အလုပ် (' + selComps.map((id) => jobComponentById(id).name).join(' + ') + ')', comps: selComps.map((id, ix) => [id, [3, 2, 1][ix] || 1]) }));
+      const ranked = [...results].sort((a, b) => b.score - a.score);
+      let kpNote = null;
+      if (kpData && ranked.length && kpData.houses && kpData.houses[9]) {
+        try {
+          const cusp = kpData.houses[9];
+          const sigSet = new Set();
+          if (cusp.sig) ['A', 'B', 'C', 'D'].forEach((g) => { (cusp.sig[g] || []).forEach((pl) => sigSet.add(pl)); });
+          if (cusp.csl) sigSet.add(cusp.csl);
+          const topPlanets = new Set();
+          ranked[0].parts.forEach((pt) => { const c = jobComponentById(pt.id); c.houses.forEach((h) => topPlanets.add(_lordOfHouse(p, h))); c.karakas.forEach((k) => topPlanets.add(k)); });
+          const hits = [...topPlanets].filter((pl) => pl && sigSet.has(pl));
+          if (hits.length) kpNote = `KP အရ ၁၀ တန့် Cusp Sub-Lord ဆက်နွယ်မှု က ထိပ်ဆုံး ရွေးချယ်မှု ၏ အချက် (${hits.join(', ')}) တွေ ကို signify လုပ်နေတယ် — အလုပ်ဘက် KP ထောက်ခံချက် ရှိတယ်`;
+        } catch (e) {}
+      }
+      const grade = (sc) => sc >= 65 ? 'အားကောင်း' : sc >= 48 ? 'အလယ်အလတ်' : 'အားနည်း';
+      return (
+        <div className="bg-white border border-teal-300 p-3 rounded shadow-sm space-y-2">
+          <div className="font-bold text-teal-900">💼 အလုပ် ရွေးချယ်မှု — ဘယ် အလုပ် က ဇာတာအရ အကျိုးပေး လဲ (ရွေးစရာ ယှဉ်)</div>
+          <div className="text-[10px] text-slate-500">ခေတ်သစ် အလုပ် တွေက တစ်အိမ်တည်း မဟုတ်တော့ — အလုပ် ပါဝင် အစိတ်အပိုင်း တွေ (မြင်ကွင်း/လက်/Digital…) ကို တွဲပြီး အလေးချိန် နဲ့ တွက်တယ်။ Preset ရွေး (အများ ၄) သို့မဟုတ် အစိတ်အပိုင်း ကိုယ်တိုင် တွဲ (အများ ၃၊ ရွေးတဲ့ အစဉ် = အလေးချိန်)။</div>
+          <div className="flex flex-wrap gap-1">
+            {JOB_PRESETS.map((j, i) => (
+              <button key={i} onClick={() => toggleJob(i)} className={`px-2 py-1 rounded-full text-[10px] font-semibold border ${selJobs.includes(i) ? 'bg-teal-700 text-white border-teal-800' : 'bg-slate-50 text-slate-700 border-slate-200'}`}>{j.name}</button>
+            ))}
+          </div>
+          <div className="border-t border-slate-100 pt-1.5">
+            <div className="text-[10px] font-bold text-slate-600 mb-1">🧩 အစိတ်အပိုင်း ကိုယ်တိုင် တွဲ (Custom)</div>
+            <div className="flex flex-wrap gap-1">
+              {JOB_COMPONENTS.map((c) => (
+                <button key={c.id} onClick={() => toggleComp(c.id)} className={`px-2 py-1 rounded-full text-[10px] font-semibold border ${selComps.includes(c.id) ? 'bg-indigo-600 text-white border-indigo-700' : 'bg-white text-slate-600 border-slate-200'}`}>{selComps.includes(c.id) ? (selComps.indexOf(c.id) + 1) + '. ' : ''}{c.name}</button>
+              ))}
+            </div>
+          </div>
+          {ranked.length > 0 && (
+            <div className="space-y-1.5 border-t border-slate-100 pt-1.5">
+              {ranked.map((r, ix) => (
+                <div key={ix} className="text-[11px]">
+                  <div className="flex justify-between"><span className="font-semibold text-slate-800">{ix + 1}. {r.name}</span><span className={`font-bold ${r.score >= 65 ? 'text-teal-700' : r.score >= 48 ? 'text-amber-600' : 'text-rose-600'}`}>{r.score}/100 · {grade(r.score)}</span></div>
+                  <div className="h-1.5 bg-slate-100 rounded"><div className={`h-1.5 rounded ${r.score >= 65 ? 'bg-teal-500' : r.score >= 48 ? 'bg-amber-400' : 'bg-rose-400'}`} style={{ width: r.score + '%' }}></div></div>
+                  <div className="text-[10px] text-slate-500">{r.parts.map((pt) => `${pt.name} ${pt.score}`).join(' · ')}</div>
+                  {r.parts.flatMap((pt) => pt.lines).slice(0, 2).map((ln, j) => (<div key={j} className="text-[10px] text-slate-400">• {ln}</div>))}
+                </div>
+              ))}
+              {kpNote && <div className="text-[10px] text-amber-700">• {kpNote}</div>}
+              <div className="text-[10px] text-slate-400">မှတ်ချက်: ဒါ က မွေးဇာတာ အခြေခံ နယ်ပယ် ယှဉ်ကြည့်မှု — "ဒီ ကိစ္စ လုပ်သင့်/မလုပ်သင့်" လို အချိန် မှီ ဆုံးဖြတ်ချက် ဆိုရင် ဟူးရား (⚖️ ဆုံးဖြတ်ချက်) မှာ မေးပါ။</div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     function PlaceTab({ p, dashaTree, kpData, birthJD, birthLat, birthLon, nodeType, birthPlace, birthName }) {
       const [purpose, setPurpose] = useState('general');
       const [cityIdx, setCityIdx] = useState(6);
@@ -2323,7 +2598,8 @@
       const planetsToShow = planetFilter === 'ALL' ? Object.keys(acg) : [planetFilter];
       return (
         <div className="p-3 space-y-3 text-xs">
-          <h2 className="font-bold text-emerald-900 text-sm">🌍 နေရာရွေး — {birthName} ၏ မွေးဇာတာမှ ဖတ်သည်</h2>
+          <h2 className="font-bold text-emerald-900 text-sm">🧭 ရွေးချယ်မှု — {birthName} ၏ မွေးဇာတာမှ ဖတ်သည်</h2>
+          <JobChoiceCard p={p} dashaTree={dashaTree} kpData={kpData} />
           <div className="flex flex-wrap gap-1">
             {[['general', '🌍 ဘဝ တစ်ခုလုံး'], ['work', '💼 အလုပ်'], ['settle', '🏠 အခြေချ'], ['study', '📚 ပညာ']].map(([k, l]) => (
               <button key={k} onClick={() => setPurpose(k)} className={`px-2 py-1 rounded-full font-semibold ${purpose === k ? 'bg-emerald-800 text-white' : 'bg-slate-100 text-slate-700'}`}>{l}</button>
@@ -2875,6 +3151,9 @@
       // Boy & Girl state with specific Timezone
       const [boy, setBoy] = useState({ name: 'သတို့သား', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
       const [girl, setGirl] = useState({ name: 'သတို့သမီး', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
+      const [rival, setRival] = useState({ name: 'ပြိုင်ဘက်', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
+      const [rivalOn, setRivalOn] = useState(false);
+      const [rpContext, setRpContext] = useState('marriage');
 
       const [citySuggestions, setCitySuggestions] = useState([]);
       const [searchTarget, setSearchTarget] = useState(null);
@@ -2933,6 +3212,22 @@
 
       const loadProfileToGirl = (p) => {
         setGirl({
+          name: p.name,
+          d: p.day,
+          m: p.month,
+          y: p.year,
+          h: p.hour,
+          min: p.minute,
+          ampm: p.ampm,
+          city: p.place,
+          lat: p.lat,
+          lon: p.lon,
+          tz: p.tz || '6.5'
+        });
+      };
+
+      const loadProfileToRival = (p) => {
+        setRival({
           name: p.name,
           d: p.day,
           m: p.month,
@@ -3032,6 +3327,7 @@
 
       const lifeOverview = generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas);
       const careerBenefit = calculateCareerBenefitSummary(birthPlanets, dashaTree);
+      const spouseProfile = buildSpouseProfile(birthPlanets, dashaTree);
       const eventWindows = calculateEventWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, tz: parseFloat(birthTz) || 6.5, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
       const placementReading = buildPlacementReading(birthPlanets, placementPlanet, birthPlanetsNext);
       const lifetimeMilestones = generateLifetimeMilestones(birthDateObj, dashaTree, birthPlanets);
@@ -3076,6 +3372,16 @@
       const girlPlanets = calculateNASA_JPL_Planets(girlJD, girl.lat, girl.lon, ayanamsa);
       const matchResult = calculateSynastry(boyPlanets, girlPlanets, ayanamsa, boyDateObj, girlDateObj);
       const kpMatch = ayanamsa === 'kp' ? calculateKPMatching(boyPlanets, girlPlanets, calculatePlacidusCusps(boyJD, boy.lat, boy.lon, 'kp'), calculatePlacidusCusps(girlJD, girl.lat, girl.lon, 'kp')) : null;
+      const boyTreeRP = calculateDashaTree(boyPlanets.Moon, boyDateObj);
+      const girlTreeRP = calculateDashaTree(girlPlanets.Moon, girlDateObj);
+      const rpMain = calculateRightPerson(boyPlanets, girlPlanets, boyTreeRP, girlTreeRP, rpContext, matchResult ? matchResult.total : 0, boy.name || 'ပထမလူ', girl.name || 'ဒုတိယလူ', kpMatch ? kpMatch.score : null);
+      const rivalH = to24(safeHour(rival.h, 12), rival.ampm);
+      const rivalDateObj = new Date(safeYear(rival.y, curY), safeMonth(rival.m, 1) - 1, safeDay(rival.d, 1), rivalH, safeMinute(rival.min, 0));
+      const rivalJD = getJulianDay(safeYear(rival.y, curY), safeMonth(rival.m, 1), safeDay(rival.d, 1), rivalH, safeMinute(rival.min, 0), parseFloat(rival.tz) || 6.5);
+      const rivalPlanets = rivalOn ? calculateNASA_JPL_Planets(rivalJD, rival.lat, rival.lon, ayanamsa) : null;
+      const rivalTreeRP = rivalPlanets ? calculateDashaTree(rivalPlanets.Moon, rivalDateObj) : null;
+      const rivalSynastry = rivalPlanets ? calculateSynastry(rivalPlanets, girlPlanets, ayanamsa, rivalDateObj, girlDateObj) : null;
+      const rpAlt = rivalPlanets ? calculateRightPerson(rivalPlanets, girlPlanets, rivalTreeRP, girlTreeRP, rpContext, rivalSynastry ? rivalSynastry.total : 0, rival.name || 'ပြိုင်ဘက်', girl.name || 'ဒုတိယလူ', null) : null;
 
       const timePad = (n) => (n < 10 ? '0' + n : n);
       const _tzDisp = new Date(transitDate.getTime() + (((parseFloat(transitTz) || 6.5) * 60) + transitDate.getTimezoneOffset()) * 60000);
@@ -3127,7 +3433,7 @@
                 { id: 'bhava', l: '🏛️ ဘာဝ' },
                 { id: 'yogas', l: '✨ ယောဂ' },
                 { id: 'matching', l: '💍 ဇာတာတိုက်' },
-                { id: 'place', l: '🌍 နေရာရွေး' },
+                { id: 'place', l: '🧭 ရွေးချယ်မှု' },
                 { id: 'relate', l: '🤝 ပေါင်းသင်း' }
               ].map((t) => (
                 <button
@@ -3663,6 +3969,11 @@
                 <div className="font-bold text-indigo-950 text-xs">🧭 အနှစ်ချုပ် — ဘဝ အကျိုးပေး အလုပ် <span className="text-[9px] font-medium text-indigo-500">(မွေးဇာတာ အရ · ဟူးရားနှင့် မသက်ဆိုင်)</span></div>
                 <div className="text-slate-800 text-[11px] font-semibold leading-relaxed">{careerBenefit.verdict}</div>
                 {careerBenefit.lines.map((ln, j) => (<div key={j} className="text-[10px] text-slate-600 leading-relaxed">• {ln}</div>))}
+                <div className="border-t border-indigo-200 pt-1.5 mt-1">
+                  <div className="font-bold text-rose-900 text-[11px]">💍 အိမ်ထောင်ဖက် ပုံစံ (ဖူးစာ ပုံစံ)</div>
+                  <div className="text-slate-800 text-[11px] font-semibold leading-relaxed">{spouseProfile.verdict}</div>
+                  {spouseProfile.lines.map((ln, j) => (<div key={j} className="text-[10px] text-slate-600 leading-relaxed">• {ln}</div>))}
+                </div>
               </div>
             </div>
           )}
@@ -3681,7 +3992,7 @@
 
               <div className="bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2">
                 <div className="flex justify-between items-baseline">
-                  <span className="font-bold text-slate-800">📚 မေးခွန်း Bank — အိမ် အလိုက် (မေးခွန်း ၅၃ ခု)</span>
+                  <span className="font-bold text-slate-800">📚 မေးခွန်း Bank — အိမ် အလိုက် (မေးခွန်း ၅၉ ခု)</span>
                   <span className="text-[9px] text-slate-500">၂ ခု ရွေးလျှင် ပေါင်းဖတ် ပေးသည်</span>
                 </div>
                 {bankSel.length > 0 && (
@@ -4022,6 +4333,59 @@
                 </div>
               </div>
 
+              {/* Rival (ပြိုင်ဘက်) — optional third person for the Right Person comparison */}
+              <div className="flex items-center gap-2">
+                <button onClick={() => setRivalOn(!rivalOn)} className={`px-2 py-1 rounded text-[11px] font-bold border ${rivalOn ? 'bg-rose-600 text-white border-rose-700' : 'bg-white text-rose-700 border-rose-300'}`}>⚔️ ပြိုင်ဘက် ထည့်ပြီး ယှဉ်ကြည့်မယ်</button>
+                {rivalOn && <span className="text-[10px] text-slate-500">အလယ်လူ (Girl) ကို ရွေးချယ်သူ ထား၍ Boy နှင့် ပြိုင်ဘက် နှစ်ယောက်ကို ယှဉ်တာပါ</span>}
+              </div>
+              {rivalOn && (
+              <div className="bg-white border border-rose-200 p-2.5 rounded space-y-1.5 shadow-sm">
+                <div className="flex justify-between items-center border-b border-rose-100 pb-1">
+                  <span className="font-bold text-rose-800">ပြိုင်ဘက် အချက်အလက် (Rival)</span>
+                  {savedProfiles.length > 0 && (
+                    <select
+                      onChange={(e) => {
+                        const prof = savedProfiles.find(pp => pp.id === e.target.value);
+                        if (prof) loadProfileToRival(prof);
+                        e.target.value = '';
+                      }}
+                      defaultValue=""
+                      className="bg-rose-50 border border-rose-300 rounded px-1.5 py-0.5 text-[10px] text-rose-900 font-medium"
+                    >
+                      <option value="" disabled>📂 မှတ်တမ်းမှရွေး</option>
+                      {savedProfiles.map(pp => (
+                        <option key={pp.id} value={pp.id}>{pp.name}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                <input value={rival.name} onChange={(e) => setRival({ ...rival, name: e.target.value })} placeholder="အမည်" className="w-full border p-1 rounded text-xs" />
+                <div className="grid grid-cols-6 gap-1">
+                  <input value={rival.d} onChange={(e) => setRival({ ...rival, d: e.target.value })} placeholder="ရက်" className="border p-1 rounded text-center" />
+                  <input value={rival.m} onChange={(e) => setRival({ ...rival, m: e.target.value })} placeholder="လ" className="border p-1 rounded text-center" />
+                  <input value={rival.y} onChange={(e) => setRival({ ...rival, y: e.target.value })} placeholder="ခုနှစ်" className="border p-1 rounded text-center" />
+                  <input value={rival.h} onChange={(e) => setRival({ ...rival, h: e.target.value })} placeholder="နာရီ" className="border p-1 rounded text-center" />
+                  <input value={rival.min} onChange={(e) => setRival({ ...rival, min: e.target.value })} placeholder="မိနစ်" className="border p-1 rounded text-center" />
+                  <button onClick={() => setRival({ ...rival, ampm: rival.ampm === 'AM' ? 'PM' : 'AM' })} className="bg-rose-700 text-white rounded font-bold">{rival.ampm}</button>
+                </div>
+                <input value={rival.city} onChange={(e) => setRival({ ...rival, city: e.target.value })} placeholder="မွေးဖွားရာ မြို့ (အမည် မှတ်သားရုံသာ — Lat/Lon ကို အောက်မှာ စစ်ထည့်ပါ)" className="w-full border p-1 rounded text-xs" />
+                <div className="grid grid-cols-3 gap-1">
+                  <div>
+                    <label className="text-slate-500 block text-[9px]">Lat:</label>
+                    <input value={rival.lat} onChange={(e) => setRival({ ...rival, lat: e.target.value })} placeholder="16.84" className="w-full border p-0.5 rounded text-center text-xs" />
+                  </div>
+                  <div>
+                    <label className="text-slate-500 block text-[9px]">Lon:</label>
+                    <input value={rival.lon} onChange={(e) => setRival({ ...rival, lon: e.target.value })} placeholder="96.17" className="w-full border p-0.5 rounded text-center text-xs" />
+                  </div>
+                  <div>
+                    <label className="text-rose-700 font-bold block text-[9px]">Timezone (TZ):</label>
+                    <input value={rival.tz} onChange={(e) => setRival({ ...rival, tz: e.target.value })} placeholder="6.5" className="w-full border border-rose-400 bg-rose-50/50 p-0.5 rounded text-center text-xs font-bold text-rose-900" />
+                  </div>
+                </div>
+              </div>
+              )}
+
               {/* Total Ashtakoota Score */}
               <div className="bg-amber-100/80 border border-amber-300 p-3 rounded text-center shadow-sm">
                 <div className="text-2xl font-bold text-amber-900">{matchResult.total} / ၃၆ မှတ်</div>
@@ -4090,6 +4454,47 @@
                   {kpMatch.lines.map((l, i) => (
                     <div key={i} className="text-[11px] text-slate-600">• {l}</div>
                   ))}
+                </div>
+              )}
+
+              {/* Right Person — ဖူးစာရှင် ကိုက်ညီမှု (v6.8) */}
+              <div className="bg-white border border-rose-300 p-3 rounded space-y-1 shadow-sm">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-rose-900">💘 ဖူးစာရှင် ကိုက်ညီမှု (Right Person)</span>
+                  <span className="font-bold text-rose-700">{rpMain.score}/100</span>
+                </div>
+                <div className="flex gap-1.5">
+                  <button onClick={() => setRpContext('dating')} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${rpContext === 'dating' ? 'bg-rose-600 text-white border-rose-700' : 'bg-white text-rose-700 border-rose-300'}`}>💑 သမီးရည်းစား</button>
+                  <button onClick={() => setRpContext('marriage')} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${rpContext === 'marriage' ? 'bg-rose-600 text-white border-rose-700' : 'bg-white text-rose-700 border-rose-300'}`}>💍 အိမ်ထောင်</button>
+                  <span className="text-[9px] text-slate-400 self-center">အဆင့် အလိုက် အလေးချိန် ပြောင်းတွက်တယ်</span>
+                </div>
+                <div className="text-[11px] font-semibold text-rose-900">{rpMain.verdict}</div>
+                {rpMain.lines.map((l, i) => (
+                  <div key={i} className="text-[11px] text-slate-600">{l.startsWith('•') ? l : '• ' + l}</div>
+                ))}
+              </div>
+
+              {rivalOn && rpAlt && (
+                <div className="bg-white border border-violet-300 p-3 rounded space-y-1 shadow-sm">
+                  <div className="font-bold text-violet-900">⚖️ ယှဉ်ကြည့်ချက် — {girl.name || 'အလယ်လူ'} အတွက် ဘယ်သူ ပိုကိုက်?</div>
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div className="bg-slate-50 border border-slate-200 rounded p-2">
+                      <div className="font-bold text-slate-800">{boy.name || 'Boy'}</div>
+                      <div>💘 ဖူးစာ အမှတ်: <b>{rpMain.score}/100</b></div>
+                      <div>ပုံစံ ကိုက် (သူ့ဘက်က ကိုယ့်ပုံစံ): {rpMain.fitBA}/72</div>
+                      <div>ဇာတာတိုက်: {matchResult.total}/36</div>
+                      <div className="text-slate-500">{rpMain.timingA.note}</div>
+                    </div>
+                    <div className="bg-rose-50 border border-rose-200 rounded p-2">
+                      <div className="font-bold text-rose-900">{rival.name || 'ပြိုင်ဘက်'}</div>
+                      <div>💘 ဖူးစာ အမှတ်: <b>{rpAlt.score}/100</b></div>
+                      <div>ပုံစံ ကိုက် (သူ့ဘက်က ကိုယ့်ပုံစံ): {rpAlt.fitBA}/72</div>
+                      <div>ဇာတာတိုက်: {rivalSynastry ? rivalSynastry.total : '—'}/36</div>
+                      <div className="text-slate-500">{rpAlt.timingA.note}</div>
+                    </div>
+                  </div>
+                  <div className="text-[11px] font-semibold text-violet-900">{Math.abs(rpMain.score - rpAlt.score) >= 10 ? `${rpMain.score > rpAlt.score ? (boy.name || 'Boy') : (rival.name || 'ပြိုင်ဘက်')} ဘက်က သိသိသာသာ သာတယ်` : Math.abs(rpMain.score - rpAlt.score) >= 4 ? `${rpMain.score > rpAlt.score ? (boy.name || 'Boy') : (rival.name || 'ပြိုင်ဘက်')} ဘက်က အနည်းငယ် သာတယ်` : 'နှစ်ယောက် သိပ် မကွာဘူး — လက်တွေ့ ဆက်ဆံရေးက ဆုံးဖြတ်လိမ့်မယ်'}</div>
+                  <div className="text-[10px] text-slate-500">မှတ်ချက်: အလယ်လူ၏ ဒဿာ အချိန် ပြတင်းက နှစ်ယောက် လုံးအတွက် အတူတူပဲ — ကွာခြားချက်က တစ်ဖက်စီ၏ ပုံစံ ကိုက်ညီမှုနှင့် သူတို့ကိုယ်တိုင်၏ အချိန်ပဲ။ နောက်ဆုံးရွေးချယ်မှုက လူ၏ ဆုံးဖြတ်ချက်ပါ။</div>
                 </div>
               )}
 
