@@ -635,6 +635,57 @@
       return out;
     }
 
+    let _hwCache = { key: null, val: null };
+    function calculateHealthWindows(birthPlanets, dashaTree, opts){
+      if(!birthPlanets||!dashaTree||!dashaTree.length) return [];
+      const ckey = ['hw', birthPlanets.Lagna, birthPlanets.Moon, opts.ayanamsa, opts.nodeType, opts.lat, opts.lon].join('|');
+      if(_hwCache.key === ckey) return _hwCache.val;
+      const moonSign=calculateVarga(birthPlanets.Moon,1), lagnaSign=calculateVarga(birthPlanets.Lagna,1);
+      const relFrom=(sign,ref)=>((sign-ref+12)%12)+1;
+      const y0=parseInt(dashaTree[0].start.slice(0,4),10);
+      const curY=new Date().getFullYear();
+      const dashaHit=(planet)=>{ if(!planet||birthPlanets[planet]==null) return false;
+        if([6,8,12,2,7].some(h=>_lordOfHouse(birthPlanets,h)===planet)) return true;
+        const hs=_planetHouse(birthPlanets,planet); return hs===6||hs===8; };
+      const hits=[];
+      for(let Y=y0; Y<=y0+90; Y++){
+        const midStr=Y+'-07-01';
+        let maha=null, antar=null;
+        for(const m of dashaTree){ if(midStr>=m.start&&midStr<m.end){ maha=m.lord; const a=(m.antars||[]).find(x=>midStr>=x.start&&midStr<x.end); antar=a?a.lord:null; break; } }
+        if(!maha||!antar) continue;
+        const dashaPts=(dashaHit(maha)?1:0)+(dashaHit(antar)?2:0);
+        if(dashaPts<1) continue;
+        let signs=null;
+        try{ const tp=calculateNASA_JPL_Planets(_jdFromDate(new Date(Y,6,1,12,0),opts.tz),opts.lat,opts.lon,opts.ayanamsa,opts.nodeType); signs={}; ['Saturn','Rahu','Mars'].forEach(k=>signs[k]=calculateVarga(tp[k],1)); }catch(e){}
+        if(!signs) continue;
+        const fac=[];
+        const satM=relFrom(signs.Saturn,moonSign), satL=relFrom(signs.Saturn,lagnaSign), rahM=relFrom(signs.Rahu,moonSign), marM=relFrom(signs.Mars,moonSign);
+        if([12,1,2].includes(satM)) fac.push('စနေ စာဒေးစာတီ');
+        else if([6,8,12].includes(satM)) fac.push('စနေ လ မှ ၆/၈/၁၂');
+        if([6,8,12].includes(satL)) fac.push('စနေ လဂ် မှ ၆/၈/၁၂');
+        if([6,8,12].includes(rahM)) fac.push('ရာဟု လ မှ ၆/၈/၁၂');
+        if([6,8].includes(marM)) fac.push('အင်္ဂါ လ မှ ၆/၈');
+        const total=dashaPts+fac.length*2;
+        const qualify=(dashaPts>=2&&fac.length>=1)||(dashaPts>=1&&fac.length>=2);
+        if(!qualify) continue;
+        hits.push({Y,total,maha,antar,note:fac.join(' + '),grade: total>=7?'အထူး ဂရုစိုက်':'ဂရုစိုက်'});
+      }
+      const grouped=[];
+      hits.forEach(h=>{
+        const last=grouped[grouped.length-1];
+        if(last && h.Y===last.y2+1 && h.grade===last.grade){ last.y2=h.Y; if(h.total>last.total){ last.total=h.total; last.maha=h.maha; last.antar=h.antar; last.note=h.note; } }
+        else grouped.push({y1:h.Y,y2:h.Y,total:h.total,maha:h.maha,antar:h.antar,note:h.note,grade:h.grade});
+      });
+      grouped.forEach(g=>{ g.isYear=true; g.yearLabel=g.y1===g.y2?(''+g.y1):(g.y1+'–'+g.y2); g.when=g.y2<curY?'ကုန်လွန်':(g.y1<=curY?'လက်ရှိ':'လာမည့်'); g.care='စစ်ဆေးမှု ပုံမှန် · အလုပ် ဝန် လျှော့ အနားယူ · ကုသိုလ်ရေး တွဲလုပ်'; });
+      let out=grouped;
+      if(out.length>6){
+        const cur=out.filter(g=>g.when==='လက်ရှိ'), fut=out.filter(g=>g.when==='လာမည့်'), past=out.filter(g=>g.when==='ကုန်လွန်').sort((a,b)=>b.total-a.total);
+        out=[...cur, ...fut.slice(0,3), ...past.slice(0, Math.max(0, 6-cur.length-Math.min(3,fut.length)))].sort((a,b)=>a.y1-b.y1);
+      }
+      _hwCache={key:ckey,val:out};
+      return out;
+    }
+
     // ===== v6: Birth-time rectification =====
     const RECT_EVENT_DEFS={
       marriage:{label:'💍 အိမ်ထောင် ကျခဲ့သည်',houses:[2,7,11],primary:7},
@@ -3437,6 +3488,7 @@
       const spouseProfile = buildSpouseProfile(birthPlanets, dashaTree);
       const ayuReading = generateAyuReading(birthPlanets, dashaTree);
       const eventWindows = calculateEventWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, tz: parseFloat(birthTz) || 6.5, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
+      const healthWindows = calculateHealthWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, tz: parseFloat(birthTz) || 6.5, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
       const placementReading = buildPlacementReading(birthPlanets, placementPlanet, birthPlanetsNext);
       const lifetimeMilestones = generateLifetimeMilestones(birthDateObj, dashaTree, birthPlanets);
       const annualForecast = generateAnnualForecast(birthDateObj, birthPlanets, transitPlanets, transitDate, transitLat, transitLon, ayanamsa, nodeType, parseFloat(transitTz) || 6.5);
@@ -4069,6 +4121,22 @@
                             </div>
                           ))}
                         </div> ); })}
+                      <div className="border-t border-rose-100 pt-2">
+                        <div className="text-[11px] font-bold text-rose-800">🩺 ကျန်းမာရေး ဂရုစိုက် သင့်သည့် ကာလ</div>
+                        <p className="text-[10px] text-slate-500 mt-0.5">ဒဿာ (၆/၈/၁၂ တန့် အရှင်၊ မာရက အရှင်) နဲ့ ကောဇာ (စနေ/ရာဟု) နှစ်လွှာ ထပ်တဲ့ ကာလ သာ ပြသည်။ ရောဂါ ဟောချက် မဟုတ် — ထောက်ပံ့အား ပါးတဲ့ ကာလ မို့ ဂရုစိုက် အဆင့် မြှင့် ရမယ့် အချိန် သာ ဖြစ်သည်။ ဒီကာလ တွေ ကျော်လွန် ရင် ထောက်ပံ့အား ပုံမှန် ပြန် ဖြစ် တတ် ပါတယ်။</p>
+                        {(!healthWindows || healthWindows.length === 0) ? <div className="text-[10px] text-slate-400 mt-0.5">ထင်ရှားသော ဂရုစိုက် ကာလ မတွေ့ပါ။</div> : healthWindows.map((w, i) => (
+                          <div key={i} className="mt-1">
+                            <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
+                              <span className="font-bold text-slate-800 text-[11px]">{w.yearLabel}</span>
+                              <span className={`px-1.5 py-0.5 rounded-full font-bold ${w.grade === 'အထူး ဂရုစိုက်' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>{w.grade}</span>
+                              <span className={`px-1.5 py-0.5 rounded-full ${w.when === 'လက်ရှိ' ? 'bg-rose-100 text-rose-700 font-bold' : 'bg-slate-50 text-slate-400'}`}>{w.when}</span>
+                              <span className="text-slate-500">{w.maha}/{w.antar} ကာလ</span>
+                              {w.note && <span className="text-rose-500">{w.note}</span>}
+                            </div>
+                            <div className="text-[9px] text-slate-400 ml-0.5">ဂရုစိုက်နည်း: {w.care}</div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
