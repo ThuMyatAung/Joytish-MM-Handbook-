@@ -1981,6 +1981,18 @@
         const vD9 = calculateVarga(bp.Venus, 9), dkD9 = dk ? calculateVarga(bp[dk], 9) : null;
         if (dkD9 != null && (vD9 === dkD9 || ((vD9 - dkD9 + 12) % 12) === 4 || ((vD9 - dkD9 + 12) % 12) === 8)) lines.push('D9 (Navamsa) အရ သောကြာနှင့် Dararakaraka ဆက်နွယ်မှု ရှိလို့ ဆက်ဆံရေး အတွင်းပိုင်း အရည်အသွေး ကောင်းဖို့ အလားအလာ ရှိတယ်');
       } catch (e) {}
+      const SPOUSE_WORK = { Sun: 'ဦးဆောင် ဦးရွက် ပြုတတ်သူ — ကိုယ်ပိုင် လုပ်ငန်းရှင်/CEO လို အဆင့် ရှိတဲ့ အလုပ်', Moon: 'လူအများ နဲ့ ဆက်ဆံရတဲ့ အလုပ် — ဝန်ဆောင်မှု/အစားအသောက်/စောင့်ရှောက်မှု ဘက်', Mars: 'နည်းပညာ/စက်/အားသုံး အလုပ် — အင်ဂျင်နီယာ/စစ်-ရဲ/ကိုယ်ခံပညာ ဘက်', Mercury: 'ကုန်သွယ်/စာရွက်/ဆက်သွယ်ရေး အလုပ် — အရောင်းအဝယ်/media/စာရင်း ဘက်', Jupiter: 'ပညာ/အကြံပေး အလုပ် — ဆရာ/ဘဏ်-ငွေကြေး/အကြံပေး ဘက်', Venus: 'အနုပညာ/အလှ အလုပ် — ဖျော်ဖြေ/ဒီဇိုင်း/အလှကုန် ဘက်', Saturn: 'စက်မှု/ဆောက်လုပ်/အဖွဲ့အစည်းကြီး ထဲက အလုပ် — ရေရှည် တည်ဆောက် တဲ့ ဘက်', Rahu: 'နိုင်ငံခြား/နည်းပညာ အသစ် နဲ့ ဆက်နွယ်တဲ့ အလုပ် — ပုံမှန် မဟုတ်တဲ့ နယ်ပယ်', Ketu: 'သုတေသန/ဘာသာရေး/ကျွမ်းကျင် သီးသန့် နယ်ပယ် က အလုပ်' };
+      const SPOUSE_FIELD = { Sun: 'အုပ်ချုပ်ရေး/ခေါင်းဆောင်မှု နယ်ပယ်', Moon: 'စောင့်ရှောက်/အစားအစာ/ဝန်ဆောင် နယ်ပယ်', Mars: 'အင်ဂျင်နီယာ/အားသုံး/ကာကွယ်ရေး နယ်ပယ်', Mercury: 'ကုန်သွယ်/ဆက်သွယ်ရေး/စာရင်း နယ်ပယ်', Jupiter: 'သင်ကြား/ဘဏ်/အကြံပေး နယ်ပယ်', Venus: 'အနုပညာ/အလှ/ဖျော်ဖြေ နယ်ပယ်', Saturn: 'စက်မှု/ဆောက်လုပ်/လုပ်သား နယ်ပယ်' };
+      const occ7 = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].filter((pl) => _planetHouse(bp, pl) === 7);
+      if (occ7.length) {
+        const main = occ7[0];
+        const stMain = _planetStrength(bp, main);
+        lines.push(`အိမ်ထောင်ဖက် အလုပ် အကြမ်းဖျင်း: ၇ တန့်ထဲ ရပ်တဲ့ ${main} အရ ${SPOUSE_WORK[main]}${occ7.length > 1 ? ` · နောက် ${occ7.slice(1).join(', ')} လည်း ပါလို့ အခြား အရိပ် ရောနိုင်တယ်` : ''}${typeof stMain === 'number' && stMain >= 80 ? ' — ဒီ ဂြိုဟ် အားကောင်း လို့ အိမ်ထောင်ဖက် က ကိုယ့် ဘဝ ကို အကျိုးပေး ထောက်ကူ ပေးနိုင်တဲ့ လူ ဖြစ်တတ်တယ်' : ''}`);
+      }
+      if (dk && SPOUSE_FIELD[dk]) lines.push(`Dararakaraka ${dk} အရ အိမ်ထောင်ဖက် နယ်ပယ် က ${SPOUSE_FIELD[dk]} ဘက် ယိုင်တယ်`);
+      if (l7h === 10) lines.push('၇ တန့် အရှင် ၁၀ တန့်မှာ ရပ်လို့ အိမ်ထောင်ဖက် က အလုပ် ထင်ရှား/နာမည် ရှိတဲ့ လူ ဖြစ်တတ်တယ်');
+      else if (l7h === 9) lines.push('၇ တန့် အရှင် ၉ တန့်မှာ ရပ်လို့ အိမ်ထောင်ဖက် က ပညာ/နိုင်ငံခြား နဲ့ ဆက်နွယ်တဲ့ အလုပ် ဖြစ်တတ်တယ်');
+      else if (l7h === 11) lines.push('၇ တန့် အရှင် ၁၁ တန့်မှာ ရပ်လို့ အိမ်ထောင်ဖက် က လူမှု ကွန်ရက် ကျယ်ပြီး ဝင်ငွေ လမ်းကြောင်း များတဲ့ အလုပ် ဖြစ်တတ်တယ်');
       const verdict = dk ? `ဖူးစာ ပုံစံ အကျဉ်း: ${RP_DK_TRAITS[dkSign]}${l7 ? ` · ဆုံရမယ့် ပတ်ဝန်းကျင်က ${l7h} တန့် အချက် အရ ခန့်မှန်းနိုင်တယ် (အောက်မှာ အသေးစိတ်)` : ''}` : '—';
       return { verdict, lines, dk, dkSign, ul };
     }
@@ -2462,7 +2474,9 @@
       { id: 'manage', name: 'စီမံ / ဦးဆောင်', en: 'Manage', houses: [10, 1], karakas: ['Sun', 'Jupiter'] },
       { id: 'care', name: 'စောင့်ရှောက်', en: 'Care', houses: [4, 5], karakas: ['Moon'] },
       { id: 'tech', name: 'နည်းပညာ / စက်', en: 'Technical', houses: [6, 10], karakas: ['Mars', 'Saturn', 'Rahu'] },
-      { id: 'finance', name: 'ငွေကြေး', en: 'Finance', houses: [2, 11], karakas: ['Jupiter'] }
+      { id: 'finance', name: 'ငွေကြေး', en: 'Finance', houses: [2, 11], karakas: ['Jupiter'] },
+      { id: 'public', name: 'အများပြည်သူ / နာမည်', en: 'Public / Fame', houses: [10, 11], karakas: ['Sun', 'Rahu'] },
+      { id: 'research', name: 'သုတေသန / သိပ္ပံ', en: 'Research / Science', houses: [5, 9], karakas: ['Mercury', 'Jupiter', 'Ketu'] }
     ];
     const JOB_PRESETS = [
       { name: 'ပန်းချီဆရာ / Visual Artist', comps: [['visual', 3], ['hand', 1]] },
@@ -2482,7 +2496,28 @@
       { name: 'တင်ဒါ / ကန်ထရိုက်', comps: [['compete', 2], ['manage', 2], ['finance', 1]] },
       { name: 'ဆရာ / သင်ကြားရေး', comps: [['language', 2], ['care', 2]] },
       { name: 'စားဖိုမှူး / စားသောက်ဆိုင်', comps: [['hand', 2], ['care', 2], ['trade', 1]] },
-      { name: 'ဓာတ်ပုံ / Video Creator', comps: [['visual', 3], ['digital', 2]] }
+      { name: 'ဓာတ်ပုံ / Video Creator', comps: [['visual', 3], ['digital', 2]] },
+      { name: 'ဒါရိုက်တာ / Director', comps: [['visual', 3], ['manage', 2], ['perform', 1]] },
+      { name: 'Production Designer', comps: [['visual', 3], ['hand', 1], ['manage', 1]] },
+      { name: 'Makeup Artist', comps: [['visual', 3], ['hand', 2]] },
+      { name: 'Guitarist', comps: [['perform', 3], ['hand', 2]] },
+      { name: 'Composer / တေးရေး', comps: [['perform', 3], ['digital', 1]] },
+      { name: 'YouTuber', comps: [['digital', 3], ['public', 2], ['perform', 2]] },
+      { name: 'Influencer / နာမည်ကျော်', comps: [['public', 3], ['digital', 2], ['perform', 1]] },
+      { name: 'သိပ္ပံပညာရှင် (ရူပ/ဓာတု)', comps: [['research', 3], ['tech', 1]] },
+      { name: 'နက္ခတ် / အာကာသ သိပ္ပံ', comps: [['research', 3], ['digital', 1]] },
+      { name: 'ကိုယ်ခံပညာ / Martial Arts', comps: [['compete', 3], ['hand', 2]] },
+      { name: 'ရဲ / လုံခြုံရေး', comps: [['compete', 2], ['tech', 1], ['manage', 1]] },
+      { name: 'ဆရာဝန် / သူနာပြု', comps: [['care', 3], ['research', 1]] },
+      { name: 'အင်ဂျင်နီယာ', comps: [['tech', 3], ['manage', 1]] },
+      { name: 'Software / IT', comps: [['digital', 3], ['tech', 2]] },
+      { name: 'စာရင်းကိုင် / ဘဏ်ဝန်ထမ်း', comps: [['finance', 3], ['digital', 1]] },
+      { name: 'အရောင်း / Sales', comps: [['trade', 3], ['voice', 1]] },
+      { name: 'Online Shop ပိုင်ရှင်', comps: [['trade', 3], ['digital', 2]] },
+      { name: 'ဆောက်လုပ်ရေး / လက်သမား', comps: [['hand', 3], ['tech', 1]] },
+      { name: 'Video Editor', comps: [['visual', 2], ['digital', 3]] },
+      { name: 'တောင်သူ / မွေးမြူရေး', comps: [['hand', 2], ['manage', 1], ['finance', 1]] },
+      { name: 'ယာဉ်မောင်း / Delivery', comps: [['hand', 2], ['trade', 1], ['tech', 1]] }
     ];
     function jobComponentById(id) { return JOB_COMPONENTS.find((c) => c.id === id); }
     function scoreJobComponent(bp, dashaTree, comp) {
