@@ -700,7 +700,9 @@
       rise:{label:'🚀 ကြီးပွား / စီးပွား ပေါက်',houses:[9,10,11],primary:10},
       house:{label:'🏡 အိမ်/ခြံ ဝယ် / နေအိမ် ပြောင်း',houses:[4,11],primary:4},
       abroad:{label:'✈️ နိုင်ငံခြား ထွက်/ပြောင်း နေခဲ့သည်',houses:[3,9,12],primary:12},
-      education:{label:'🎓 ပညာ အရေးပါ အောင်မြင်/ပြီး',houses:[4,5,9],primary:5},
+      education:{label:'🎓 တက္ကသိုလ် တက် / ဘွဲ့ ရ',houses:[5,9],primary:9},
+      edubasic:{label:'🏫 အခြေခံ ပညာ စတက် / အခြေခံ အောင်',houses:[4,5],primary:4},
+      sibling:{label:'👨‍👧 မွေးချင်း မွေး (ညီအစ်ကို/မောင်နှမ ရ)',houses:[3,11],primary:3},
       jobloss:{label:'📉 အလုပ် ပြုတ် / လုပ်ငန်း ပိတ်',houses:[6,8,10],primary:10},
       hardship:{label:'⚠️ မတော်တဆ/နာမကျန်း/အခက်အခဲကြီး',houses:[6,8,12],primary:8}
     };
@@ -3312,6 +3314,7 @@
       const [rival, setRival] = useState({ name: 'ပြိုင်ဘက်', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
       const [rivalOn, setRivalOn] = useState(false);
       const [rpContext, setRpContext] = useState('marriage');
+      const [rpCenter, setRpCenter] = useState('girl');
 
       const [citySuggestions, setCitySuggestions] = useState([]);
       const [searchTarget, setSearchTarget] = useState(null);
@@ -3540,8 +3543,8 @@
       const rivalJD = getJulianDay(safeYear(rival.y, curY), safeMonth(rival.m, 1), safeDay(rival.d, 1), rivalH, safeMinute(rival.min, 0), parseFloat(rival.tz) || 6.5);
       const rivalPlanets = rivalOn ? calculateNASA_JPL_Planets(rivalJD, rival.lat, rival.lon, ayanamsa) : null;
       const rivalTreeRP = rivalPlanets ? calculateDashaTree(rivalPlanets.Moon, rivalDateObj) : null;
-      const rivalSynastry = rivalPlanets ? calculateSynastry(rivalPlanets, girlPlanets, ayanamsa, rivalDateObj, girlDateObj) : null;
-      const rpAlt = rivalPlanets ? calculateRightPerson(rivalPlanets, girlPlanets, rivalTreeRP, girlTreeRP, rpContext, rivalSynastry ? rivalSynastry.total : 0, rival.name || 'ပြိုင်ဘက်', girl.name || 'ဒုတိယလူ', null) : null;
+      const rivalSynastry = rivalPlanets ? (rpCenter === 'girl' ? calculateSynastry(rivalPlanets, girlPlanets, ayanamsa, rivalDateObj, girlDateObj) : calculateSynastry(boyPlanets, rivalPlanets, ayanamsa, boyDateObj, rivalDateObj)) : null;
+      const rpAlt = rivalPlanets ? (rpCenter === 'girl' ? calculateRightPerson(rivalPlanets, girlPlanets, rivalTreeRP, girlTreeRP, rpContext, rivalSynastry ? rivalSynastry.total : 0, rival.name || 'ပြိုင်ဘက်', girl.name || 'ဒုတိယလူ', null) : calculateRightPerson(boyPlanets, rivalPlanets, boyTreeRP, rivalTreeRP, rpContext, rivalSynastry ? rivalSynastry.total : 0, boy.name || 'ပထမလူ', rival.name || 'ပြိုင်ဘက်', null)) : null;
 
       const timePad = (n) => (n < 10 ? '0' + n : n);
       const _tzDisp = new Date(transitDate.getTime() + (((parseFloat(transitTz) || 6.5) * 60) + transitDate.getTimezoneOffset()) * 60000);
@@ -4672,24 +4675,30 @@
 
               {rivalOn && rpAlt && (
                 <div className="bg-white border border-violet-300 p-3 rounded space-y-1 shadow-sm">
-                  <div className="font-bold text-violet-900">⚖️ ယှဉ်ကြည့်ချက် — {girl.name || 'အလယ်လူ'} အတွက် ဘယ်သူ ပိုကိုက်?</div>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="font-bold text-violet-900">⚖️ ယှဉ်ကြည့်ချက် — {rpCenter === 'girl' ? (girl.name || 'အလယ်လူ') : (boy.name || 'အလယ်လူ')} အတွက် ဘယ်သူ ပိုကိုက်?</span>
+                    <span className="ml-auto flex gap-1">
+                      <button onClick={() => setRpCenter('girl')} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${rpCenter === 'girl' ? 'bg-violet-600 text-white border-violet-700' : 'bg-white text-violet-700 border-violet-300'}`}>👧 မိန်းကလေး အလယ်</button>
+                      <button onClick={() => setRpCenter('boy')} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${rpCenter === 'boy' ? 'bg-violet-600 text-white border-violet-700' : 'bg-white text-violet-700 border-violet-300'}`}>👦 ယောက်ျားလေး အလယ်</button>
+                    </span>
+                  </div>
                   <div className="grid grid-cols-2 gap-2 text-[11px]">
                     <div className="bg-slate-50 border border-slate-200 rounded p-2">
-                      <div className="font-bold text-slate-800">{boy.name || 'Boy'}</div>
+                      <div className="font-bold text-slate-800">{rpCenter === 'girl' ? (boy.name || 'Boy') : (girl.name || 'Girl')}</div>
                       <div>💘 ဖူးစာ အမှတ်: <b>{rpMain.score}/100</b></div>
-                      <div>ပုံစံ ကိုက် (သူ့ဘက်က ကိုယ့်ပုံစံ): {rpMain.fitBA}/72</div>
+                      <div>ပုံစံ ကိုက် (အလယ်လူ့ ပုံစံ နဲ့): {rpCenter === 'girl' ? rpMain.fitBA : rpMain.fitAB}/72</div>
                       <div>ဇာတာတိုက်: {matchResult.total}/36</div>
-                      <div className="text-slate-500">{rpMain.timingA.note}</div>
+                      <div className="text-slate-500">{rpCenter === 'girl' ? rpMain.timingA.note : rpMain.timingB.note}</div>
                     </div>
                     <div className="bg-rose-50 border border-rose-200 rounded p-2">
                       <div className="font-bold text-rose-900">{rival.name || 'ပြိုင်ဘက်'}</div>
                       <div>💘 ဖူးစာ အမှတ်: <b>{rpAlt.score}/100</b></div>
-                      <div>ပုံစံ ကိုက် (သူ့ဘက်က ကိုယ့်ပုံစံ): {rpAlt.fitBA}/72</div>
+                      <div>ပုံစံ ကိုက် (အလယ်လူ့ ပုံစံ နဲ့): {rpCenter === 'girl' ? rpAlt.fitBA : rpAlt.fitAB}/72</div>
                       <div>ဇာတာတိုက်: {rivalSynastry ? rivalSynastry.total : '—'}/36</div>
-                      <div className="text-slate-500">{rpAlt.timingA.note}</div>
+                      <div className="text-slate-500">{rpCenter === 'girl' ? rpAlt.timingA.note : rpAlt.timingB.note}</div>
                     </div>
                   </div>
-                  <div className="text-[11px] font-semibold text-violet-900">{Math.abs(rpMain.score - rpAlt.score) >= 10 ? `${rpMain.score > rpAlt.score ? (boy.name || 'Boy') : (rival.name || 'ပြိုင်ဘက်')} ဘက်က သိသိသာသာ သာတယ်` : Math.abs(rpMain.score - rpAlt.score) >= 4 ? `${rpMain.score > rpAlt.score ? (boy.name || 'Boy') : (rival.name || 'ပြိုင်ဘက်')} ဘက်က အနည်းငယ် သာတယ်` : 'နှစ်ယောက် သိပ် မကွာဘူး — လက်တွေ့ ဆက်ဆံရေးက ဆုံးဖြတ်လိမ့်မယ်'}</div>
+                  <div className="text-[11px] font-semibold text-violet-900">{Math.abs(rpMain.score - rpAlt.score) >= 10 ? `${rpMain.score > rpAlt.score ? (rpCenter === 'girl' ? (boy.name || 'Boy') : (girl.name || 'Girl')) : (rival.name || 'ပြိုင်ဘက်')} ဘက်က သိသိသာသာ သာတယ်` : Math.abs(rpMain.score - rpAlt.score) >= 4 ? `${rpMain.score > rpAlt.score ? (rpCenter === 'girl' ? (boy.name || 'Boy') : (girl.name || 'Girl')) : (rival.name || 'ပြိုင်ဘက်')} ဘက်က အနည်းငယ် သာတယ်` : 'နှစ်ယောက် သိပ် မကွာဘူး — လက်တွေ့ ဆက်ဆံရေးက ဆုံးဖြတ်လိမ့်မယ်'}</div>
                   <div className="text-[10px] text-slate-500">မှတ်ချက်: အလယ်လူ၏ ဒဿာ အချိန် ပြတင်းက နှစ်ယောက် လုံးအတွက် အတူတူပဲ — ကွာခြားချက်က တစ်ဖက်စီ၏ ပုံစံ ကိုက်ညီမှုနှင့် သူတို့ကိုယ်တိုင်၏ အချိန်ပဲ။ နောက်ဆုံးရွေးချယ်မှုက လူ၏ ဆုံးဖြတ်ချက်ပါ။</div>
                 </div>
               )}
