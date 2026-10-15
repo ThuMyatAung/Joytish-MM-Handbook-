@@ -51,6 +51,8 @@
   </div>
 
   <script type="text/babel">
+    // v6.15 (2026-10-15): Tropical = pure Western — CircleChart (Placidus), Western-format tables, Western readings + synastry; Astrocartography shows ONLY under Tropical. Vedic layers (nakshatra, dasha, Ashtakoota, yogas, Prashna, Job/Place layers) are sidereal-only. Sidereal code paths unchanged from v6.14.
+    // v6.16 (2026-10-15): Western Layer 2 — Solar Return + Secondary Progressions (Readings), aspect patterns (Yoga), Composite chart + partner profiles (Matching/Relate), Vocational + Relocation (Place). All tropical-only; sidereal unchanged.
     const { useState, useEffect, useRef, Component } = React;
 
     // ==========================================
@@ -2239,6 +2241,286 @@
       return n;
     }
 
+
+    // ==========================================
+    // WESTERN (TROPICAL) LAYER — v6.15
+    // Used ONLY when ayanamsa === 'tropical'. Sidereal modes never call these.
+    // Western astrology has no nakshatra, no Vimshottari dasha, no Ashtakoota:
+    // under Tropical those layers are hidden and this Western layer is shown.
+    // ==========================================
+    const WESTERN_SIGNS = [
+      { en: 'Aries', my: 'မိဿ', glyph: '♈', element: 'မီး', quality: 'Cardinal', ruler: 'Mars', coRuler: '', style: 'တိုက်ရိုက် မြန်မြန် ရဲရဲဝံ့ဝံ့', traits: 'စတင် လုပ်ရဲတဲ့ သတ္တိနဲ့ ကိုယ်တိုင် ဦးဆောင်ချင်စိတ် ပြင်းတယ်။ စောင့်ဆိုင်း နေရတာကို မကြိုက်ဘဲ ဆုံးဖြတ်ချက် မြန်တယ်၊ ဒါပေမယ့် အစပိုင်းပဲ အားပါပြီး အဆုံးထိ မြဲအောင် ကြိုးစားရတတ် တယ်။' },
+      { en: 'Taurus', my: 'ပြိဿ', glyph: '♉', element: 'မြေ', quality: 'Fixed', ruler: 'Venus', coRuler: '', style: 'တည်တည် ငြိမ်ငြိမ် မြဲမြဲမြံမြံ', traits: 'တည်ငြိမ်မှုနဲ့ လက်တွေ့ အကျိုးကို အလေး ထားတယ်။ အပြောင်းအလဲ နှေးပေမယ့် တစ်ခါ ဆုံးဖြတ်ပြီးရင် မြဲတယ်။ အလှ၊ အရသာနဲ့ သက်သောင့်သက်သာ ရှိတာတွေကို ခံစား တတ်တယ်။' },
+      { en: 'Gemini', my: 'မေထုန်', glyph: '♊', element: 'လေ', quality: 'Mutable', ruler: 'Mercury', coRuler: '', style: 'စူးစမ်း မြန်မြန် အပြော သွက်သွက်', traits: 'သိချင်စိတ် ပြင်းပြီး အသစ်အသစ်တွေကို မြန်မြန် သင်ယူနိုင်တယ်။ စကားပြော၊ စာရေး၊ ဆက်သွယ်ရေးမှာ သွက်တယ်။ စိတ် နှစ်ခွ ဖြစ်နေတတ်ပြီး တစ်နေရာတည်းမှာ ကြာကြာ မနေနိုင်တာ ရှိတယ်။' },
+      { en: 'Cancer', my: 'ကရကဋ်', glyph: '♋', element: 'ရေ', quality: 'Cardinal', ruler: 'Moon', coRuler: '', style: 'နူးညံ့ သိမ်မွေ့ ကာကွယ်လိုစိတ်နဲ့', traits: 'ခံစားချက် နက်ရှိုင်းပြီး မိသားစုနဲ့ အိမ်ကို အလေး ထားတယ်။ သူများကို ကာကွယ် ပြုစုရတာ ကြိုက်တယ်။ စိတ် အတက်အကျ ရှိပြီး လုံခြုံမှု မရှိရင် အထဲ ချုပ်နေ တတ်တယ်။' },
+      { en: 'Leo', my: 'သိဟ်', glyph: '♌', element: 'မီး', quality: 'Fixed', ruler: 'Sun', coRuler: '', style: 'ရဲဝံ့ ထင်ရှား ဂုဏ်ယူစွာ', traits: 'ကိုယ့်ကို ကိုယ် ယုံကြည်မှု ရှိပြီး ဖန်တီးမှုနဲ့ ထင်ရှားမှုကို ကြိုက်တယ်။ ရက်ရောပြီး ဦးဆောင် နေရာ ယူရတာ သဘာဝ ကျတယ်။ အသိအမှတ် ပြုခံချင်စိတ်က အားအင် လည်း ဖြစ်သလို အားနည်းချက်လည်း ဖြစ်နိုင် တယ်။' },
+      { en: 'Virgo', my: 'ကန်', glyph: '♍', element: 'မြေ', quality: 'Mutable', ruler: 'Mercury', coRuler: '', style: 'စနစ်တကျ အသေးစိတ် စီစစ်၍', traits: 'အသေးစိတ်ကို မြင်တတ်ပြီး အလုပ်ကို စနစ်တကျ ပြီးပြတ်အောင် လုပ်တယ်။ သုံးသပ် စီစစ်နိုင်စွမ်း ကောင်းတယ်။ ပြည့်စုံချင်စိတ် ပြင်းလွန်းရင် ကိုယ့်ကို ကိုယ် ဝေဖန် လွန်တာ ရှိတယ်။' },
+      { en: 'Libra', my: 'တူ', glyph: '♎', element: 'လေ', quality: 'Cardinal', ruler: 'Venus', coRuler: '', style: 'ဟန်ချက်ညီ ညှိနှိုင်း၍ နူးညံ့စွာ', traits: 'ဟန်ချက်နဲ့ သဟဇာတကို အလေး ထားပြီး ဆက်ဆံရေး ကောင်းတယ်။ အလှနဲ့ တရားမျှတမှုကို ခံစားတတ်တယ်။ ဆုံးဖြတ်ချက် ချဖို့ နှစ်ဖက် ချိန်ဆ နေရတာနဲ့ ကြာတတ် တယ်။' },
+      { en: 'Scorpio', my: 'ဗြိစ္ဆာ', glyph: '♏', element: 'ရေ', quality: 'Fixed', ruler: 'Mars', coRuler: 'Pluto', style: 'နက်နက်ရှိုင်းရှိုင်း ပြင်းပြင်း ထန်ထန်', traits: 'ခံစားချက်နဲ့ အာရုံစူးစိုက်မှု ပြင်းထန်ပြီး အရာရာရဲ့ အတွင်းပိုင်းကို မြင်အောင် ကြည့်တယ်။ လျှို့ဝှက်တာ ထိန်းတတ်ပြီး တစ်ခါ ယုံကြည်ပြီးရင် လုံးဝ သစ္စာ ရှိတယ်။ စွဲလမ်းမှုကို ထိန်းဖို့ တော့ လိုတယ်။' },
+      { en: 'Sagittarius', my: 'ဓနု', glyph: '♐', element: 'မီး', quality: 'Mutable', ruler: 'Jupiter', coRuler: '', style: 'ပွင့်လင်း လွတ်လပ် အဝေးကို လှမ်း၍', traits: 'လွတ်လပ်မှုနဲ့ အသိပညာ ချဲ့ထွင်မှုကို ကြိုက်တယ်။ ရိုးသား ပွင့်လင်းပြီး ခရီး၊ ဒဿန၊ ယုံကြည်မှုတွေမှာ စိတ်ဝင်စားတယ်။ ကတိ ကြီးကြီး ပေးမိပြီး အသေးစိတ်ကို လွတ်သွား တတ်တာ ရှိတယ်။' },
+      { en: 'Capricorn', my: 'မကာရ', glyph: '♑', element: 'မြေ', quality: 'Cardinal', ruler: 'Saturn', coRuler: '', style: 'ရည်မှန်းချက် နဲ့ စည်းကမ်း ရှိရှိ', traits: 'ရည်မှန်းချက် ကြီးပြီး စည်းကမ်း၊ တာဝန်ယူမှုနဲ့ ဖြည်းဖြည်းချင်း တက်လှမ်းတယ်။ လက်တွေ့ ကျပြီး ရေရှည် အကျိုးကို ကြည့်တယ်။ အလုပ် ဖိအားကို ကိုယ့်ဆီ ကိုယ် ယူလွန်း တတ်တာ ရှိတယ်။' },
+      { en: 'Aquarius', my: 'ကုံ', glyph: '♒', element: 'လေ', quality: 'Fixed', ruler: 'Saturn', coRuler: 'Uranus', style: 'ဆန်းသစ် ကိုယ်ပိုင် အမြင်နဲ့ လွတ်လပ်စွာ', traits: 'ကိုယ်ပိုင် အတွေးနဲ့ ဆန်းသစ်မှုကို တန်ဖိုး ထားတယ်။ လူ့အဖွဲ့အစည်းနဲ့ အနာဂတ်ကို စိတ်ဝင်စားပြီး သမားရိုးကျကနေ ကွဲထွက် ရဲတယ်။ ခံစားချက်ကို ဉာဏ်နဲ့ ခွဲထားတတ်ပြီး ဝေးကွာ သလို ဖြစ်နိုင် တယ်။' },
+      { en: 'Pisces', my: 'မိန်', glyph: '♓', element: 'ရေ', quality: 'Mutable', ruler: 'Jupiter', coRuler: 'Neptune', style: 'နူးညံ့ စာနာ စိတ်ကူး ပြည့်ပြည့်', traits: 'စာနာမှုနဲ့ စိတ်ကူး အားကောင်းပြီး အနုပညာနဲ့ ခံစားချက်မှာ ဆက်စပ် လွယ်တယ်။ သူများရဲ့ ခံစားချက်ကို ကိုယ့်လိုပဲ ခံစား မိတတ်တယ်။ နယ်နိမိတ် မထားတတ်ရင် စိတ် ပင်ပန်း လွယ်တာ ရှိတယ်။' }
+    ];
+    const WESTERN_PLANET_MY = { Sun: 'နေ', Moon: 'တနင်္လာ', Mars: 'အင်္ဂါ', Mercury: 'ဗုဒ္ဓဟူး', Jupiter: 'ကြာသပတေး', Venus: 'သောကြာ', Saturn: 'စနေ', Uranus: 'Uranus', Neptune: 'Neptune', Pluto: 'Pluto', Rahu: 'North Node', Ketu: 'South Node', Lagna: 'လဂ် (Ascendant)' };
+    const WESTERN_PLANET_THEME = {
+      Sun: 'ကိုယ့် အဓိက စရိုက်နဲ့ ဘဝ ဦးတည်ချက်', Moon: 'ခံစားချက်နဲ့ စိတ် လိုအပ်ချက်', Mars: 'လုပ်ရဲစွမ်းနဲ့ လုပ်ဆောင် တိုက်ခိုက်ပုံ',
+      Mercury: 'အတွေးနဲ့ ဆက်သွယ် ပြောဆိုပုံ', Jupiter: 'ကြီးထွားမှုနဲ့ အခွင့်အလမ်း ရှာပုံ', Venus: 'အချစ်၊ အလှနဲ့ တန်ဖိုး ထားပုံ',
+      Saturn: 'စည်းကမ်း၊ တာဝန်နဲ့ ရေရှည် တည်ဆောက်ပုံ', Uranus: 'ဆန်းသစ်မှုနဲ့ လွတ်လပ်ချင်စိတ်', Neptune: 'စိတ်ကူးနဲ့ စိတ်ဓာတ် ဆိုင်ရာ ရှာဖွေမှု',
+      Pluto: 'အတွင်း စွမ်းအားနဲ့ ကြီးကြီးမားမား အပြောင်းအလဲ', Rahu: 'ဘဝ သင်ယူရာ ဦးတည်ချက် (North Node)', Ketu: 'အကျွမ်းတဝင် ရှိပြီး လွှတ်ချရမယ့် ပုံစံ (South Node)', Lagna: 'အပေါ်ယံ ပုံစံနဲ့ ဘဝ ချဉ်းကပ်ပုံ'
+    };
+    const WESTERN_HOUSE_DOMAIN = ['ကိုယ့် ပုံစံနဲ့ ခန္ဓာ', 'ငွေကြေးနဲ့ ကိုယ်ပိုင် တန်ဖိုး', 'ဆက်သွယ်ရေးနဲ့ အခြေခံ သင်ယူမှု', 'အိမ်နဲ့ မိသားစု အရင်း', 'ဖန်တီးမှု၊ အချစ်နဲ့ သားသမီး', 'နေ့စဉ် အလုပ်နဲ့ ကျန်းမာရေး', 'လက်တွဲဖော်နဲ့ အိမ်ထောင်', 'မျှဝေ ပိုင်ဆိုင်မှုနဲ့ အတွင်း အပြောင်းအလဲ', 'ခရီး၊ အဆင့်မြင့် ပညာနဲ့ ယုံကြည်မှု', 'အလုပ်အကိုင်နဲ့ လူထု ပုံရိပ်', 'မိတ်ဆွေနဲ့ အနာဂတ် မျှော်မှန်းချက်', 'စိတ် အတွင်းပိုင်းနဲ့ လျှို့ဝှက် အရာ'];
+    const WESTERN_ASPECT_DEFS = [
+      { type: 'Conjunction', my: 'ပူးယှဉ် (Conjunction 0°)', angle: 0, orb: 8, kind: 'merge' },
+      { type: 'Sextile', my: 'Sextile (60°)', angle: 60, orb: 5, kind: 'flow' },
+      { type: 'Square', my: 'Square (90°)', angle: 90, orb: 6, kind: 'tension' },
+      { type: 'Trine', my: 'Trine (120°)', angle: 120, orb: 8, kind: 'flow' },
+      { type: 'Opposition', my: 'ဆန့်ကျင် (Opposition 180°)', angle: 180, orb: 8, kind: 'tension' }
+    ];
+    const WESTERN_ASPECT_TEXT = {
+      merge: 'ဂြိုဟ် နှစ်ခုရဲ့ စွမ်းအင်တွေ တစ်နေရာတည်းမှာ ပေါင်းစည်း လှုပ်ရှားတယ်။',
+      flow: 'ဂြိုဟ် နှစ်ခု အချင်းချင်း အထောက်အပံ့ ပေးပြီး စွမ်းအင်တွေ စီးဆင်း လွယ်တယ်။',
+      tension: 'ဂြိုဟ် နှစ်ခုကြား ပွတ်တိုက်မှု ရှိပြီး အဲ့ဒီ အားပြိုင်မှုကပဲ တိုးတက်အောင် တွန်းပေး တယ်။'
+    };
+    function westernAspectBetween(lonA, lonB, orbScale) {
+      const sep = Math.abs(((lonA - lonB + 540) % 360) - 180);
+      let best = null;
+      WESTERN_ASPECT_DEFS.forEach((def) => {
+        const off = Math.abs(sep - def.angle);
+        if (off <= def.orb * (orbScale || 1) && (!best || off < best.orb)) best = { type: def.type, typeMy: def.my, kind: def.kind, orb: +off.toFixed(2) };
+      });
+      return best;
+    }
+    function calculateWesternAspects(p, keys) {
+      const ks = (keys || ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto']).filter((k) => typeof p[k] === 'number');
+      const out = [];
+      for (let i = 0; i < ks.length; i++) for (let j = i + 1; j < ks.length; j++) {
+        const lum = (ks[i] === 'Sun' || ks[i] === 'Moon' || ks[j] === 'Sun' || ks[j] === 'Moon') ? 1.25 : 1;
+        const asp = westernAspectBetween(p[ks[i]], p[ks[j]], lum);
+        if (asp) out.push({ a: ks[i], b: ks[j], type: asp.type, typeMy: asp.typeMy, kind: asp.kind, orb: asp.orb });
+      }
+      return out.sort((x, y) => x.orb - y.orb);
+    }
+    function calculateTransitAspects(tp, np) {
+      const tKeys = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto'];
+      const nKeys = ['Sun', 'Moon', 'Lagna', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'];
+      const out = [];
+      tKeys.forEach((tk) => { if (typeof tp[tk] !== 'number') return; nKeys.forEach((nk) => { if (typeof np[nk] !== 'number') return; const asp = westernAspectBetween(tp[tk], np[nk], 0.45); if (asp) out.push({ t: tk, n: nk, type: asp.type, typeMy: asp.typeMy, kind: asp.kind, orb: asp.orb }); }); });
+      return out.sort((x, y) => x.orb - y.orb).slice(0, 10);
+    }
+    function westernHouseOf(lon, cusps) {
+      if (!cusps || cusps.length !== 12 || typeof lon !== 'number') return null;
+      for (let i = 0; i < 12; i++) {
+        const start = cusps[i], end = cusps[(i + 1) % 12];
+        const span = ((end - start) % 360 + 360) % 360;
+        const off = ((lon - start) % 360 + 360) % 360;
+        if (off < span || off > 359.95) return i + 1; // 0.05 deg tolerance: a planet sitting exactly on a cusp (float jitter between engines) belongs to the house that starts there
+      }
+      return 1;
+    }
+    function fmtWestDeg(lon) {
+      const s = Math.floor(norm360(lon) / 30);
+      const dIn = norm360(lon) - s * 30;
+      const deg = Math.floor(dIn);
+      const min = Math.floor((dIn - deg) * 60);
+      return { signIdx: s, sign: WESTERN_SIGNS[s], deg, min };
+    }
+    function westernRulerOf(signIdx) { const sg = WESTERN_SIGNS[signIdx]; return sg.coRuler ? sg.ruler + ' / ' + sg.coRuler : sg.ruler; }
+    function generateWesternReadings(p, cusps) {
+      const signOf = (k) => Math.floor(norm360(p[k]) / 30);
+      const bigThree = [
+        { role: 'နေ — Sun Sign (အတွင်း စရိုက် အနှစ်သာရ)', key: 'Sun' },
+        { role: 'တနင်္လာ — Moon Sign (ခံစားချက်နဲ့ စိတ် လိုအပ်ချက်)', key: 'Moon' },
+        { role: 'လဂ် — Rising Sign (သူများ မြင်ရတဲ့ ပုံစံ၊ ဘဝ ချဉ်းကပ်ပုံ)', key: 'Lagna' }
+      ].map((r) => { const sg = WESTERN_SIGNS[signOf(r.key)]; return { role: r.role, sign: sg, text: sg.traits }; });
+      const keys = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'Rahu', 'Ketu'];
+      const signLines = keys.filter((k) => typeof p[k] === 'number').map((k) => { const sg = WESTERN_SIGNS[signOf(k)]; return { planet: k, sign: sg, text: `${WESTERN_PLANET_MY[k]} သည် ${sg.my} ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ${WESTERN_PLANET_THEME[k]} ကို ${sg.style} ပုံစံနဲ့ ဖော်ပြ လှုပ်ရှား တယ်။` }; });
+      const houseLines = cusps ? keys.filter((k) => typeof p[k] === 'number').map((k) => { const h = westernHouseOf(p[k], cusps); return { planet: k, house: h, text: `${WESTERN_PLANET_MY[k]} သည် ${h} တန့် မှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ${WESTERN_PLANET_THEME[k]} ဟာ ${WESTERN_HOUSE_DOMAIN[h - 1]} နယ်ပယ်မှာ အဓိက အလေး ရောက် တယ်။` }; }) : [];
+      const aspects = calculateWesternAspects(p);
+      const counts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      keys.forEach((k) => { if (typeof p[k] === 'number') counts[signOf(k)]++; });
+      const stelliums = counts.map((c, i) => ({ c, s: WESTERN_SIGNS[i] })).filter((x) => x.c >= 3);
+      const elCount = { 'မီး': 0, 'မြေ': 0, 'လေ': 0, 'ရေ': 0 };
+      keys.forEach((k) => { if (typeof p[k] === 'number') elCount[WESTERN_SIGNS[signOf(k)].element]++; });
+      return { bigThree, signLines, houseLines, aspects, stelliums, elCount };
+    }
+    function signRelation(a, b) {
+      const d = ((b - a) % 12 + 12) % 12;
+      const dd = Math.min(d, 12 - d);
+      if (d === 0) return { score: 82, label: 'ရာသီ အတူတူ — စရိုက် တူညီ' };
+      if (dd === 4) return { score: 90, label: 'ဓာတ် တူ (Trine) — သဘာဝ သဟဇာတ' };
+      if (dd === 2) return { score: 76, label: 'Sextile — အချင်းချင်း အထောက်အပံ့' };
+      if (d === 6) return { score: 58, label: 'ဆန့်ကျင် ရာသီ — ဆွဲအား ရှိပေမယ့် သဘောထား ကွဲနိုင်' };
+      if (dd === 3) return { score: 42, label: 'Square — ပွတ်တိုက်မှု များနိုင်' };
+      return { score: 62, label: 'ကြားနေ — တိုက်ရိုက် သက်ရောက်မှု နည်း' };
+    }
+    function calculateWesternSynastry(bP, gP) {
+      if (!bP || !gP || typeof bP.Moon !== 'number' || typeof gP.Moon !== 'number') return { score: 0, verdict: 'အချက်အလက် မပြည့်စုံပါ', lines: [], pairRows: [], aspectHits: [] };
+      const sOf = (p, k) => Math.floor(norm360(p[k]) / 30);
+      const pairDefs = [
+        { a: 'Sun', b: 'Sun', w: 0.15, label: 'နေ × နေ — ဘဝ ဦးတည်ချက်' },
+        { a: 'Sun', b: 'Moon', w: 0.13, label: 'နေ × တနင်္လာ' }, { a: 'Moon', b: 'Sun', w: 0.12, label: 'တနင်္လာ × နေ' },
+        { a: 'Moon', b: 'Moon', w: 0.20, label: 'တနင်္လာ × တနင်္လာ — ခံစားချက်' },
+        { a: 'Venus', b: 'Mars', w: 0.12, label: 'သောကြာ × အင်္ဂါ — ဆွဲဆောင်မှု' }, { a: 'Mars', b: 'Venus', w: 0.08, label: 'အင်္ဂါ × သောကြာ' },
+        { a: 'Venus', b: 'Venus', w: 0.10, label: 'သောကြာ × သောကြာ — အချစ် ပုံစံ' },
+        { a: 'Mercury', b: 'Mercury', w: 0.10, label: 'ဗုဒ္ဓဟူး × ဗုဒ္ဓဟူး — ဆက်သွယ်ရေး' }
+      ];
+      let wsum = 0, acc = 0;
+      const pairRows = pairDefs.map((pd) => { const rel = signRelation(sOf(bP, pd.a), sOf(gP, pd.b)); wsum += pd.w; acc += rel.score * pd.w; return { label: pd.label, rel, aSign: WESTERN_SIGNS[sOf(bP, pd.a)], bSign: WESTERN_SIGNS[sOf(gP, pd.b)] }; });
+      let score = wsum ? acc / wsum : 60;
+      const crossKeys = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars'];
+      const aspectHits = [];
+      crossKeys.forEach((ak) => crossKeys.forEach((bk) => { const asp = westernAspectBetween(bP[ak], gP[bk], 0.8); if (asp) aspectHits.push({ a: ak, b: bk, type: asp.type, typeMy: asp.typeMy, kind: asp.kind, orb: asp.orb }); }));
+      aspectHits.sort((x, y) => x.orb - y.orb);
+      const flow = aspectHits.filter((h) => h.kind === 'flow' || h.kind === 'merge').length;
+      const tense = aspectHits.filter((h) => h.kind === 'tension').length;
+      score = Math.max(5, Math.min(97, Math.round(score + Math.min(8, flow * 2) - Math.min(8, tense * 2))));
+      const verdict = score >= 78 ? 'အလွန် သဟဇာတ — စရိုက် အခြေခံ တူညီမှု မြင့်' : score >= 65 ? 'သဟဇာတ ကောင်း' : score >= 50 ? 'အလယ်အလတ် — နားလည်မှုနဲ့ ကြိုးစားမှု လို' : 'ပွတ်တိုက်မှု များနိုင် — ဆက်သွယ်ရေး အထူး ဂရုစိုက်ရန်';
+      const lines = pairRows.map((r) => `${r.label}: ${r.aSign.en} × ${r.bSign.en} — ${r.rel.label} (${r.rel.score})`);
+      lines.push(`Cross-chart aspect: သဟဇာတ ${flow} ခု · ပွတ်တိုက် ${tense} ခု တွေ့တယ်။`);
+      lines.push('မှတ်ချက်: Western synastry သည် စရိုက် သဟဇာတကိုပဲ ညွှန်းတာပါ — လူ တစ်ယောက်ရဲ့ ရွေးချယ်မှုကို အာမ မခံပါ။');
+      return { score, verdict, lines, pairRows, aspectHits: aspectHits.slice(0, 8) };
+    }
+
+
+    // ==========================================
+    // WESTERN LAYER 2 — v6.16: timing (Solar Return, Progressions),
+    // aspect patterns, Composite chart, partner profile, vocational.
+    // Used ONLY when ayanamsa === 'tropical'.
+    // ==========================================
+    function solveSolarReturnJD(sunLon, approxJD, lat, lon, nodeType) {
+      let jd = approxJD;
+      for (let i = 0; i < 6; i++) {
+        const sn = calculateNASA_JPL_Planets(jd, lat, lon, 'tropical', nodeType).Sun;
+        const err = ((sunLon - sn + 540) % 360) - 180;
+        jd += err / 0.9856;
+        if (Math.abs(err) < 0.0005) break;
+      }
+      return jd;
+    }
+    function calculateSolarReturn(birthJD, sunLon, lat, lon, nodeType, nowJD) {
+      let n = Math.floor((nowJD - birthJD) / 365.2422);
+      let jd = solveSolarReturnJD(sunLon, birthJD + n * 365.2422, lat, lon, nodeType);
+      if (jd > nowJD) { n -= 1; jd = solveSolarReturnJD(sunLon, birthJD + n * 365.2422, lat, lon, nodeType); }
+      const planets = calculateNASA_JPL_Planets(jd, lat, lon, 'tropical', nodeType);
+      const cusps = calculatePlacidusCusps(jd, lat, lon, 'tropical');
+      return { jd, age: n, planets, cusps };
+    }
+    const PROG_PHASES = [
+      { name: 'New Moon', my: 'လ ဆန်း — အစ အသစ်၊ မျိုးစေ့ စိုက်တဲ့ ကာလ' },
+      { name: 'Crescent', my: 'လ ကြီး စ — ရုန်းကန် တည်ဆောက်၊ ပုံစံ ဖော်တဲ့ ကာလ' },
+      { name: 'First Quarter', my: 'လ ထက် ဝက် — လုပ်ဆောင် ဆုံးဖြတ်၊ အတားအဆီး ဖြတ်တဲ့ ကာလ' },
+      { name: 'Gibbous', my: 'လ ပြည့် ကပ် — ပြင်ဆင် ညှိနှိုင်း၊ ပြီးပြတ်အောင် ချီတက်တဲ့ ကာလ' },
+      { name: 'Full Moon', my: 'လ ပြည့် — ရလဒ် မြင်ရပြီး ဟန်ချက် ပြန် ညှိရတဲ့ ကာလ' },
+      { name: 'Disseminating', my: 'လ ပြည့် ကျော် — မျှဝေ သင်ပေး၊ ရထားတာ ပြန် ဖြန့်တဲ့ ကာလ' },
+      { name: 'Last Quarter', my: 'လ ဆုတ် ထက်ဝက် — ပြန် သုံးသပ်၊ မကိုက် တော့တာ လွှတ်ချတဲ့ ကာလ' },
+      { name: 'Balsamic', my: 'လ ကွယ် ကပ် — အနားယူ ပိတ်သိမ်း၊ နောက် စက်ဝန်း အတွက် အား ပြန်ဖြည့်တဲ့ ကာလ' }
+    ];
+    function calculateProgressions(birthJD, lat, lon, nodeType, nowJD) {
+      const age = (nowJD - birthJD) / 365.2422;
+      const pjd = birthJD + age;
+      const planets = calculateNASA_JPL_Planets(pjd, lat, lon, 'tropical', nodeType);
+      const cusps = calculatePlacidusCusps(pjd, lat, lon, 'tropical');
+      const phase = norm360(planets.Moon - planets.Sun);
+      return { age, jd: pjd, planets, cusps, phase, phaseInfo: PROG_PHASES[Math.min(7, Math.floor(phase / 45))] };
+    }
+    function detectAspectPatterns(p) {
+      const keys = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto'].filter((k) => typeof p[k] === 'number');
+      const sep = (a, b) => Math.abs(((p[a] - p[b] + 540) % 360) - 180);
+      const near = (a, b, ang, orb) => Math.abs(sep(a, b) - ang) <= orb;
+      const out = [];
+      const seen = {};
+      const push = (name, planets, text) => { const key = name + ':' + planets.slice().sort().join(','); if (!seen[key]) { seen[key] = 1; out.push({ name, planets, text }); } };
+      for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) for (let k = j + 1; k < keys.length; k++) {
+        const A = keys[i], B = keys[j], C = keys[k];
+        if (near(A, B, 120, 8) && near(B, C, 120, 8) && near(A, C, 120, 8)) {
+          const el = WESTERN_SIGNS[Math.floor(norm360(p[A]) / 30)].element;
+          push('Grand Trine', [A, B, C], 'ဂြိုဟ် သုံးခု Trine အချင်းချင်း ဆက်နေတဲ့ Grand Trine (' + el + ' ဓာတ်) — စွမ်းအင် စီးဆင်း လွယ်ပြီး သဘာဝ အရည်အချင်း ထင်ရှားတယ်။ လွယ်လွန်း လို့ ကြိုးစားမှု လျော့တာ တော့ သတိထားရ တယ်။');
+        }
+      }
+      const opps = [];
+      for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) if (near(keys[i], keys[j], 180, 8)) opps.push([keys[i], keys[j]]);
+      opps.forEach((pr) => {
+        const apexes = keys.filter((k) => k !== pr[0] && k !== pr[1] && near(k, pr[0], 90, 6) && near(k, pr[1], 90, 6));
+        if (apexes.length >= 2 && near(apexes[0], apexes[1], 180, 8)) {
+          push('Grand Cross', [pr[0], pr[1], apexes[0], apexes[1]], 'ဆန့်ကျင် နှစ်စုံ တွဲနေတဲ့ Grand Cross — နယ်ပယ် လေးခုလုံး တစ်ပြိုင်နက် ဆွဲတဲ့ ပုံစံ။ ခံနိုင်ရည် ကြီးပေမယ့် စိတ် ဖိအား များတတ် တယ်။');
+        } else apexes.forEach((ap) => {
+          push('T-Square', [pr[0], pr[1], ap], 'ဆန့်ကျင် နှစ်ခုနဲ့ ' + ap + ' က apex ဖြစ်နေတဲ့ T-Square — တင်းမာမှုက ဘဝကို တွန်းတဲ့ အင်ဂျင် ဖြစ်တယ်။ ' + ap + ' ရဲ့ နယ်ပယ်မှာ ဖိအားနဲ့ အောင်မြင်မှု တွဲ ရှိတတ် တယ်။');
+        });
+      });
+      for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) {
+        if (!near(keys[i], keys[j], 60, 4)) continue;
+        keys.forEach((ap) => { if (ap !== keys[i] && ap !== keys[j] && near(ap, keys[i], 150, 3.5) && near(ap, keys[j], 150, 3.5)) {
+          push('Yod', [keys[i], keys[j], ap], 'Sextile အခြေခံကနေ ' + ap + ' ကို Quincunx နှစ်ခု ထောက်ထားတဲ့ Yod (Finger of God) — ' + ap + ' ရဲ့ နယ်ပယ်မှာ ညှိမရ တဲ့ ခံစားချက်နဲ့ အထူး တာဝန် တစ်ခု ရှိနေသလို ဖြစ်တတ် တယ်။');
+        } });
+      }
+      return out;
+    }
+    function compositeMidpoint(a, b) { const d = ((b - a + 540) % 360) - 180; return norm360(a + d / 2); }
+    function calculateComposite(bP, gP) {
+      if (!bP || !gP || typeof bP.Sun !== 'number' || typeof gP.Sun !== 'number') return null;
+      const keys = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'Lagna'];
+      const comp = {};
+      keys.forEach((k) => { if (typeof bP[k] === 'number' && typeof gP[k] === 'number') comp[k] = compositeMidpoint(bP[k], gP[k]); });
+      const aspects = calculateWesternAspects(comp);
+      const sOf = (k) => WESTERN_SIGNS[Math.floor(norm360(comp[k]) / 30)];
+      const lines = [
+        'Composite နေ သည် ' + sOf('Sun').my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ဒီ ဆက်ဆံရေးရဲ့ အနှစ်သာရ ဟာ ' + sOf('Sun').style + ' ပုံစံ ဖြစ်တယ်။',
+        'Composite တနင်္လာ သည် ' + sOf('Moon').my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် နှစ်ယောက် အတူ ရှိချိန် ခံစားချက် ဟာ ' + sOf('Moon').style + ' ဖြစ်တယ်။',
+        'Composite သောကြာ သည် ' + sOf('Venus').my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် နှစ်ယောက်ကြား ချစ်ခြင်း ဖော်ပြပုံ ဟာ ' + sOf('Venus').style + ' ဖြစ်တယ်။'
+      ];
+      return { planets: comp, aspects, lines };
+    }
+    function buildWesternPartnerProfile(p, cusps) {
+      if (!p || !cusps) return null;
+      const keys = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto'];
+      const desc = WESTERN_SIGNS[Math.floor(norm360(cusps[6]) / 30)];
+      const ruler = desc.ruler;
+      const rulerSign = typeof p[ruler] === 'number' ? WESTERN_SIGNS[Math.floor(norm360(p[ruler]) / 30)] : null;
+      const in7 = keys.filter((k) => westernHouseOf(p[k], cusps) === 7);
+      const venSign = WESTERN_SIGNS[Math.floor(norm360(p.Venus) / 30)];
+      const marSign = WESTERN_SIGNS[Math.floor(norm360(p.Mars) / 30)];
+      const lines = [
+        'Descendant (7th တန့် ထိပ်) သည် ' + desc.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ' + desc.style + ' စရိုက် ရှိသူကို လက်တွဲဖော် အဖြစ် ဆွဲဆောင် ခံရတတ် တယ်။',
+        rulerSign ? '7th အရှင် ' + ruler + ' သည် ' + rulerSign.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် လက်တွဲဖော် ဟာ ' + rulerSign.style + ' ပုံစံ ရှိနေတတ် တယ်။' : '',
+        in7.length ? '7th တန့်ထဲမှာ ' + in7.join(', ') + ' ရှိနေတယ် — အဲ့ဒီ ဂြိုဟ်တွေရဲ့ စရိုက်က လက်တွဲဖော်မှာ ထင်ရှား တတ်တယ်။' : '7th တန့်ထဲမှာ ဂြိုဟ် မရှိပါ — အရှင် ရပ်တည်မှုကို အဓိက ကြည့်ပါ။',
+        'သောကြာ သည် ' + venSign.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် အချစ်ကို ' + venSign.style + ' ပုံစံနဲ့ ဖော်ပြ တတ်တယ်။',
+        'အင်္ဂါ သည် ' + marSign.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ဆွဲဆောင်မှုနဲ့ လိုချင်တာကို လိုက်ပုံ ဟာ ' + marSign.style + ' ဖြစ်တယ်။'
+      ].filter(Boolean);
+      return { desc, ruler, in7, lines };
+    }
+    const MC_FIELDS = [
+      'ဦးဆောင်မှု၊ စွန့်ဦးတီထွင်၊ အားကစား၊ အင်ဂျင်နီယာ၊ လုံခြုံရေး လုပ်ငန်း',
+      'ဘဏ်/ငွေကြေး၊ အစားအသောက် လုပ်ငန်း၊ အိမ် မြေ၊ အလှ ပြင်၊ လက်မှု အနုပညာ',
+      'စာရေး/မီဒီယာ၊ ကုန်သွယ်၊ ပို့ဆောင်ရေး၊ သင်ကြားရေး၊ IT ဆက်သွယ်ရေး',
+      'အိမ် မြေ၊ ဟိုတယ်/စားသောက်ဆိုင်၊ ပြုစုရေး လုပ်ငန်း၊ မိသားစု လုပ်ငန်း',
+      'အနုပညာ/ဖျော်ဖြေရေး၊ ကလေး ပညာရေး၊ ရင်းနှီးမြှုပ်နှံမှု၊ ပွဲလမ်း စီစဉ်ရေး',
+      'ကျန်းမာရေး၊ စာရင်းကိုင်/အရည်အသွေး စစ်၊ အုပ်ချုပ်ရေး အထောက်၊ ဆေးဝါး',
+      'ဥပဒေ၊ ဒီဇိုင်း/အလှ၊ လူမှုဆက်ဆံရေး၊ အတိုင်ပင်ခံ၊ ပွဲ စီစဉ်ရေး',
+      'စိတ်ပညာ၊ သုတေသန၊ အာမခံ/အခွန်၊ ခွဲစိတ် ဆေး၊ စုံထောက်/လုံခြုံရေး',
+      'ခရီးသွား လုပ်ငန်း၊ အဆင့်မြင့် ပညာရေး၊ ထုတ်ဝေရေး၊ ဥပဒေ/ဒဿန၊ အားကစား',
+      'အစိုးရ/အုပ်ချုပ်ရေး၊ ဆောက်လုပ်ရေး၊ စီးပွားရေး စီမံခန့်ခွဲမှု၊ အင်ဂျင်နီယာ',
+      'IT/နည်းပညာ၊ သိပ္ပံ၊ လူမှု အဖွဲ့အစည်း၊ လေကြောင်း၊ မီဒီယာ ဆန်းသစ်',
+      'ဆေး/ကုထုံး၊ ရုပ်ရှင်/ဓာတ်ပုံ၊ ရေ လုပ်ငန်း၊ စိတ်ဓာတ် ဆိုင်ရာ၊ အနုပညာ ကုထုံး'
+    ];
+    function buildWesternVocational(p, cusps) {
+      if (!p || !cusps) return null;
+      const keys = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto'];
+      const mcIdx = Math.floor(norm360(cusps[9]) / 30);
+      const mc = WESTERN_SIGNS[mcIdx];
+      const ruler = mc.ruler;
+      const rulerHouse = typeof p[ruler] === 'number' ? westernHouseOf(p[ruler], cusps) : null;
+      const inH = (h) => keys.filter((k) => westernHouseOf(p[k], cusps) === h);
+      const lines = [
+        'MC (10th တန့် ထိပ်) သည် ' + mc.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် အလုပ်မှာ ' + mc.style + ' ပုံစံနဲ့ အသိအမှတ် ပြုခံချင်တယ်။',
+        'MC အရှင် ' + ruler + (rulerHouse ? ' သည် ' + rulerHouse + ' တန့် မှာ ရှိနေတယ် — အလုပ်ရဲ့ အသီးအပွင့် ဟာ ' + WESTERN_HOUSE_DOMAIN[rulerHouse - 1] + ' နယ်ပယ်နဲ့ ဆက်နေ တယ်။' : '။'),
+        inH(10).length ? '10th တန့်ထဲက ဂြိုဟ်: ' + inH(10).join(', ') + ' — အဲ့ဒီ စွမ်းအင်တွေက အလုပ်မှာ တိုက်ရိုက် ထင်ရှား တယ်။' : '10th တန့်ထဲမှာ ဂြိုဟ် မရှိပါ — MC ရာသီနဲ့ အရှင်ကို အဓိက ကြည့်ပါ။',
+        inH(6).length ? '6th တန့် (နေ့စဉ် အလုပ်) ထဲက ဂြိုဟ်: ' + inH(6).join(', ') + '။' : '',
+        inH(2).length ? '2nd တန့် (ဝင်ငွေ) ထဲက ဂြိုဟ်: ' + inH(2).join(', ') + '။' : ''
+      ].filter(Boolean);
+      return { mc, fields: MC_FIELDS[mcIdx], lines };
+    }
+
     // ==========================================
     // 3. CHART & MODAL COMPONENTS
     // ==========================================
@@ -2732,12 +3014,16 @@
       );
     }
 
-    function PlaceTab({ p, dashaTree, kpData, birthJD, birthLat, birthLon, nodeType, birthPlace, birthName }) {
+    function PlaceTab({ ayanamsa, p, dashaTree, kpData, birthJD, birthLat, birthLon, nodeType, birthPlace, birthName }) {
       const [purpose, setPurpose] = useState('general');
       const [cityIdx, setCityIdx] = useState(6);
       const [planetFilter, setPlanetFilter] = useState('ALL');
       const [customLat, setCustomLat] = useState('');
       const [customLon, setCustomLon] = useState('');
+      const isTrop = ayanamsa === 'tropical';
+      const [relIdx, setRelIdx] = useState(6);
+      const voc = isTrop ? buildWesternVocational(p, calculatePlacidusCusps(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'tropical')) : null;
+      const relCusps = isTrop ? calculatePlacidusCusps(birthJD, ACG_CITIES[relIdx].lat, ACG_CITIES[relIdx].lon, 'tropical') : null;
       const dirs = scoreDirections(p, dashaTree, purpose);
       const fd = foreignDomesticVerdict(p, dashaTree, kpData);
       const climate = climateNote(p);
@@ -2759,13 +3045,16 @@
       return (
         <div className="p-3 space-y-3 text-xs">
           <h2 className="font-bold text-emerald-900 text-sm">🧭 ရွေးချယ်မှု — {birthName} ၏ မွေးဇာတာမှ ဖတ်သည်</h2>
-          <JobChoiceCard p={p} dashaTree={dashaTree} kpData={kpData} />
+          {!isTrop && <JobChoiceCard p={p} dashaTree={dashaTree} kpData={kpData} />}
+          {!isTrop && (
           <div className="flex flex-wrap gap-1">
             {[['general', '🌍 ဘဝ တစ်ခုလုံး'], ['work', '💼 အလုပ်'], ['settle', '🏠 အခြေချ'], ['study', '📚 ပညာ']].map(([k, l]) => (
               <button key={k} onClick={() => setPurpose(k)} className={`px-2 py-1 rounded-full font-semibold ${purpose === k ? 'bg-emerald-800 text-white' : 'bg-slate-100 text-slate-700'}`}>{l}</button>
             ))}
           </div>
+          )}
 
+          {!isTrop && (
           <div className="bg-white border border-emerald-200 p-3 rounded shadow-sm space-y-2">
             <div className="font-bold text-emerald-900">🧭 အလွှာ ၁ — အရပ်မျက်နှာ အမှတ်ပေး (မွေးရပ် {birthPlace} ကို ဗဟိုပြု)</div>
             <div className="bg-emerald-50 border border-emerald-100 rounded p-2">
@@ -2780,7 +3069,9 @@
             ))}
             <div className="text-slate-600">သတိပြုရန် အရပ်: <b>{dirs.worst.dir}</b> ({dirs.worst.score} မှတ်) — ထို အရပ်သို့ သွားမည် ဆိုပါက ဒဿာ ကာလ ကောင်းချိန်ကို ရွေးပါ။{dirs.currentDasha ? ` လက်ရှိ ဒဿာ: ${dirs.currentDasha.maha.lord} မဟာ${dirs.currentDasha.antar ? ' · ' + dirs.currentDasha.antar.lord + ' အန္တရာ' : ''}` : ''}</div>
           </div>
+          )}
 
+          {!isTrop && (
           <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-2">
             <div className="font-bold text-emerald-900">🏠🌏 အလွှာ ၂ — ပြည်တွင်း ကံ / နိုင်ငံခြား အခြေချ ကံ</div>
             <div className="flex items-center space-x-2"><span className="w-24 font-medium">ပြည်တွင်း</span><div className="flex-1"><ScoreBar score={fd.domestic * 10} color="bg-teal-600" /></div></div>
@@ -2789,13 +3080,39 @@
             <ul className="list-disc pl-4 space-y-0.5 text-slate-700">{fd.lines.map((r, i) => <li key={i}>{r}</li>)}</ul>
             {!kpData && <div className="text-slate-500">ℹ️ KP စနစ် ရွေးထားပါက ၁၂ တန့် CSL signification ကိုပါ ထပ်စစ်ပေးမည်။</div>}
           </div>
+          )}
 
+          {!isTrop && (
           <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-1">
             <div className="font-bold text-emerald-900">🌦️ အလွှာ ၃ — ဒေသ အမျိုးအစား မှတ်ချက်</div>
             <div className="text-slate-700">{climate.text}</div>
             <div className="text-slate-500">ဓာတ် ဟန်ချက် — မီး {climate.tally[0]} · မြေ {climate.tally[1]} · လေ {climate.tally[2]} · ရေ {climate.tally[3]}</div>
           </div>
+          )}
 
+          {isTrop && voc && (
+            <div className="bg-white border border-emerald-200 p-3 rounded shadow-sm space-y-1.5">
+              <div className="font-bold text-emerald-900">💼 အလုပ်အကိုင် အညွှန်း (Vocational — MC)</div>
+              {voc.lines.map((l, i) => (<p key={i} className="text-slate-700 leading-relaxed">{l}</p>))}
+              <div className="text-slate-700">ကိုက်ညီ တဲ့ အလုပ် နယ်ပယ်များ: {voc.fields}</div>
+              <div className="text-slate-500">Western vocational သည် စရိုက်/ဝါသနာ အညွှန်း ဖြစ်ပါတယ် — အမှတ်ပေး အလုပ် တိုက်စနစ် (Job Choice) ကတော့ Vedic ဘက်မှာပဲ ရှိပါတယ်။</div>
+            </div>
+          )}
+          {isTrop && relCusps && (
+            <div className="bg-white border border-teal-200 p-3 rounded shadow-sm space-y-1.5">
+              <div className="font-bold text-teal-900">🧳 Relocation Chart — မြို့သစ်မှာ ဇာတာ ပြန်ဆွဲချက်</div>
+              <div className="flex items-center space-x-2">
+                <span className="font-semibold text-slate-700">မြို့ ရွေးရန်:</span>
+                <select value={relIdx} onChange={(e) => setRelIdx(parseInt(e.target.value, 10))} className="flex-1 border border-teal-300 rounded px-2 py-1 bg-teal-50 font-medium">
+                  {ACG_CITIES.map((c, i) => <option key={i} value={i}>{c.n} ({c.en})</option>)}
+                </select>
+              </div>
+              <p className="text-slate-700 leading-relaxed">{ACG_CITIES[relIdx].n} မှာ လဂ် (Ascendant) သည် {WESTERN_SIGNS[Math.floor(norm360(relCusps[0]) / 30)].my} ရာသီ၊ MC သည် {WESTERN_SIGNS[Math.floor(norm360(relCusps[9]) / 30)].my} ရာသီ ဖြစ်သွားတယ်။</p>
+              <div className="text-slate-700">{['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'].map((k) => k + ' → H' + westernHouseOf(p[k], relCusps)).join(' · ')}</div>
+              <div className="text-slate-500">ဂြိုဟ် ဒီဂရီတွေ မပြောင်းပါ — လဂ်နဲ့ အိမ်တွေပဲ နေရာ အလိုက် ရွေ့တာပါ။ မွေးချိန် တိကျမှု အပေါ် မူတည် ပါတယ်။</div>
+            </div>
+          )}
+          {isTrop && (
           <div className="bg-white border border-indigo-200 p-3 rounded shadow-sm space-y-2">
             <div className="font-bold text-indigo-900">🗺️ Astrocartography — ဂြိုဟ် လိုင်းများ မြေပုံ</div>
             <div className="flex flex-wrap gap-1">
@@ -2844,6 +3161,8 @@
             </div>
             <div className="text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">⚠️ Astrocartography သည် မွေးချိန် တိကျမှုပေါ် မူတည်သည် — မွေးချိန် ၁၅ မိနစ် လွဲလျှင် လိုင်းနေရာ ကီလိုမီတာ ~၄၀၀ အထိ ရွေ့နိုင်သည်။ မွေးချိန် မသေချာပါက အရပ်မျက်နှာ နည်းကို အဓိက ထားပါ။</div>
           </div>
+          )}
+          {!isTrop && (<div className="bg-white border border-slate-200 p-3 rounded shadow-sm text-slate-600">🗺️ Astrocartography သည် Tropical (Western) နည်း ဖြစ်ပါတယ် — အရှေ့တိုင်း chart ကို အနောက်တိုင်း နည်းနဲ့ မရောအောင် Tropical mode မှာပဲ ပြပါတယ်။ Ayanamsa မှာ TROPICAL ကို ရွေးပြီး ဒီ tab မှာ ပြန်ကြည့်ပါ။</div>)}
         </div>
       );
     }
@@ -2914,6 +3233,31 @@
         return { planets, dasha, kp };
       };
       const A = calc(personA), B = calc(personB);
+      if (ayanamsa === 'tropical') {
+        const wsyn = calculateWesternSynastry(A.planets, B.planets);
+        const comp = calculateComposite(A.planets, B.planets);
+        return (
+          <div className="p-3 space-y-3 text-xs">
+            <h2 className="font-bold text-emerald-900 text-sm">🤝 ပေါင်းသင်း ဆက်ဆံရေး — Western Synastry</h2>
+            <div className="text-slate-600">Tropical (Western) mode မှာ ရာသီ သဟဇာတနဲ့ cross-chart aspect တွေနဲ့ပဲ ဖတ်တယ် — ဒသာ တိုက်ဆိုင်မှုနဲ့ အိမ် အခြေခံ အခန်းကဏ္ဍ ခွဲတာတွေက Vedic နည်းမို့ Lahiri / KP / Raman မှာ ကြည့်ပါ။</div>
+            <RelPersonForm title="လူ (က) အချက်အလက်" person={personA} setPerson={setPersonA} savedProfiles={savedProfiles} onLoadProfile={fillFromProfile(setPersonA)} />
+            <RelPersonForm title="လူ (ခ) အချက်အလက်" person={personB} setPerson={setPersonB} savedProfiles={savedProfiles} onLoadProfile={fillFromProfile(setPersonB)} />
+            <div className="bg-indigo-800 text-white p-3 rounded shadow-sm">
+              <div className="text-[11px] opacity-80">{personA.name} × {personB.name} — Western Synastry</div>
+              <div className="text-lg font-bold">{wsyn.score} / 100 — {wsyn.verdict}</div>
+            </div>
+            <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-1">
+              {wsyn.lines.map((l, i) => <div key={i} className="text-slate-700">• {l}</div>)}
+            </div>
+            {comp && (
+              <div className="bg-white border border-indigo-200 p-3 rounded shadow-sm space-y-1.5">
+                <div className="font-bold text-indigo-900">🧬 Composite — ဒီ ဆက်ဆံရေး ကိုယ်တိုင် ၏ စရိုက်</div>
+                {comp.lines.map((l, i) => (<p key={i} className="text-slate-700 leading-relaxed">{l}</p>))}
+              </div>
+            )}
+          </div>
+        );
+      }
       const res = calculateRelationship(A.planets, B.planets, A.dasha, B.dasha, mode, A.kp, B.kp, personA.name, personB.name);
       return (
         <div className="p-3 space-y-3 text-xs">
@@ -2968,6 +3312,38 @@
             <div className="text-slate-500">ℹ️ KP Significator စစ်ဆေးချက် အတွက် အပေါ် စနစ် (Ayanamsa) တွင် KP ကို ရွေးထားပါ။</div>
           )}
         </div>
+      );
+    }
+
+    function CircleChart({ planets, cusps, transitPlanets, size = 330 }) {
+      if (!planets || typeof planets.Lagna !== 'number') return null;
+      const asc = planets.Lagna;
+      const C = 170;
+      const pt = (lon, r) => { const th = (180 - norm360(lon - asc)) * Math.PI / 180; return [C + r * Math.cos(th), C - r * Math.sin(th)]; };
+      const keys = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'Rahu', 'Ketu'];
+      const aspects = calculateWesternAspects(planets, keys.slice(0, 10));
+      const placed = [];
+      keys.forEach((k) => { if (typeof planets[k] !== 'number') return; let r = 100; if (placed.some((q) => Math.abs(((planets[k] - q.lon + 540) % 360) - 180) < 13)) r = 82; placed.push({ k, lon: planets[k], r }); });
+      return (
+        <svg viewBox="0 0 340 340" style={{ width: size, height: size }} className="mx-auto block">
+          <circle cx={C} cy={C} r="166" fill="#ffffff" stroke="#94a3b8" strokeWidth="1" />
+          <circle cx={C} cy={C} r="140" fill="none" stroke="#cbd5e1" strokeWidth="0.8" />
+          <circle cx={C} cy={C} r="114" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="0.8" />
+          {Array.from({ length: 12 }, (_, i) => { const lon = Math.floor(asc / 30) * 30 + i * 30; const a1 = pt(lon, 166); const a2 = pt(lon, 140); const at = pt(lon + 15, 153); const sIdx = Math.floor(norm360(lon) / 30); return (
+            <g key={'sg' + i}>
+              <line x1={a1[0]} y1={a1[1]} x2={a2[0]} y2={a2[1]} stroke="#94a3b8" strokeWidth="0.7" />
+              <text x={at[0]} y={at[1] + 3} textAnchor="middle" fontSize="10" fill="#334155">{WESTERN_SIGNS[sIdx].glyph}</text>
+            </g> ); })}
+          {cusps && cusps.map((cl, i) => { const a1 = pt(cl, 140); const a2 = pt(cl, 114); const span = ((cusps[(i + 1) % 12] - cl) % 360 + 360) % 360; const at = pt(cl + span / 2, 127); const major = i === 0 || i === 9; return (
+            <g key={'cu' + i}>
+              <line x1={a1[0]} y1={a1[1]} x2={a2[0]} y2={a2[1]} stroke={major ? '#b45309' : '#94a3b8'} strokeWidth={major ? 1.6 : 0.8} />
+              <text x={at[0]} y={at[1] + 3} textAnchor="middle" fontSize="8.5" fill="#64748b">{i + 1}</text>
+            </g> ); })}
+          {aspects.filter((a) => a.kind !== 'merge').map((a, i) => { const a1 = pt(planets[a.a], 112); const a2 = pt(planets[a.b], 112); return <line key={'as' + i} x1={a1[0]} y1={a1[1]} x2={a2[0]} y2={a2[1]} stroke={a.kind === 'flow' ? '#2563eb' : '#dc2626'} strokeWidth="0.8" opacity={Math.max(0.15, 0.55 - a.orb * 0.04)} />; })}
+          {placed.map((q) => { const a = pt(q.lon, q.r); return <text key={'pl' + q.k} x={a[0]} y={a[1] + 3} textAnchor="middle" fontSize="9.5" fontWeight="bold" fill="#0f172a">{PLANET_SHORT[q.k] || q.k}</text>; })}
+          {transitPlanets && keys.map((k) => { if (typeof transitPlanets[k] !== 'number') return null; const a = pt(transitPlanets[k], 131); return <circle key={'tr' + k} cx={a[0]} cy={a[1]} r="2.4" fill="#ea580c" stroke="#fff" strokeWidth="0.7" />; })}
+          <text x={C} y={C + 3} textAnchor="middle" fontSize="9" fill="#94a3b8">WESTERN</text>
+        </svg>
       );
     }
 
@@ -3171,7 +3547,7 @@
     }
 
     // Fullscreen Chart View Modal
-    function FullscreenChartModal({ isOpen, onClose, chartType, planets, transitPlanets, isOverlay, vargaNum, birthInfo, transitInfo }) {
+    function FullscreenChartModal({ isOpen, onClose, chartType, planets, transitPlanets, isOverlay, vargaNum, birthInfo, transitInfo, westernCusps }) {
       const [zoom,setZoom]=useState(1);
       const [pan,setPan]=useState({x:0,y:0});
       const drag=useRef(null);
@@ -3186,7 +3562,7 @@
           <div className="relative bg-white p-3 rounded-2xl shadow-2xl border border-slate-300 max-w-lg w-full">
             <button onClick={onClose} className="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shadow-lg border-2 border-white z-50">✕</button>
             <div className="flex items-center justify-between pb-2">
-              <div className="font-bold text-xs text-emerald-900">D-{vargaNum} ({chartType.toUpperCase()}) မျက်နှာပြင်ပြည့်</div>
+              <div className="font-bold text-xs text-emerald-900">{westernCusps ? 'WESTERN (Tropical) မျက်နှာပြင်ပြည့်' : ('D-' + vargaNum + ' (' + chartType.toUpperCase() + ') မျက်နှာပြင်ပြည့်')}</div>
               <div className="flex gap-1">
                 <button onClick={()=>setZoom(z=>Math.min(3,z+.2))} className="bg-emerald-700 text-white px-2 py-1 rounded text-xs font-bold">＋</button>
                 <button onClick={()=>setZoom(z=>Math.max(.65,z-.2))} className="bg-slate-700 text-white px-2 py-1 rounded text-xs font-bold">−</button>
@@ -3196,9 +3572,10 @@
             <div className="chart-pan-area h-[68vh] min-h-[340px] flex justify-center items-center rounded-xl bg-slate-50 border border-slate-200"
               onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onWheel={wheel}>
               <div style={{transform:`translate(${pan.x}px,${pan.y}px) scale(${zoom})`,transformOrigin:'center center',transition:drag.current?'none':'transform .08s ease'}}>
-                {chartType==='south'?<SouthChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} size={320}/>:
+                {westernCusps ? <CircleChart planets={planets} cusps={westernCusps} transitPlanets={isOverlay ? transitPlanets : null} size={320}/> :
+                 (chartType==='south'?<SouthChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} size={320}/>:
                  chartType==='north'?<NorthChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} size={320}/>:
-                 <EastChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} birthInfo={birthInfo} transitInfo={transitInfo} size={320}/>}
+                 <EastChart planets={planets} transitPlanets={transitPlanets} isOverlay={isOverlay} vargaNum={vargaNum} birthInfo={birthInfo} transitInfo={transitInfo} size={320}/>)}
               </div>
             </div>
             <div className="text-center text-[10px] text-slate-500 pt-2">လက်နဲ့ဆွဲရွှေ့၊ Pinch/Mouse Wheel ဖြင့် Zoom လုပ်နိုင်ပါသည်။</div>
@@ -3475,8 +3852,16 @@
       const birthPlanets = calculateNASA_JPL_Planets(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
       const birthPlanetsNext = calculateNASA_JPL_Planets(birthJD + 1, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
       const kpCusps = ayanamsa === 'kp' ? calculatePlacidusCusps(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa) : null;
+      const isTrop = ayanamsa === 'tropical';
+      const tropCusps = isTrop ? calculatePlacidusCusps(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'tropical') : null;
+      const western = isTrop ? generateWesternReadings(birthPlanets, tropCusps) : null;
+      const nowJD = Date.now() / 86400000 + 2440587.5;
+      const solarReturn = isTrop ? calculateSolarReturn(birthJD, birthPlanets.Sun, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, nodeType, nowJD) : null;
+      const progressions = isTrop ? calculateProgressions(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, nodeType, nowJD) : null;
+      const aspectPatterns = isTrop ? detectAspectPatterns(birthPlanets) : [];
       const tJD = transitDate.getTime() / 86400000 + 2440587.5;
       const transitPlanets = calculateNASA_JPL_Planets(tJD, parseFloat(transitLat) || 16.84, parseFloat(transitLon) || 96.17, ayanamsa, nodeType);
+      const tropTransitCusps = isTrop ? calculatePlacidusCusps(tJD, parseFloat(transitLat) || 16.84, parseFloat(transitLon) || 96.17, 'tropical') : null;
 
       const dashaTree = calculateDashaTree(birthPlanets.Moon, birthDateObj);
       const bhavaBala = calculateBhavaBala(birthPlanets);
@@ -3546,6 +3931,10 @@
       const rivalPlanets = rivalOn ? calculateNASA_JPL_Planets(rivalJD, rival.lat, rival.lon, ayanamsa) : null;
       const rivalTreeRP = rivalPlanets ? calculateDashaTree(rivalPlanets.Moon, rivalDateObj) : null;
       const rivalSynastry = rivalPlanets ? (rpCenter === 'girl' ? calculateSynastry(rivalPlanets, girlPlanets, ayanamsa, rivalDateObj, girlDateObj) : calculateSynastry(boyPlanets, rivalPlanets, ayanamsa, boyDateObj, rivalDateObj)) : null;
+      const westernSynastry = isTrop ? calculateWesternSynastry(boyPlanets, girlPlanets) : null;
+      const composite = isTrop ? calculateComposite(boyPlanets, girlPlanets) : null;
+      const boyPartner = isTrop ? buildWesternPartnerProfile(boyPlanets, calculatePlacidusCusps(boyJD, parseFloat(boy.lat) || 16.84, parseFloat(boy.lon) || 96.17, 'tropical')) : null;
+      const girlPartner = isTrop ? buildWesternPartnerProfile(girlPlanets, calculatePlacidusCusps(girlJD, parseFloat(girl.lat) || 16.84, parseFloat(girl.lon) || 96.17, 'tropical')) : null;
       const rpAlt = rivalPlanets ? (rpCenter === 'girl' ? calculateRightPerson(rivalPlanets, girlPlanets, rivalTreeRP, girlTreeRP, rpContext, rivalSynastry ? rivalSynastry.total : 0, rival.name || 'ပြိုင်ဘက်', girl.name || 'ဒုတိယလူ', null) : calculateRightPerson(boyPlanets, rivalPlanets, boyTreeRP, rivalTreeRP, rpContext, rivalSynastry ? rivalSynastry.total : 0, boy.name || 'ပထမလူ', rival.name || 'ပြိုင်ဘက်', null)) : null;
 
       const timePad = (n) => (n < 10 ? '0' + n : n);
@@ -3639,7 +4028,48 @@
           </div>
 
           {/* TAB 1: TRANSIT */}
-          {activeTab === 'transit' && (
+          {activeTab === 'transit' && isTrop && (
+            <div className="p-3 space-y-3">
+              <div className="flex justify-between items-baseline">
+                <h2 className="font-bold text-emerald-900 text-sm">လက်ရှိ ကောဇာ (Western Transit)</h2>
+                <span className="text-[11px] text-slate-500">{transitCity} • {transitTimeStr}</span>
+              </div>
+              <div className="flex space-x-1">
+                <input value={transitCity} onChange={(e) => setTransitCity(e.target.value)} placeholder="မြို့၊ နိုင်ငံ..." className="flex-1 bg-white border border-slate-300 rounded p-1.5 text-xs" />
+                <button onClick={() => handleSearchCity(transitCity, 'transit')} className="bg-emerald-800 text-white px-3 py-1 rounded text-xs font-semibold">ရှာမည်</button>
+              </div>
+              {citySuggestions.length > 0 && searchTarget === 'transit' && (
+                <div className="bg-white border border-slate-300 rounded shadow-md text-xs">
+                  {citySuggestions.map((it, idx) => (
+                    <div key={idx} onClick={() => selectCity(it)} className="p-2 border-b last:border-0 hover:bg-slate-100 cursor-pointer">{it.display_name}</div>
+                  ))}
+                </div>
+              )}
+              <div className="py-1"><CircleChart planets={transitPlanets} cusps={tropTransitCusps} /></div>
+              <button onClick={() => setShowFullscreenChart(true)} className="w-full py-2 bg-slate-800 text-white rounded text-xs font-bold shadow hover:bg-slate-900 flex items-center justify-center space-x-1">
+                <span>🔍 မျက်နှာပြင်ပြည့် ကြည့်မည် (Fullscreen View)</span>
+              </button>
+              <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
+                <div className="grid grid-cols-4 bg-slate-100 p-2 font-bold text-slate-700"><span>ဂြိုဟ်</span><span>ရာသီ ဒီဂရီ</span><span>မွေးဇာတာ အိမ်</span><span>ရာသီ အရှင်</span></div>
+                {['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto'].map((k) => { const fd = fmtWestDeg(transitPlanets[k]); const h = westernHouseOf(transitPlanets[k], tropCusps); return (
+                  <div key={k} className="grid grid-cols-4 p-2 border-t border-slate-100 items-center">
+                    <span className="font-bold">{PLANET_SHORT[k]} ({k})</span>
+                    <span>{fd.sign.glyph} {fd.sign.en} {fd.deg}°{fd.min}′</span>
+                    <span>{h ? 'H' + h : '–'}</span>
+                    <span className="text-slate-500">{westernRulerOf(fd.signIdx)}</span>
+                  </div> ); })}
+              </div>
+              <div className="bg-white rounded border border-slate-200 p-3 text-xs space-y-1.5">
+                <div className="font-bold text-emerald-900">🎯 မွေးဇာတာကို ထိတဲ့ Transit Aspect များ</div>
+                {calculateTransitAspects(transitPlanets, birthPlanets).map((a, i) => (
+                  <div key={i} className="text-slate-700">• Transit {a.t} — {a.typeMy} — မွေးဇာတာ {a.n} (orb {a.orb}°)</div>
+                ))}
+                {calculateTransitAspects(transitPlanets, birthPlanets).length === 0 && <div className="text-slate-400">ထင်ရှားတဲ့ aspect မရှိပါ။</div>}
+                <div className="text-slate-400">Western transit မှာ Sade Sati / ဒသာ မသုံးပါ — ဂြိုဟ် ရွေ့လျားမှုနဲ့ မွေးဇာတာကို ထိတဲ့ aspect တွေကိုပဲ ကြည့်တယ်။</div>
+              </div>
+            </div>
+          )}
+          {activeTab === 'transit' && !isTrop && (
             <div className="p-3 space-y-3">
               <div className="flex justify-between items-baseline">
                 <h2 className="font-bold text-emerald-900 text-sm">လက်ရှိ ကောဇာဂြိုဟ်ခွင် (Live Transit)</h2>
@@ -3690,7 +4120,42 @@
           )}
 
           {/* TAB 2: BIRTH CHART */}
-          {activeTab === 'chart' && (
+          {activeTab === 'chart' && isTrop && (
+            <div className="p-3 space-y-3">
+              <h2 className="font-bold text-emerald-900 text-sm">မွေးဇာတာ (Western / Tropical — Circle Chart)</h2>
+              <button onClick={() => setIsOverlayOn(!isOverlayOn)} className={`w-full py-1.5 rounded text-xs font-bold border ${isOverlayOn ? 'bg-amber-600 text-white border-amber-600' : 'bg-white text-slate-700 border-slate-300'}`}>
+                {isOverlayOn ? '✓ ကောဇာ စက်ပြိုင် (Overlay: ON)' : '⊞ ကောဇာ စက်ပြိုင် ဖွင့်မည် (Overlay: OFF)'}
+              </button>
+              <div className="py-1"><CircleChart planets={birthPlanets} cusps={tropCusps} transitPlanets={isOverlayOn ? transitPlanets : null} /></div>
+              <button onClick={() => setShowFullscreenChart(true)} className="w-full py-2 bg-slate-800 text-white rounded text-xs font-bold shadow hover:bg-slate-900 flex items-center justify-center space-x-1">
+                <span>🔍 မျက်နှာပြင်အပြည့် ကြည့်မည် (Fullscreen View)</span>
+              </button>
+              <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
+                <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">ဂြိုဟ် အနေအထား (Western Positions — Placidus အိမ်)</div>
+                <div className="grid grid-cols-5 bg-slate-50 p-1.5 font-bold text-[10px] text-slate-600 border-b"><span>ဂြိုဟ်</span><span>ရာသီ ဒီဂရီ</span><span>အိမ်</span><span>ရာသီ အရှင်</span><span>℞</span></div>
+                {['Lagna', 'Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'Rahu', 'Ketu'].map((k) => { if (typeof birthPlanets[k] !== 'number') return null; const fd = fmtWestDeg(birthPlanets[k]); const h = westernHouseOf(birthPlanets[k], tropCusps); const diff = ((birthPlanetsNext[k] - birthPlanets[k] + 540) % 360) - 180; const retro = !['Lagna', 'Sun', 'Moon'].includes(k) && diff < 0; return (
+                  <div key={k} className="grid grid-cols-5 p-1.5 border-t border-slate-100 text-[10px] items-center">
+                    <span className="font-bold text-emerald-900">{PLANET_SHORT[k]} ({k})</span>
+                    <span>{fd.sign.glyph} {fd.sign.en} {fd.deg}°{fd.min}′</span>
+                    <span>{h ? 'H' + h : '–'}</span>
+                    <span className="text-slate-500">{westernRulerOf(fd.signIdx)}</span>
+                    <span className="text-rose-600 font-bold">{retro ? '℞' : ''}</span>
+                  </div> ); })}
+              </div>
+              <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
+                <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">အိမ် Cusp များ (Placidus)</div>
+                <div className="grid grid-cols-3 bg-slate-50 p-1.5 font-bold text-[10px] text-slate-600 border-b"><span>အိမ်</span><span>Cusp ရာသီ ဒီဂရီ</span><span>အရှင်</span></div>
+                {tropCusps && tropCusps.map((cl, i) => { const fd = fmtWestDeg(cl); return (
+                  <div key={i} className="grid grid-cols-3 p-1.5 border-t border-slate-100 text-[10px] items-center">
+                    <span className="font-bold">H{i + 1}{i === 0 ? ' (ASC)' : i === 9 ? ' (MC)' : ''}</span>
+                    <span>{fd.sign.glyph} {fd.sign.en} {fd.deg}°{fd.min}′</span>
+                    <span className="text-slate-500">{westernRulerOf(fd.signIdx)}</span>
+                  </div> ); })}
+              </div>
+              <div className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded p-2">မှတ်ချက်: Divisional chart (D-9 စသည်) နဲ့ မွေးချိန် ပြင်ဆင်မှု (Rectification) သည် Vedic နည်းများ ဖြစ်လို့ Tropical မှာ မပြပါ — Lahiri / KP / Raman မှာ သုံးပါ။</div>
+            </div>
+          )}
+          {activeTab === 'chart' && !isTrop && (
             <div className="p-3 space-y-3">
               <div className="flex justify-between items-center">
                 <h2 className="font-bold text-emerald-900 text-sm">မွေးဇာတာ & စက်ပြိုင် {ayanamsa === 'kp' && <span className="bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded font-bold ml-1">KP Mode</span>}</h2>
@@ -3925,7 +4390,52 @@
           )}
 
           {/* TAB 3: READINGS (ဟောစာတမ်း) */}
-          {activeTab === 'readings' && (
+          {activeTab === 'readings' && isTrop && western && (
+            <div className="p-3 space-y-3 text-xs">
+              <h2 className="font-bold text-emerald-900 text-sm">ဇာတာ အဟောစာတမ်း (TROPICAL / Western Method)</h2>
+              <div className="bg-white border border-emerald-200 p-3 rounded shadow-sm space-y-2.5">
+                <h3 className="font-bold text-slate-800 text-xs border-b pb-1">☀️🌙⬆️ Big Three — နေ · တနင်္လာ · လဂ်</h3>
+                {western.bigThree.map((b, i) => (
+                  <div key={i}>
+                    <span className="font-bold text-emerald-800">{b.role}: {b.sign.glyph} {b.sign.en}</span>
+                    <p className="text-slate-600 mt-0.5 leading-relaxed">{b.text}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-2">
+                <h3 className="font-bold text-slate-800 text-xs border-b pb-1">🪐 ဂြိုဟ် ရာသီ အလိုက် အဟော (Planet in Sign)</h3>
+                {western.signLines.map((l, i) => (<p key={i} className="text-slate-700 leading-relaxed">{l.text}</p>))}
+              </div>
+              <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-2">
+                <h3 className="font-bold text-slate-800 text-xs border-b pb-1">🏠 ဂြိုဟ် အိမ် အလိုက် အဟော (Planet in House — Placidus)</h3>
+                {western.houseLines.map((l, i) => (<p key={i} className="text-slate-700 leading-relaxed">{l.text}</p>))}
+              </div>
+              <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-1.5">
+                <h3 className="font-bold text-slate-800 text-xs border-b pb-1">🔗 Aspect များ (အဓိက)</h3>
+                {western.aspects.slice(0, 12).map((a, i) => (<div key={i} className="text-slate-700">• {a.a} — {a.b}: {a.typeMy} (orb {a.orb}°) — {WESTERN_ASPECT_TEXT[a.kind]}</div>))}
+                {western.aspects.length === 0 && <div className="text-slate-400">ထင်ရှားတဲ့ aspect မရှိပါ။</div>}
+              </div>
+              {solarReturn && (
+                <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-1.5">
+                  <h3 className="font-bold text-slate-800 text-xs border-b pb-1">☀️ Solar Return — ဒီနှစ် ဇာတာ (အသက် {solarReturn.age} ပြည့်)</h3>
+                  <p className="text-slate-700 leading-relaxed">Solar Return လဂ် သည် {WESTERN_SIGNS[Math.floor(norm360(solarReturn.planets.Lagna) / 30)].my} ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ဒီနှစ် ဘဝ ချဉ်းကပ်ပုံ ဟာ {WESTERN_SIGNS[Math.floor(norm360(solarReturn.planets.Lagna) / 30)].style} ဖြစ်တယ်။</p>
+                  <p className="text-slate-700 leading-relaxed">Solar Return နေ သည် {westernHouseOf(solarReturn.planets.Sun, solarReturn.cusps)} တန့် မှာ ရှိနေတယ် — ဒီနှစ် အဓိက အလေး ရောက်ရာ နယ်ပယ် ဟာ {WESTERN_HOUSE_DOMAIN[westernHouseOf(solarReturn.planets.Sun, solarReturn.cusps) - 1]} ဖြစ်တယ်။</p>
+                  <p className="text-slate-700 leading-relaxed">Solar Return တနင်္လာ သည် {WESTERN_SIGNS[Math.floor(norm360(solarReturn.planets.Moon) / 30)].my} ရာသီ၊ {westernHouseOf(solarReturn.planets.Moon, solarReturn.cusps)} တန့် မှာ ရှိနေတယ်။</p>
+                  <p className="text-slate-500">Solar Return ကို မွေးရပ်နဲ့ ဆွဲထားတာပါ — မွေးဇာတာနဲ့ တွဲ ဖတ်ရတဲ့ နှစ်စဉ် အလွှာ ဖြစ်တယ်။</p>
+                </div>
+              )}
+              {progressions && (
+                <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-1.5">
+                  <h3 className="font-bold text-slate-800 text-xs border-b pb-1">🌙 Secondary Progressions — လက်ရှိ ဘဝ အခန်း (အသက် {progressions.age.toFixed(1)})</h3>
+                  <p className="text-slate-700 leading-relaxed">Progressed တနင်္လာ သည် {WESTERN_SIGNS[Math.floor(norm360(progressions.planets.Moon) / 30)].my} ရာသီ၊ {westernHouseOf(progressions.planets.Moon, progressions.cusps)} တန့် မှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ဒီကာလ စိတ် အလေး ရောက်ရာ ဟာ {WESTERN_HOUSE_DOMAIN[westernHouseOf(progressions.planets.Moon, progressions.cusps) - 1]} ဖြစ်တယ်။</p>
+                  <p className="text-slate-700 leading-relaxed">Progressed နေ သည် {WESTERN_SIGNS[Math.floor(norm360(progressions.planets.Sun) / 30)].my} ရာသီမှာ ရှိနေတယ် — {Math.floor(norm360(progressions.planets.Sun) / 30) !== Math.floor(norm360(birthPlanets.Sun) / 30) ? 'မွေး နေ ရာသီ (' + WESTERN_SIGNS[Math.floor(norm360(birthPlanets.Sun) / 30)].en + ') ကနေ ပြောင်းသွား ပြီ၊ စရိုက် အသစ် တစ်ခု ကြီးထွား လာနေတဲ့ ကာလ ဖြစ်တယ်။' : 'မွေး နေ ရာသီ အတိုင်းပဲ ရှိသေးတယ်။'}</p>
+                  <p className="text-slate-700 leading-relaxed">လ စက်ဝန်း အဆင့်: {progressions.phaseInfo.my} (Progressed Moon–Sun {Math.floor(progressions.phase)}°)</p>
+                </div>
+              )}
+              <div className="text-[11px] text-slate-500 bg-amber-50 border border-amber-200 rounded p-2">ဒီ အဟောတွေက Western (Tropical) နည်း သက်သက် ပါ — နက္ခတ်၊ ဒသာ၊ ယောဂ စတဲ့ Vedic အလွှာတွေကို Tropical မှာ မရောထားပါ။</div>
+            </div>
+          )}
+          {activeTab === 'readings' && !isTrop && (
             <div className="p-3 space-y-3 text-xs">
               <div className="flex justify-between items-baseline">
                 <h2 className="font-bold text-emerald-900 text-sm">ဇာတာ အဟောစာတမ်း ({ayanamsa.toUpperCase()} Method)</h2>
@@ -4206,7 +4716,14 @@
           )}
 
           {/* TAB 4: PRASHNA HORARY (ဟူးရား) */}
-          {activeTab === 'prashna' && (
+          {activeTab === 'prashna' && isTrop && (
+            <div className="p-3 text-xs">
+              <div className="bg-amber-50 border border-amber-300 p-3 rounded leading-relaxed text-amber-900">
+                <strong>ဟူးရား (Prashna) သည် Vedic / KP နည်း ဖြစ်ပါတယ်။</strong> Tropical (Western) mode မှာ မပြပါ — ဟူးရား သုံးချင်ရင် အပေါ်က စနစ်မှာ Lahiri သို့ KP ကို ပြောင်းရွေးပါ။
+              </div>
+            </div>
+          )}
+          {activeTab === 'prashna' && !isTrop && (
             <div className="p-3 space-y-3 text-xs">
               <div className="flex justify-between items-baseline">
                 <h2 className="font-bold text-emerald-900 text-sm">🧭 ဟူးရား ကောဇာ အဟောစနစ် (Unified Prashna)</h2>
@@ -4334,7 +4851,14 @@
           )}
 
           {/* TAB 5: DASHA */}
-          {activeTab === 'dasha' && (
+          {activeTab === 'dasha' && isTrop && (
+            <div className="p-3 text-xs">
+              <div className="bg-amber-50 border border-amber-300 p-3 rounded leading-relaxed text-amber-900">
+                <strong>ဝိမ္သောတ္တရီ ဒသာသည် Vedic နည်း ဖြစ်ပါတယ်။</strong> Western မှာ ဒသာစနစ် မရှိဘဲ အချိန် အဟောကို Transit aspect တွေနဲ့ ကြည့်ပါတယ် — "ကောဇာ" tab မှာ ကြည့်နိုင်ပါတယ်။ ဒသာ သုံးချင်ရင် Lahiri / KP / Raman ကို ရွေးပါ။
+              </div>
+            </div>
+          )}
+          {activeTab === 'dasha' && !isTrop && (
             <div className="p-3 space-y-2 text-xs">
               <h2 className="font-bold text-emerald-900 text-sm mb-1">ဝိမ္သောတ္တရီ ဒသာစက်ဝန်း</h2>
               {dashaTree.map((m, mIdx) => (
@@ -4359,7 +4883,28 @@
           )}
 
           {/* TAB 6: BHAVA BALA */}
-          {activeTab === 'bhava' && (
+          {activeTab === 'bhava' && isTrop && (
+            <div className="p-3 space-y-3 text-xs">
+              <h2 className="font-bold text-emerald-900 text-sm">အိမ် ၁၂ ပါး (Western — Placidus)</h2>
+              <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
+                <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">အိမ် Cusp များ (Placidus)</div>
+                <div className="grid grid-cols-3 bg-slate-50 p-1.5 font-bold text-[10px] text-slate-600 border-b"><span>အိမ်</span><span>Cusp ရာသီ ဒီဂရီ</span><span>အရှင်</span></div>
+                {tropCusps && tropCusps.map((cl, i) => { const fd = fmtWestDeg(cl); return (
+                  <div key={i} className="grid grid-cols-3 p-1.5 border-t border-slate-100 text-[10px] items-center">
+                    <span className="font-bold">H{i + 1}{i === 0 ? ' (ASC)' : i === 9 ? ' (MC)' : ''}</span>
+                    <span>{fd.sign.glyph} {fd.sign.en} {fd.deg}°{fd.min}′</span>
+                    <span className="text-slate-500">{westernRulerOf(fd.signIdx)}</span>
+                  </div> ); })}
+              </div>
+              <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-1.5">
+                <div className="font-bold text-emerald-900">အိမ် အလိုက် ဂြိုဟ်များ</div>
+                {Array.from({ length: 12 }, (_, i) => { const inH = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Uranus', 'Neptune', 'Pluto'].filter((k) => westernHouseOf(birthPlanets[k], tropCusps) === i + 1); return (
+                  <div key={i} className="flex justify-between border-b border-slate-50 pb-1"><span className="font-medium text-slate-800">H{i + 1} — {WESTERN_HOUSE_DOMAIN[i]}</span><span className="text-slate-600">{inH.length ? inH.join(', ') : '—'}</span></div> ); })}
+              </div>
+              <div className="text-slate-500">Bhava Bala သည် Vedic နည်း ဖြစ်လို့ Tropical မှာ မပြပါ။</div>
+            </div>
+          )}
+          {activeTab === 'bhava' && !isTrop && (
             <div className="p-3 space-y-2 text-xs">
               <h2 className="font-bold text-emerald-900 text-sm">{ayanamsa === 'kp' && kpData ? 'ဘာဝ ၁၂ ပါး (KP Cusp မြင်ကွင်း)' : 'ဘာဝ ၁၂ ပါး အားဗလ (Bhava Bala)'}</h2>
               {ayanamsa === 'kp' && kpData && (
@@ -4401,7 +4946,29 @@
           )}
 
           {/* TAB 7: YOGAS */}
-          {activeTab === 'yogas' && (
+          {activeTab === 'yogas' && isTrop && western && (
+            <div className="p-3 space-y-3 text-xs">
+              <h2 className="font-bold text-emerald-900 text-sm">Aspect နှင့် ဓာတ် ဟန်ချက် (Western)</h2>
+              <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-1.5">
+                <div className="font-bold text-emerald-900">🔗 Natal Aspect များ (အားလုံး)</div>
+                {western.aspects.map((a, i) => (<div key={i} className="text-slate-700">• {a.a} — {a.b}: {a.typeMy} (orb {a.orb}°) — {WESTERN_ASPECT_TEXT[a.kind]}</div>))}
+                {western.aspects.length === 0 && <div className="text-slate-400">ထင်ရှားတဲ့ aspect မရှိပါ။</div>}
+              </div>
+              <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-1.5">
+                <div className="font-bold text-emerald-900">✨ Aspect Pattern များ</div>
+                {aspectPatterns.map((pt, i) => (<div key={i} className="text-slate-700">• <b>{pt.name}</b> ({pt.planets.join(' · ')}): {pt.text}</div>))}
+                {aspectPatterns.length === 0 && <div className="text-slate-400">Grand Trine / T-Square / Grand Cross / Yod pattern မတွေ့ပါ။</div>}
+              </div>
+              <div className="bg-white border border-slate-200 p-3 rounded shadow-sm space-y-1">
+                <div className="font-bold text-emerald-900">🧭 ဓာတ် ဟန်ချက် (Element Balance)</div>
+                <div className="text-slate-700">မီး {western.elCount['မီး']} · မြေ {western.elCount['မြေ']} · လေ {western.elCount['လေ']} · ရေ {western.elCount['ရေ']}</div>
+                <div className="text-slate-500">ဂြိုဟ် စုနေတဲ့ ဓာတ်က စရိုက်မှာ ထင်ရှားတယ် — မီး = စိတ်အားထက်သန်မှု၊ မြေ = လက်တွေ့၊ လေ = အတွေး / ဆက်သွယ်ရေး၊ ရေ = ခံစားချက်။</div>
+                {western.stelliums.map((sm, i) => (<div key={i} className="text-slate-700">⭐ Stellium: {sm.s.en} ရာသီမှာ ဂြိုဟ် {sm.c} လုံး စုနေတယ် — အဲ့ဒီ ရာသီ စရိုက် အထူး ပြင်းတယ်။</div>))}
+              </div>
+              <div className="text-slate-500">ယောဂ (Yoga) သည် Vedic နည်း ဖြစ်လို့ Tropical မှာ မပြပါ။</div>
+            </div>
+          )}
+          {activeTab === 'yogas' && !isTrop && (
             <div className="p-3 space-y-2 text-xs">
               <h2 className="font-bold text-emerald-900 text-sm mb-1">{ayanamsa === 'kp' && kpData ? 'KP Significators (ယောဂ အစား)' : `ပါဝင်သော ယောဂများ (${yogas.length})`}</h2>
               {ayanamsa === 'kp' && kpData && (
@@ -4431,7 +4998,7 @@
           )}
 
           {/* TAB 8: MATCHING (ဇာတာတိုက်စစ်) */}
-          {activeTab === 'place' && <PlaceTab p={birthPlanets} dashaTree={dashaTree} kpData={kpData} birthJD={birthJD} birthLat={parseFloat(birthLat) || 16.84} birthLon={parseFloat(birthLon) || 96.17} nodeType={nodeType} birthPlace={birthPlace} birthName={birthName} />}
+          {activeTab === 'place' && <PlaceTab ayanamsa={ayanamsa} p={birthPlanets} dashaTree={dashaTree} kpData={kpData} birthJD={birthJD} birthLat={parseFloat(birthLat) || 16.84} birthLon={parseFloat(birthLon) || 96.17} nodeType={nodeType} birthPlace={birthPlace} birthName={birthName} />}
 
           {activeTab === 'relate' && <RelateTab ayanamsa={ayanamsa} nodeType={nodeType} savedProfiles={savedProfiles} />}
 
@@ -4560,7 +5127,8 @@
                 </div>
               </div>
 
-              {/* Rival (ပြိုင်ဘက်) — optional third person for the Right Person comparison */}
+              {/* Rival (ပြိုင်ဘက်) — optional third person for the Right Person comparison */}              {!isTrop && (<div className="space-y-3">
+
               <div className="flex items-center gap-2">
                 <button onClick={() => setRivalOn(!rivalOn)} className={`px-2 py-1 rounded text-[11px] font-bold border ${rivalOn ? 'bg-rose-600 text-white border-rose-700' : 'bg-white text-rose-700 border-rose-300'}`}>⚔️ ပြိုင်ဘက် ထည့်ပြီး ယှဉ်ကြည့်မယ်</button>
                 {rivalOn && <span className="text-[10px] text-slate-500">အလယ်လူ (Girl) ကို ရွေးချယ်သူ ထား၍ Boy နှင့် ပြိုင်ဘက် နှစ်ယောက်ကို ယှဉ်တာပါ</span>}
@@ -4612,8 +5180,40 @@
                 </div>
               </div>
               )}
+              </div>)}
 
-              {/* Total Ashtakoota Score */}
+              {isTrop && westernSynastry && (
+                <div className="bg-white border border-indigo-200 p-3 rounded shadow-sm space-y-2">
+                  <div className="font-bold text-indigo-900">💞 Western Synastry — စရိုက် သဟဇာတ</div>
+                  <div className="text-2xl font-bold text-indigo-900">{westernSynastry.score} / 100 — {westernSynastry.verdict}</div>
+                  {westernSynastry.pairRows.map((r, i) => (<div key={i} className="flex justify-between border-b border-slate-50 pb-1"><span className="text-slate-700">{r.label}</span><span className="font-semibold text-slate-800">{r.aSign.en} × {r.bSign.en} · {r.rel.score}</span></div>))}
+                  {westernSynastry.aspectHits.map((h, i) => (<div key={'h' + i} className="text-slate-600">• {h.a} — {h.b}: {h.typeMy} (orb {h.orb}°)</div>))}
+                  <div className="text-slate-500">Ashtakoota / Right Person / ဒသာ အချိန်တွေသည် Vedic နည်းများ ဖြစ်လို့ Tropical မှာ မပြပါ။</div>
+                </div>
+              )}
+              {isTrop && composite && (
+                <div className="bg-white border border-indigo-200 p-3 rounded shadow-sm space-y-1.5">
+                  <div className="font-bold text-indigo-900">🧬 Composite Chart — ဆက်ဆံရေး ကိုယ်တိုင် ၏ ဇာတာ</div>
+                  {composite.lines.map((l, i) => (<p key={i} className="text-slate-700 leading-relaxed">{l}</p>))}
+                  <div className="text-slate-500">Composite သည် နှစ်ယောက် ဂြိုဟ်တွေရဲ့ အလယ်မှတ် ဇာတာ ဖြစ်ပါတယ် — အိမ် (house) မပါဘဲ ရာသီနဲ့ aspect ကိုပဲ ဖတ်ပါတယ်။</div>
+                </div>
+              )}
+              {isTrop && boyPartner && girlPartner && (
+                <div className="bg-white border border-rose-200 p-3 rounded shadow-sm space-y-2">
+                  <div className="font-bold text-rose-900">💍 လက်တွဲဖော် ပုံစံ (Partner Profile — ကိုယ့် ဇာတာမှ)</div>
+                  <div>
+                    <div className="font-bold text-slate-800">👦 Boy</div>
+                    {boyPartner.lines.map((l, i) => (<p key={i} className="text-slate-700 leading-relaxed">{l}</p>))}
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-800">👧 Girl</div>
+                    {girlPartner.lines.map((l, i) => (<p key={i} className="text-slate-700 leading-relaxed">{l}</p>))}
+                  </div>
+                  <div className="text-slate-500">မှတ်ချက်: ဒါက ကိုယ့် ဇာတာထဲက လက်တွဲဖော် ပုံစံ အညွှန်း ပဲ ဖြစ်ပါတယ် — တစ်ဖက်လူရဲ့ ရွေးချယ်မှုကို အာမ မခံပါ။</div>
+                </div>
+              )}
+              {/* Total Ashtakoota Score */}              {!isTrop && (<div className="space-y-3">
+
               <div className="bg-amber-100/80 border border-amber-300 p-3 rounded text-center shadow-sm">
                 <div className="text-2xl font-bold text-amber-900">{matchResult.total} / ၃၆ မှတ်</div>
                 <div className="font-semibold text-amber-800 text-xs mt-0.5">{matchResult.verdict}</div>
@@ -4624,8 +5224,10 @@
                   </div>
                 )}
               </div>
+              </div>)}
 
-              {/* Deep Synastry Metrics */}
+              {/* Deep Synastry Metrics */}              {!isTrop && (<div className="space-y-3">
+
               <div className="bg-white border border-amber-200 p-3 rounded space-y-1.5 shadow-sm">
                 <h3 className="font-bold text-emerald-900 text-xs border-b pb-1">နှစ်ဦးကြား သံယောဇဉ်နှင့် ဖြစ်နိုင်ခြေ ရာခိုင်နှုန်းဆန်းစစ်ချက်</h3>
                 <div className="flex justify-between py-0.5 border-b border-slate-100">
@@ -4651,8 +5253,10 @@
                   ✨ <strong>ရေစက်အထောက်အပံ့:</strong> <span className="text-emerald-800 font-semibold">{matchResult.karmicBond}</span>
                 </div>
               </div>
+              </div>)}
 
-              {/* FUTURE SYNERGY WINDOW */}
+              {/* FUTURE SYNERGY WINDOW */}              {!isTrop && (<div className="space-y-3">
+
               {matchResult.futureWindow && matchResult.futureWindow.hasFuture && (
                 <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-500 p-3 rounded-lg shadow-sm space-y-1.5">
                   <div className="flex justify-between items-center border-b border-amber-200 pb-1">
@@ -4683,8 +5287,10 @@
                   ))}
                 </div>
               )}
+              </div>)}
 
-              {/* Right Person — ဖူးစာရှင် ကိုက်ညီမှု (v6.8) */}
+              {/* Right Person — ဖူးစာရှင် ကိုက်ညီမှု (v6.8) */}              {!isTrop && (<div className="space-y-3">
+
               <div className="bg-white border border-rose-300 p-3 rounded space-y-1 shadow-sm">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-rose-900">💘 ဖူးစာရှင် ကိုက်ညီမှု (Right Person)</span>
@@ -4730,8 +5336,10 @@
                   <div className="text-[10px] text-slate-500">မှတ်ချက်: အလယ်လူ၏ ဒဿာ အချိန် ပြတင်းက နှစ်ယောက် လုံးအတွက် အတူတူပဲ — ကွာခြားချက်က တစ်ဖက်စီ၏ ပုံစံ ကိုက်ညီမှုနှင့် သူတို့ကိုယ်တိုင်၏ အချိန်ပဲ။ နောက်ဆုံးရွေးချယ်မှုက လူ၏ ဆုံးဖြတ်ချက်ပါ။</div>
                 </div>
               )}
+              </div>)}
 
-              {/* 36 Points Table Breakdown */}
+              {/* 36 Points Table Breakdown */}              {!isTrop && (<div className="space-y-3">
+
               <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs shadow-sm">
                 <div className="bg-slate-100 p-2 font-bold text-slate-700 border-b border-slate-200 flex justify-between">
                   <span>အဋ္ဌကုတ (၃၆) မှတ် အသေးစိတ် ခွဲခြမ်းစိတ်ဖြာချက်</span>
@@ -4749,6 +5357,7 @@
                   </div>
                 ))}
               </div>
+              </div>)}
             </div>
           )}
 
@@ -4761,6 +5370,7 @@
             transitPlanets={transitPlanets}
             isOverlay={activeTab === 'chart' && isOverlayOn}
             vargaNum={varga}
+            westernCusps={isTrop ? (activeTab === 'transit' ? tropTransitCusps : tropCusps) : null}
             birthInfo={{ name: birthName, date: `${sD}.${sM}.${sY}`, time: `${birthHour}:${birthMinute} ${birthAmPm}`, city: birthPlace }}
             transitInfo={{ date: `${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`, time: `${now.getHours()}:${now.getMinutes()}`, city: transitCity }}
           />
