@@ -53,6 +53,8 @@
   <script type="text/babel">
     // v6.15 (2026-10-15): Tropical = pure Western — CircleChart (Placidus), Western-format tables, Western readings + synastry; Astrocartography shows ONLY under Tropical. Vedic layers (nakshatra, dasha, Ashtakoota, yogas, Prashna, Job/Place layers) are sidereal-only. Sidereal code paths unchanged from v6.14.
     // v6.16 (2026-10-15): Western Layer 2 — Solar Return + Secondary Progressions (Readings), aspect patterns (Yoga), Composite chart + partner profiles (Matching/Relate), Vocational + Relocation (Place). All tropical-only; sidereal unchanged.
+    // v6.17 (2026-10-16): Strength layer — Shadbala (six-fold, main components) + Ashtakavarga (classical BAV/SAV, total 337) as one additive card in the sidereal Birth Chart tab. No existing reading or calculation changed.
+    // v6.18 (2026-10-16): Matching — top Clear now also resets the rival (and closes it), plus a dedicated rival clear button. Rectification — clear-all button. Tropical Birth Chart — Western extras card (Part of Fortune day/night formula, mean Black Moon Lilith, Sun–Moon midpoint). Chiron deferred: no verified orbital elements available to this app's accuracy standard.
     const { useState, useEffect, useRef, Component } = React;
 
     // ==========================================
@@ -305,6 +307,133 @@
         return { label: 'သမအိမ်', color: 'text-slate-600' };
       }
       return { label: 'သမအိမ်', color: 'text-slate-600' };
+    }
+
+    // ===== v6.18: Western extras =====
+    function partOfFortune(asc, sun, moon, isDay) { return isDay ? norm360(asc + moon - sun) : norm360(asc + sun - moon); }
+    function meanLilith(jd) { const T = (jd - 2451545.0) / 36525; return norm360(263.3532465 + 4069.0137287 * T); }
+    function sunMoonMidpoint(sun, moon) { const d = ((moon - sun + 540) % 360) - 180; return norm360(sun + d / 2); }
+
+    // ===== v6.17: Shadbala + Ashtakavarga =====
+    const GRAHAS7 = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
+    const BAV_TABLE = {
+      Sun: { Sun: [1, 2, 4, 7, 8, 9, 10, 11], Moon: [3, 6, 10, 11], Mars: [1, 2, 4, 7, 8, 9, 10, 11], Mercury: [3, 5, 6, 9, 10, 11, 12], Jupiter: [5, 6, 9, 11], Venus: [6, 7, 12], Saturn: [1, 2, 4, 7, 8, 9, 10, 11], Lagna: [3, 4, 6, 10, 11, 12] },
+      Moon: { Sun: [3, 6, 7, 8, 10, 11], Moon: [1, 3, 6, 7, 10, 11], Mars: [2, 3, 5, 6, 9, 10, 11], Mercury: [1, 3, 4, 5, 7, 8, 10, 11], Jupiter: [1, 4, 7, 8, 10, 11, 12], Venus: [3, 4, 5, 7, 9, 10, 11], Saturn: [3, 5, 6, 11], Lagna: [3, 6, 10, 11] },
+      Mars: { Sun: [3, 5, 6, 10, 11], Moon: [3, 6, 11], Mars: [1, 2, 4, 7, 8, 10, 11], Mercury: [3, 5, 6, 11], Jupiter: [6, 10, 11, 12], Venus: [6, 8, 11, 12], Saturn: [1, 4, 7, 8, 9, 10, 11], Lagna: [1, 3, 6, 10, 11] },
+      Mercury: { Sun: [5, 6, 8, 11, 12], Moon: [2, 4, 6, 8, 10, 11], Mars: [1, 2, 4, 7, 8, 9, 11], Mercury: [1, 3, 5, 6, 9, 10, 11, 12], Jupiter: [6, 8, 11, 12], Venus: [1, 2, 3, 4, 5, 8, 9, 11], Saturn: [1, 2, 4, 7, 8, 9, 10, 11], Lagna: [1, 2, 4, 6, 8, 10, 11, 12] },
+      Jupiter: { Sun: [1, 2, 3, 4, 7, 8, 9, 10, 11], Moon: [2, 5, 7, 9, 11], Mars: [1, 2, 4, 7, 8, 10, 11], Mercury: [1, 2, 4, 5, 6, 9, 10, 11], Jupiter: [1, 2, 3, 4, 7, 8, 10, 11], Venus: [2, 5, 6, 9, 10, 11], Saturn: [3, 5, 6, 12], Lagna: [1, 2, 4, 5, 6, 7, 9, 10, 11] },
+      Venus: { Sun: [8, 11, 12], Moon: [1, 2, 3, 4, 5, 8, 9, 11, 12], Mars: [3, 5, 6, 9, 11, 12], Mercury: [3, 5, 6, 9, 11], Jupiter: [5, 8, 9, 10, 11], Venus: [1, 2, 3, 4, 5, 8, 9, 10, 11], Saturn: [3, 4, 5, 8, 9, 10, 11], Lagna: [1, 2, 3, 4, 5, 8, 9, 11] },
+      Saturn: { Sun: [1, 2, 4, 7, 8, 10, 11], Moon: [3, 6, 11], Mars: [3, 5, 6, 10, 11, 12], Mercury: [6, 8, 9, 10, 11, 12], Jupiter: [5, 6, 11, 12], Venus: [6, 11, 12], Saturn: [3, 5, 6, 11], Lagna: [1, 3, 4, 6, 10, 11] }
+    };
+    function computeAshtakavarga(p) {
+      const signs = {}; GRAHAS7.forEach((k) => { signs[k] = Math.floor(norm360(p[k]) / 30) % 12; });
+      const contrib = Object.assign({}, signs, { Lagna: Math.floor(norm360(p.Lagna) / 30) % 12 });
+      const bav = {}, totals = {};
+      GRAHAS7.forEach((pl) => {
+        const row = new Array(12).fill(0);
+        Object.keys(BAV_TABLE[pl]).forEach((c) => { BAV_TABLE[pl][c].forEach((h) => { row[(contrib[c] + h - 1) % 12]++; }); });
+        bav[pl] = row; totals[pl] = row.reduce((a, b) => a + b, 0);
+      });
+      const sav = new Array(12).fill(0);
+      GRAHAS7.forEach((pl) => { bav[pl].forEach((v, i) => { sav[i] += v; }); });
+      return { bav, sav, totals, grand: sav.reduce((a, b) => a + b, 0) };
+    }
+    const DEEP_EXALT = { Sun: 10, Moon: 33, Mars: 298, Mercury: 165, Jupiter: 95, Venus: 357, Saturn: 200 };
+    const EXALT_SIGN = { Sun: 0, Moon: 1, Mars: 9, Mercury: 5, Jupiter: 3, Venus: 11, Saturn: 6 };
+    const NAISARGIKA = { Sun: 60, Moon: 51.43, Mars: 17.14, Mercury: 25.71, Jupiter: 34.29, Venus: 42.86, Saturn: 8.57 };
+    const SHADBALA_MIN = { Sun: 5, Moon: 6, Mars: 5, Mercury: 7, Jupiter: 6.5, Venus: 5.5, Saturn: 5 };
+    const MT_RANGE = { Sun: [4, 0, 20], Moon: [1, 3, 30], Mars: [0, 0, 12], Mercury: [5, 15, 20], Jupiter: [8, 0, 10], Venus: [6, 0, 15], Saturn: [10, 0, 20] };
+    const MEAN_SPEED = { Mars: 0.524, Mercury: 1.383, Jupiter: 0.0831, Venus: 1.2028, Saturn: 0.0335 };
+    function angDistSB(a, b) { const d = Math.abs(norm360(a - b)); return d > 180 ? 360 - d : d; }
+    function mcLongitudeSB(jd, lon) {
+      const d = jd - 2451545.0;
+      const ramc = norm360(280.46061837 + 360.98564736629 * d + lon) * Math.PI / 180;
+      const eps = 23.4393 * Math.PI / 180;
+      return norm360(Math.atan2(Math.sin(ramc), Math.cos(ramc) * Math.cos(eps)) * 180 / Math.PI);
+    }
+    function saptavargajaBala(planet, p) {
+      const lon = norm360(p[planet]);
+      const pSign = Math.floor(lon / 30) % 12;
+      let total = 0;
+      [1, 2, 3, 7, 9, 12, 30].forEach((v) => {
+        const vs = calculateVarga(lon, v);
+        if (vs === EXALT_SIGN[planet]) { total += 30; return; }
+        const lord = RASI_LORDS[vs];
+        if (lord === planet) {
+          if (v === 1) { const mt = MT_RANGE[planet]; const degIn = lon % 30; if (mt && vs === mt[0] && degIn >= mt[1] && degIn < mt[2]) { total += 22.5; return; } }
+          total += 15; return;
+        }
+        const lordSign = Math.floor(norm360(p[lord]) / 30) % 12;
+        const rel12 = ((lordSign - pSign) % 12 + 12) % 12 + 1;
+        const tempFriend = [2, 3, 4, 10, 11, 12].indexOf(rel12) !== -1;
+        const rel = NATURAL_RELATIONS[planet];
+        let nat = 0;
+        if (rel) { if (rel.friends.indexOf(lord) !== -1) nat = 1; else if (rel.enemies.indexOf(lord) !== -1) nat = -1; }
+        const s2 = nat + (tempFriend ? 1 : -1);
+        total += s2 === 2 ? 7.5 : (s2 === 1 ? 3.75 : (s2 === 0 ? 1.875 : (s2 === -1 ? 0.9375 : 0.46875)));
+      });
+      return total;
+    }
+    function computeShadbala(p, jd, lat, lon, ayanamsaType, nodeType) {
+      const pNext = calculateNASA_JPL_Planets(jd + 0.5, lat, lon, ayanamsaType, nodeType);
+      const pPrev = calculateNASA_JPL_Planets(jd - 0.5, lat, lon, ayanamsaType, nodeType);
+      const mc = mcLongitudeSB(jd, lon);
+      const ic = norm360(mc + 180);
+      const ayan = p.ayanamsaVal || 0;
+      const lagSign = Math.floor(norm360(p.Lagna) / 30) % 12;
+      const elong = norm360(p.Moon - p.Sun);
+      const pakshaBen = elong <= 180 ? elong / 3 : (360 - elong) / 3;
+      const out = {};
+      GRAHAS7.forEach((pl) => {
+        const L = norm360(p[pl]);
+        const sign = Math.floor(L / 30) % 12;
+        const degIn = L % 30;
+        const house = ((sign - lagSign + 12) % 12) + 1;
+        const uccha = (180 - angDistSB(L, DEEP_EXALT[pl])) / 3;
+        const sapta = saptavargajaBala(pl, p);
+        const masc = ['Sun', 'Mars', 'Jupiter'].indexOf(pl) !== -1;
+        const fem = ['Moon', 'Venus'].indexOf(pl) !== -1;
+        const wantOdd = masc || pl === 'Mercury';
+        let oja = 0;
+        if ((sign % 2 === 0) === wantOdd) oja += 15;
+        if ((calculateVarga(L, 9) % 2 === 0) === wantOdd) oja += 15;
+        const kendra = [1, 4, 7, 10].indexOf(house) !== -1 ? 60 : ([2, 5, 8, 11].indexOf(house) !== -1 ? 30 : 15);
+        const drek = Math.floor(degIn / 10) === (masc ? 0 : (fem ? 2 : 1)) ? 15 : 0;
+        const sthana = uccha + sapta + oja + kendra + drek;
+        const digHouse = { Sun: 10, Mars: 10, Moon: 4, Venus: 4, Mercury: 1, Jupiter: 1, Saturn: 7 }[pl];
+        const dig = (180 - angDistSB(L, ((lagSign + digHouse - 1) % 12) * 30 + 15)) / 3;
+        const trop = norm360(L + ayan);
+        const diurnal = ['Sun', 'Mercury', 'Jupiter'].indexOf(pl) !== -1;
+        const nocturnal = ['Moon', 'Venus', 'Saturn'].indexOf(pl) !== -1;
+        const natD = (180 - angDistSB(trop, mc)) / 3;
+        const natN = (180 - angDistSB(trop, ic)) / 3;
+        const nathon = diurnal ? natD : (nocturnal ? natN : (natD + natN) / 2);
+        const paksha = ['Moon', 'Mercury', 'Jupiter', 'Venus'].indexOf(pl) !== -1 ? pakshaBen : 60 - pakshaBen;
+        const eps = 23.4393 * Math.PI / 180;
+        const decl = Math.asin(Math.sin(eps) * Math.sin(trop * Math.PI / 180)) * 180 / Math.PI;
+        const ayanaB = 24 + (['Sun', 'Mars', 'Jupiter', 'Venus'].indexOf(pl) !== -1 ? 1 : -1) * decl * (24 / 23.44);
+        const kala = nathon + paksha + ayanaB;
+        let cheshta;
+        if (pl === 'Sun') cheshta = ayanaB;
+        else if (pl === 'Moon') cheshta = paksha;
+        else { const sp = ((norm360(pNext[pl]) - norm360(pPrev[pl]) + 540) % 360) - 180; cheshta = sp < 0 ? 60 : Math.max(0, Math.min(60, 60 * sp / MEAN_SPEED[pl])); }
+        let drik = 0;
+        GRAHAS7.forEach((q) => {
+          if (q === pl) return;
+          const qSign = Math.floor(norm360(p[q]) / 30) % 12;
+          const rel = ((sign - qSign) % 12 + 12) % 12 + 1;
+          let asp = rel === 7;
+          if (q === 'Mars' && (rel === 4 || rel === 8)) asp = true;
+          if (q === 'Jupiter' && (rel === 5 || rel === 9)) asp = true;
+          if (q === 'Saturn' && (rel === 3 || rel === 10)) asp = true;
+          if (asp) drik += ['Jupiter', 'Venus', 'Mercury', 'Moon'].indexOf(q) !== -1 ? 15 : -15;
+        });
+        drik = Math.max(-60, Math.min(60, drik));
+        const total = sthana + dig + kala + cheshta + NAISARGIKA[pl] + drik;
+        const rupas = total / 60;
+        out[pl] = { uccha, sapta, oja, kendra, drek, sthana, dig, nathon, paksha, ayana: ayanaB, kala, cheshta, nais: NAISARGIKA[pl], drik, total, rupas, req: SHADBALA_MIN[pl], ratio: rupas / SHADBALA_MIN[pl] };
+      });
+      return out;
     }
 
     function getKPSubLordData(deg) {
@@ -3347,6 +3476,75 @@
       );
     }
 
+    function StrengthPanel({ planets, jd, lat, lon, ayanamsa, nodeType }) {
+      let sb = null, av = null;
+      try { sb = computeShadbala(planets, jd, lat, lon, ayanamsa, nodeType); av = computeAshtakavarga(planets); } catch (e) { return null; }
+      if (!sb || !av) return null;
+      const f1 = (n) => (Math.round(n * 10) / 10).toFixed(1);
+      const grade = (r) => r >= 1.25 ? { t: 'အားကောင်း', c: 'bg-emerald-100 text-emerald-800' } : (r >= 1 ? { t: 'လိုချက် ပြည့်', c: 'bg-slate-100 text-slate-700' } : { t: 'အားလျော့', c: 'bg-rose-100 text-rose-700' });
+      return (
+        <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs mt-3">
+          <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">💪 အားဗလ — Shadbala &amp; Ashtakavarga (မွေးဇာတာ)</div>
+          <div className="p-2 space-y-2">
+            {GRAHAS7.map((pl) => { const s = sb[pl]; const g = grade(s.ratio); return (
+              <div key={pl} className="border-b border-slate-100 pb-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-emerald-900 w-20">{PLANET_SHORT[pl]} ({pl})</span>
+                  <span className="font-bold text-slate-800">{f1(s.rupas)} Rupa</span>
+                  <span className="text-slate-400">လိုချက် {s.req}</span>
+                  <span className={'px-1.5 py-0.5 rounded text-[10px] font-bold ' + g.c}>{g.t}</span>
+                </div>
+                <div className="text-[10px] text-slate-500 mt-0.5">နေရာ {f1(s.sthana)} (ဥစ္စ {f1(s.uccha)} · ဝဂ္ဂ {f1(s.sapta)} · ကိန့် {f1(s.kendra)}) · Dig {f1(s.dig)} · Kala {f1(s.kala)} · Cheshta {f1(s.cheshta)} · သဘာဝ {f1(s.nais)} · မြင်ကွင်း {f1(s.drik)}</div>
+              </div> ); })}
+            <div>
+              <div className="font-bold text-slate-700 mt-1">Sarvashtakavarga (SAV) — ရာသီ အလိုက် အမှတ် (၂၈ အထက် အားကောင်း)</div>
+              <div className="grid grid-cols-12 gap-1 mt-1 text-center">
+                {av.sav.map((v, i) => (<div key={i} className={'rounded p-1 ' + (v >= 28 ? 'bg-emerald-50' : (v <= 20 ? 'bg-rose-50' : 'bg-slate-50'))}><div className="text-[9px] text-slate-500">{RASI_NAMES_EN[i].slice(0, 3)}</div><div className="font-bold text-slate-800">{v}</div></div>))}
+              </div>
+              <div className="font-bold text-slate-700 mt-2">Bhinnashtakavarga (BAV) — ဂြိုဟ် အလိုက်</div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-[10px] mt-1">
+                  <thead><tr className="text-slate-500"><th className="text-left p-1">ဂြိုဟ်</th>{RASI_NAMES_EN.map((n, i) => (<th key={i} className="p-1">{n.slice(0, 3)}</th>))}<th className="p-1">ပေါင်း</th></tr></thead>
+                  <tbody>
+                    {GRAHAS7.map((pl) => (<tr key={pl} className="border-t border-slate-100"><td className="p-1 font-bold text-emerald-900">{PLANET_SHORT[pl]}</td>{av.bav[pl].map((v, i) => (<td key={i} className="p-1 text-center">{v}</td>))}<td className="p-1 text-center font-bold">{av.totals[pl]}</td></tr>))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="text-[9px] text-slate-400 leading-relaxed">မှတ်ချက်: Ashtakavarga က ရှေးနည်း အတိအကျ (စုစုပေါင်း {av.grand}) ပါ။ Shadbala မှာ Saptavargaja (ဝဂ္ဂ ၇ မျိုး), Dig, Naisargika အပြည့်, Kala မှာ Nathonnatha/Paksha/Ayana ပါတယ် — Cheshta ကို ဂြိုဟ် အမြန်နှုန်း အခြေခံ အနီးစပ်, Drik ကို မြင်ကွင်း အကျဉ်းချုပ် နဲ့ တွက်ပြီး Tribhaga နဲ့ Varsha/Masa/Dina/Hora အပိုင်းတွေ မပါသေးပါ။</div>
+          </div>
+        </div>
+      );
+    }
+
+    function WesternExtrasCard({ planets, cusps, jd }) {
+      if (!planets || typeof planets.Sun !== 'number') return null;
+      const sunH = westernHouseOf(planets.Sun, cusps);
+      const isDay = sunH >= 7 && sunH <= 12;
+      const rows = [
+        { label: 'Part of Fortune', sym: '⊗', lon: partOfFortune(planets.Lagna, planets.Sun, planets.Moon, isDay), note: 'အခွင့်အလမ်းနဲ့ အဆင်ပြေမှု စီးဝင်တဲ့ အမှတ် — ဒီ ရာသီ/အိမ် နယ်ပယ်ကို အားထားရင် အလုပ်အကိုင် လန်းဆန်း တတ်တယ်။ နေ့/ည မွေးချိန်အလိုက် ဖော်မြူလာ ပြောင်းတွက်တယ် (ဒီ ဇာတာ: ' + (isDay ? 'နေ့' : 'ည') + ' မွေးချိန်)။' },
+        { label: 'Black Moon Lilith (Mean)', sym: '⚸', lon: meanLilith(jd), note: 'ညှိနှိုင်းမရ၊ အညံ့ မခံတဲ့ အတွင်း သဘာဝ ရှိတဲ့ နေရာ — ဒီ နယ်ပယ်မှာ ကိုယ့် မူကို မလျှော့တတ်၊ အစစ် အမှန် ကိုပဲ တောင်းဆိုတတ်တယ်။ Mean Lilith (ပျမ်းမျှ ရွေ့လျားမှု) နဲ့ တွက်ထားတယ်။' },
+        { label: 'Sun–Moon Midpoint', sym: '☉/☽', lon: sunMoonMidpoint(planets.Sun, planets.Moon), note: 'ရည်ရွယ်ချက် (Sun) နဲ့ စိတ် (Moon) ဆုံတဲ့ အလယ်အမှတ် — ဆက်ဆံရေးနဲ့ မိတ်ဖက် ကိစ္စမှာ အရေးပါတဲ့ နေရာ၊ တခြား ဂြိုဟ် ဒီ အမှတ်ကို ထိရင် ဆက်ဆံရေး အပြောင်းအလဲ ဖြစ်တတ်တယ်။' }
+      ];
+      return (
+        <div className="bg-white rounded border border-slate-200 overflow-hidden text-xs">
+          <div className="bg-slate-100 p-2 font-bold text-slate-800 border-b">✨ အပို အချက်များ (Western Extras)</div>
+          <div className="grid grid-cols-4 bg-slate-50 p-1.5 font-bold text-[10px] text-slate-600 border-b"><span>အမှတ်</span><span>ရာသီ ဒီဂရီ</span><span>အိမ်</span><span>ရာသီ အရှင်</span></div>
+          {rows.map((r) => { const fd = fmtWestDeg(r.lon); const h = westernHouseOf(r.lon, cusps); return (
+            <div key={r.label}>
+              <div className="grid grid-cols-4 p-1.5 border-t border-slate-100 text-[10px] items-center">
+                <span className="font-bold text-emerald-900">{r.sym} {r.label}</span>
+                <span>{fd.sign.glyph} {fd.sign.en} {fd.deg}°{fd.min}′</span>
+                <span>{h ? 'H' + h : '–'}</span>
+                <span className="text-slate-500">{westernRulerOf(fd.signIdx)}</span>
+              </div>
+              <div className="px-1.5 pb-1.5 text-[10px] text-slate-500 leading-relaxed">{r.note}</div>
+            </div> ); })}
+          <div className="px-2 pb-2 text-[9px] text-slate-400">မှတ်ချက်: Chiron ကို မထည့်ရသေးပါ — ဒီ app ရဲ့ တိကျမှု စံချိန် နဲ့ ကိုက်အောင် စစ်ထားတဲ့ orbital element မရှိသေးလို့၊ ခန့်မှန်း မထည့်ချင်လို့ပါ။</div>
+        </div>
+      );
+    }
+
     function EastChart({ planets, transitPlanets, isOverlay, vargaNum, birthInfo, transitInfo, size = 330 }) {
       const u = size / 3;
       const lagnaSign = calculateVarga(planets ? planets.Lagna : 0, vargaNum);
@@ -3797,6 +3995,12 @@
       const clearSynastryInputs = () => {
         setBoy({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5' });
         setGirl({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5' });
+        setRival({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5' });
+        setRivalOn(false);
+      };
+      const clearRivalOnly = () => {
+        setRival({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5' });
+        setRivalOn(false);
       };
 
       const handleSearchCity = async (text, target) => {
@@ -4152,6 +4356,7 @@
                     <span className="text-slate-500">{westernRulerOf(fd.signIdx)}</span>
                   </div> ); })}
               </div>
+              <WesternExtrasCard planets={birthPlanets} cusps={tropCusps} jd={birthJD} />
               <div className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded p-2">မှတ်ချက်: Divisional chart (D-9 စသည်) နဲ့ မွေးချိန် ပြင်ဆင်မှု (Rectification) သည် Vedic နည်းများ ဖြစ်လို့ Tropical မှာ မပြပါ — Lahiri / KP / Raman မှာ သုံးပါ။</div>
             </div>
           )}
@@ -4342,6 +4547,7 @@
                   </div>
                 </div>
               )}
+              <StrengthPanel planets={birthPlanets} jd={birthJD} lat={parseFloat(birthLat) || 16.84} lon={parseFloat(birthLon) || 96.17} ayanamsa={ayanamsa} nodeType={nodeType} />
               {/* v6: မွေးချိန် ပြန်ရှာရန် (Rectification) */}
               <div className="bg-white rounded-xl shadow-sm border border-violet-100 overflow-hidden mt-3">
                 <div className="bg-violet-50 px-3 py-2 border-b border-violet-100">
@@ -4371,6 +4577,7 @@
                     </select>
                   </label>
                   <button onClick={runRectification} disabled={rectBusy} className="w-full bg-violet-700 hover:bg-violet-800 disabled:opacity-50 text-white font-bold py-2 rounded-lg text-xs">{rectBusy ? 'ရှာနေသည်…' : '🔍 အချိန် ရှာမယ်'}</button>
+                  <button onClick={() => { setRectFrom(''); setRectTo(''); setRectEvents([{ type: 'marriage', date: '' }, { type: 'job', date: '' }, { type: 'abroad', date: '' }]); setRectAppSign(''); setRectResults(null); }} className="w-full bg-white border border-slate-300 text-slate-600 font-bold py-1.5 rounded-lg text-[11px]">🧹 ထည့်ထားတာတွေ အားလုံး ရှင်း</button>
                   {rectResults && (rectResults.length === 0 ? (<div className="text-[10px] text-rose-500">ဖြစ်စဉ် ရက်စွဲ အနည်းဆုံး တစ်ခု ထည့်ပါ (သို့) ရလဒ် မတွေ့ပါ။</div>) : (
                     <div className="space-y-1.5">
                       {rectResults.map((r, i) => { const h24 = Math.floor(r.mins / 60), mm = r.mins % 60, h12 = ((h24 + 11) % 12) + 1, ap = h24 >= 12 ? 'PM' : 'AM'; return (
@@ -5131,6 +5338,7 @@
 
               <div className="flex items-center gap-2">
                 <button onClick={() => setRivalOn(!rivalOn)} className={`px-2 py-1 rounded text-[11px] font-bold border ${rivalOn ? 'bg-rose-600 text-white border-rose-700' : 'bg-white text-rose-700 border-rose-300'}`}>⚔️ ပြိုင်ဘက် ထည့်ပြီး ယှဉ်ကြည့်မယ်</button>
+                {rivalOn && <button onClick={clearRivalOnly} className="px-2 py-1 rounded text-[11px] font-bold border bg-white text-slate-600 border-slate-300 ml-1">🗑 ပြိုင်ဖက် ရှင်း</button>}
                 {rivalOn && <span className="text-[10px] text-slate-500">အလယ်လူ (Girl) ကို ရွေးချယ်သူ ထား၍ Boy နှင့် ပြိုင်ဘက် နှစ်ယောက်ကို ယှဉ်တာပါ</span>}
               </div>
               {rivalOn && (
