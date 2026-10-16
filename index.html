@@ -55,6 +55,7 @@
     // v6.16 (2026-10-15): Western Layer 2 — Solar Return + Secondary Progressions (Readings), aspect patterns (Yoga), Composite chart + partner profiles (Matching/Relate), Vocational + Relocation (Place). All tropical-only; sidereal unchanged.
     // v6.17 (2026-10-16): Strength layer — Shadbala (six-fold, main components) + Ashtakavarga (classical BAV/SAV, total 337) as one additive card in the sidereal Birth Chart tab. No existing reading or calculation changed.
     // v6.18 (2026-10-16): Matching — top Clear now also resets the rival (and closes it), plus a dedicated rival clear button. Rectification — clear-all button. Tropical Birth Chart — Western extras card (Part of Fortune day/night formula, mean Black Moon Lilith, Sun–Moon midpoint). Chiron deferred: no verified orbital elements available to this app's accuracy standard.
+    // v6.19 (2026-10-17): Correctness pass — (1) ErrorBoundary reset now removes ONLY this app's keys (jyotish_agreed_v1, saved_jyotish_pwa) instead of localStorage.clear() wiping the whole origin. (2) Bhava details degree range now names the end sign (12.4° in one sign ends at 12.4° of the NEXT sign). (3) Timezone: preset/searched cities resolve an IANA zone (country/state tables from Nominatim address); birth/matching/relate JDs use the zone's offset FOR THE ENTERED DATE via Intl (DST + historical rules), manual tz entry clears the zone and wins; estimateTimezone remains only as fallback (GPS / unmapped places); Asia/Yangon is +6.5 on modern dates so Yangon tz handling is unchanged. (4) CALCULATION AUDIT vs Swiss Ephemeris 2.10: Sun/Moon/Lagna/mean-node/ayanamsas were already accurate (<=0.8 / <=7 / <=0.25 / <=0.23 / <=0.11 arcmin), but Mercury..Saturn (+Uranus/Neptune/Pluto) carried a J2000-frame error growing ~50.3 arcsec/yr because precession was never applied to the Keplerian-element planets — fixed in toGeocentric (_precLon). Planet longitudes therefore SHIFT by -psi(T) vs v6.18 (e.g. -8.1 arcmin for 1990 births, -42 for 1950, +22 for 2026 — sign follows the correction); Sun/Moon/Lagna/nodes/ayanamsa outputs are unchanged. Post-fix audit (5 epochs, 1950-2026): Mercury/Venus/Mars <=1.1 arcmin, Moon improved 7.2 -> 2.5 arcmin by adding its five next-largest longitude terms; Jupiter/Saturn keep their element residuals (<=6 / <=10 arcmin). A van Flandern-Pulkkinen perturbation series for Jupiter/Saturn was tested and REJECTED on audit evidence: the Standish elements already absorb the great inequality, so adding the series double-counted it (Saturn worsened 9.6 -> 32 arcmin in testing). Remaining known accuracy class (disclosed, not hidden): true node up to ~25 arcmin (mean node, the default, is <=0.25 arcmin).
     const { useState, useEffect, useRef, Component } = React;
 
     // ==========================================
@@ -239,6 +240,48 @@
       }
       // Global fallback calculated directly from longitude
       return Math.round((lon / 15.0) * 2) / 2;
+    }
+
+    // ===== v6.19: IANA timezone resolution (DST + historical offsets via Intl) =====
+    function zoneOffsetAtInstant(zone, date) {
+      try {
+        const dtf = new Intl.DateTimeFormat('en-US', { timeZone: zone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const parts = {};
+        dtf.formatToParts(date).forEach((pt) => { parts[pt.type] = pt.value; });
+        const asUTC = Date.UTC(+parts.year, +parts.month - 1, +parts.day, (+parts.hour) % 24, +parts.minute, +parts.second);
+        return (asUTC - Math.floor(date.getTime() / 1000) * 1000) / 3600000;
+      } catch (e) { return null; }
+    }
+    function zoneOffsetHours(zone, y, mo, d, h, mi) {
+      if (!zone) return null;
+      try {
+        const target = Date.UTC(y, mo - 1, d, h, mi, 0);
+        let guess = target;
+        for (let i = 0; i < 3; i++) {
+          const off = zoneOffsetAtInstant(zone, new Date(guess));
+          if (off == null) return null;
+          const next = target - off * 3600000;
+          if (next === guess) break;
+          guess = next;
+        }
+        return (target - guess) / 3600000;
+      } catch (e) { return null; }
+    }
+    function personEffTz(p, y, m, d, h24, mi) {
+      if (p && p.zone) { const z = zoneOffsetHours(p.zone, y, m, d, h24, mi); if (z != null) return z; }
+      return parseFloat(p && p.tz) || 6.5;
+    }
+    const ZONE_BY_COUNTRY = { 'Myanmar': 'Asia/Yangon', 'Thailand': 'Asia/Bangkok', 'Singapore': 'Asia/Singapore', 'Malaysia': 'Asia/Kuala_Lumpur', 'Japan': 'Asia/Tokyo', 'South Korea': 'Asia/Seoul', 'India': 'Asia/Kolkata', 'United Kingdom': 'Europe/London', 'Ireland': 'Europe/Dublin', 'France': 'Europe/Paris', 'Germany': 'Europe/Berlin', 'Italy': 'Europe/Rome', 'Spain': 'Europe/Madrid', 'Netherlands': 'Europe/Amsterdam', 'United Arab Emirates': 'Asia/Dubai', 'Vietnam': 'Asia/Ho_Chi_Minh', 'Philippines': 'Asia/Manila', 'Indonesia': 'Asia/Jakarta', 'Cambodia': 'Asia/Phnom_Penh', 'Laos': 'Asia/Vientiane', 'Bangladesh': 'Asia/Dhaka', 'Nepal': 'Asia/Kathmandu', 'Sri Lanka': 'Asia/Colombo', 'China': 'Asia/Shanghai', 'Hong Kong': 'Asia/Hong_Kong', 'Taiwan': 'Asia/Taipei', 'Turkey': 'Europe/Istanbul', 'Türkiye': 'Europe/Istanbul', 'Israel': 'Asia/Jerusalem', 'Saudi Arabia': 'Asia/Riyadh', 'Qatar': 'Asia/Qatar', 'Kuwait': 'Asia/Kuwait', 'Pakistan': 'Asia/Karachi', 'Maldives': 'Indian/Maldives', 'Bhutan': 'Asia/Thimphu', 'Brunei': 'Asia/Brunei', 'Mongolia': 'Asia/Ulaanbaatar', 'New Zealand': 'Pacific/Auckland', 'South Africa': 'Africa/Johannesburg', 'Egypt': 'Africa/Cairo', 'Nigeria': 'Africa/Lagos', 'Kenya': 'Africa/Nairobi', 'Ethiopia': 'Africa/Addis_Ababa', 'Greece': 'Europe/Athens', 'Portugal': 'Europe/Lisbon', 'Switzerland': 'Europe/Zurich', 'Austria': 'Europe/Vienna', 'Belgium': 'Europe/Brussels', 'Sweden': 'Europe/Stockholm', 'Norway': 'Europe/Oslo', 'Denmark': 'Europe/Copenhagen', 'Finland': 'Europe/Helsinki', 'Poland': 'Europe/Warsaw', 'Czechia': 'Europe/Prague', 'Hungary': 'Europe/Budapest', 'Romania': 'Europe/Bucharest', 'Ukraine': 'Europe/Kyiv' };
+    const ZONE_BY_US_STATE = { 'Alabama': 'America/Chicago', 'Alaska': 'America/Anchorage', 'Arizona': 'America/Phoenix', 'Arkansas': 'America/Chicago', 'California': 'America/Los_Angeles', 'Colorado': 'America/Denver', 'Connecticut': 'America/New_York', 'Delaware': 'America/New_York', 'Florida': 'America/New_York', 'Georgia': 'America/New_York', 'Hawaii': 'Pacific/Honolulu', 'Idaho': 'America/Boise', 'Illinois': 'America/Chicago', 'Indiana': 'America/Indiana/Indianapolis', 'Iowa': 'America/Chicago', 'Kansas': 'America/Chicago', 'Kentucky': 'America/New_York', 'Louisiana': 'America/Chicago', 'Maine': 'America/New_York', 'Maryland': 'America/New_York', 'Massachusetts': 'America/New_York', 'Michigan': 'America/Detroit', 'Minnesota': 'America/Chicago', 'Mississippi': 'America/Chicago', 'Missouri': 'America/Chicago', 'Montana': 'America/Denver', 'Nebraska': 'America/Chicago', 'Nevada': 'America/Los_Angeles', 'New Hampshire': 'America/New_York', 'New Jersey': 'America/New_York', 'New Mexico': 'America/Denver', 'New York': 'America/New_York', 'North Carolina': 'America/New_York', 'North Dakota': 'America/Chicago', 'Ohio': 'America/New_York', 'Oklahoma': 'America/Chicago', 'Oregon': 'America/Los_Angeles', 'Pennsylvania': 'America/New_York', 'Rhode Island': 'America/New_York', 'South Carolina': 'America/New_York', 'South Dakota': 'America/Chicago', 'Tennessee': 'America/Chicago', 'Texas': 'America/Chicago', 'Utah': 'America/Denver', 'Vermont': 'America/New_York', 'Virginia': 'America/New_York', 'Washington': 'America/Los_Angeles', 'West Virginia': 'America/New_York', 'Wisconsin': 'America/Chicago', 'Wyoming': 'America/Denver', 'District of Columbia': 'America/New_York' };
+    const ZONE_BY_CA_PROVINCE = { 'Ontario': 'America/Toronto', 'Quebec': 'America/Toronto', 'Québec': 'America/Toronto', 'British Columbia': 'America/Vancouver', 'Alberta': 'America/Edmonton', 'Manitoba': 'America/Winnipeg', 'Saskatchewan': 'America/Regina', 'Nova Scotia': 'America/Halifax', 'New Brunswick': 'America/Moncton', 'Newfoundland and Labrador': 'America/St_Johns', 'Prince Edward Island': 'America/Halifax', 'Yukon': 'America/Whitehorse', 'Northwest Territories': 'America/Yellowknife', 'Nunavut': 'America/Iqaluit' };
+    const ZONE_BY_AU_STATE = { 'New South Wales': 'Australia/Sydney', 'Victoria': 'Australia/Melbourne', 'Queensland': 'Australia/Brisbane', 'South Australia': 'Australia/Adelaide', 'Western Australia': 'Australia/Perth', 'Tasmania': 'Australia/Hobart', 'Northern Territory': 'Australia/Darwin', 'Australian Capital Territory': 'Australia/Sydney' };
+    function zoneForAddress(addr) {
+      if (!addr) return '';
+      const c = addr.country || '';
+      if (c === 'United States') return ZONE_BY_US_STATE[addr.state] || '';
+      if (c === 'Canada') return ZONE_BY_CA_PROVINCE[addr.state] || '';
+      if (c === 'Australia') return ZONE_BY_AU_STATE[addr.state] || '';
+      return ZONE_BY_COUNTRY[c] || '';
     }
 
     function norm360(deg) {
@@ -514,7 +557,12 @@
         0.058793 * Math.sin(2 * D - 2 * Mp) +
         0.057066 * Math.sin(2 * D - M - Mp) +
         0.053322 * Math.sin(2 * D + Mp) +
-        0.045758 * Math.sin(2 * D - M);
+        0.045758 * Math.sin(2 * D - M) +
+        0.041 * Math.sin(Mp - M) -
+        0.035 * Math.sin(D) -
+        0.031 * Math.sin(Mp + M) -
+        0.015 * Math.sin(2 * F - 2 * D) +
+        0.011 * Math.sin(Mp - 4 * D);
       moonTrop = norm360(moonTrop);
 
       let omega = norm360(125.04452 - 1934.136261 * T + 0.0020708 * T * T);
@@ -550,7 +598,13 @@
       }
 
       const earth = getPlanetXYZ(1.00000261, 0.00000562, 0.01671123, -0.00004392, -0.00001531, -0.01294668, 100.46457166, 35999.37244981, 102.93768193, 0.32327364, 0, 0);
-      const toGeocentric = (pXYZ) => norm360(Math.atan2(pXYZ.y - earth.y, pXYZ.x - earth.x) * 180 / Math.PI);
+      // v6.19 audit fix: the JPL Keplerian elements are in the J2000 mean frame, while the
+      // Sun/Moon series in this function are ecliptic-of-date. Add IAU precession in longitude
+      // (5038.47875 arcsec/century) so all bodies share the of-date frame. Before this fix the
+      // five planets drifted from the Sun/Moon/Lagna frame by ~50.3 arcsec per year from J2000
+      // (measured vs Swiss Ephemeris: +42 arcmin at 1950, -22 arcmin at 2026).
+      const _precLon = T * (5038.47875 / 3600.0);
+      const toGeocentric = (pXYZ) => norm360(Math.atan2(pXYZ.y - earth.y, pXYZ.x - earth.x) * 180 / Math.PI + _precLon);
 
       const mercury = getPlanetXYZ(0.38709927, 0.00000037, 0.20563593, 0.00001906, 7.00497902, -0.00594749, 252.25032350, 149472.67411175, 77.45779628, 0.16047689, 48.33076593, -0.12534081);
       const venus = getPlanetXYZ(0.72333566, 0.00000390, 0.00677672, -0.00004107, 3.39467605, -0.00078890, 181.97909950, 58517.81538729, 131.60246718, 0.00268329, 76.67984255, -0.27769418);
@@ -3297,16 +3351,16 @@
     }
 
     const REL_CITIES = [
-      { n: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' }, { n: 'မန္တလေး', lat: '21.9786', lon: '96.0836', tz: '6.5' },
-      { n: 'နေပြည်တော်', lat: '19.7633', lon: '96.1742', tz: '6.5' }, { n: 'တောင်ကြီး', lat: '20.7833', lon: '97.0333', tz: '6.5' },
-      { n: 'ဘန်ကောက်', lat: '13.7563', lon: '100.5018', tz: '7' }, { n: 'စင်ကာပူ', lat: '1.3521', lon: '103.8198', tz: '8' },
-      { n: 'ကွာလာလမ်ပူ', lat: '3.1390', lon: '101.6869', tz: '8' }, { n: 'တိုကျို', lat: '35.6762', lon: '139.6503', tz: '9' },
-      { n: 'ဆိုးလ်', lat: '37.5665', lon: '126.9780', tz: '9' }, { n: 'ဒေလီ', lat: '28.6139', lon: '77.2090', tz: '5.5' },
-      { n: 'ဒူဘိုင်း', lat: '25.2048', lon: '55.2708', tz: '4' }, { n: 'လန်ဒန်', lat: '51.5074', lon: '-0.1278', tz: '0' },
-      { n: 'နယူးယောက်', lat: '40.7128', lon: '-74.0060', tz: '-5' }, { n: 'ဆစ်ဒနီ', lat: '-33.8688', lon: '151.2093', tz: '10' }
+      { n: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5', zone: 'Asia/Yangon' }, { n: 'မန္တလေး', lat: '21.9786', lon: '96.0836', tz: '6.5', zone: 'Asia/Yangon' },
+      { n: 'နေပြည်တော်', lat: '19.7633', lon: '96.1742', tz: '6.5', zone: 'Asia/Yangon' }, { n: 'တောင်ကြီး', lat: '20.7833', lon: '97.0333', tz: '6.5', zone: 'Asia/Yangon' },
+      { n: 'ဘန်ကောက်', lat: '13.7563', lon: '100.5018', tz: '7', zone: 'Asia/Bangkok' }, { n: 'စင်ကာပူ', lat: '1.3521', lon: '103.8198', tz: '8', zone: 'Asia/Singapore' },
+      { n: 'ကွာလာလမ်ပူ', lat: '3.1390', lon: '101.6869', tz: '8', zone: 'Asia/Kuala_Lumpur' }, { n: 'တိုကျို', lat: '35.6762', lon: '139.6503', tz: '9', zone: 'Asia/Tokyo' },
+      { n: 'ဆိုးလ်', lat: '37.5665', lon: '126.9780', tz: '9', zone: 'Asia/Seoul' }, { n: 'ဒေလီ', lat: '28.6139', lon: '77.2090', tz: '5.5', zone: 'Asia/Kolkata' },
+      { n: 'ဒူဘိုင်း', lat: '25.2048', lon: '55.2708', tz: '4', zone: 'Asia/Dubai' }, { n: 'လန်ဒန်', lat: '51.5074', lon: '-0.1278', tz: '0', zone: 'Europe/London' },
+      { n: 'နယူးယောက်', lat: '40.7128', lon: '-74.0060', tz: '-5', zone: 'America/New_York' }, { n: 'ဆစ်ဒနီ', lat: '-33.8688', lon: '151.2093', tz: '10', zone: 'Australia/Sydney' }
     ];
     function RelPersonForm({ title, person, setPerson, savedProfiles, onLoadProfile }) {
-      const set = (k, v) => setPerson({ ...person, [k]: v });
+      const set = (k, v) => setPerson((k === 'tz' || k === 'lat' || k === 'lon' || k === 'city') ? { ...person, [k]: v, zone: '' } : { ...person, [k]: v });
       return (
         <div className="bg-white border border-slate-200 p-2.5 rounded space-y-1.5 shadow-sm">
           <div className="flex justify-between items-center border-b border-slate-100 pb-1">
@@ -3331,7 +3385,7 @@
             <input value={person.min} onChange={(e) => set('min', e.target.value)} placeholder="မိနစ်" className="border p-1 rounded text-center" />
             <button onClick={() => set('ampm', person.ampm === 'AM' ? 'PM' : 'AM')} className="bg-emerald-800 text-white rounded font-bold">{person.ampm}</button>
           </div>
-          <select defaultValue="" onChange={(e) => { const c = REL_CITIES[parseInt(e.target.value, 10)]; if (c) setPerson({ ...person, city: c.n, lat: c.lat, lon: c.lon, tz: c.tz }); e.target.value = ''; }} className="w-full bg-emerald-50 border border-emerald-300 rounded px-1.5 py-1 text-[11px] text-emerald-900 font-medium">
+          <select defaultValue="" onChange={(e) => { const c = REL_CITIES[parseInt(e.target.value, 10)]; if (c) setPerson({ ...person, city: c.n, lat: c.lat, lon: c.lon, tz: c.tz, zone: c.zone }); e.target.value = ''; }} className="w-full bg-emerald-50 border border-emerald-300 rounded px-1.5 py-1 text-[11px] text-emerald-900 font-medium">
             <option value="" disabled>🏙️ မြို့ ရွေးရန် (သို့) အောက်တွင် Lat/Lon ကိုယ်တိုင် ရိုက်ပါ</option>
             {REL_CITIES.map((c, i) => <option key={i} value={i}>{c.n}</option>)}
           </select>
@@ -3346,15 +3400,15 @@
     }
 
     function RelateTab({ ayanamsa, nodeType, savedProfiles }) {
-      const fillFromProfile = (setter) => (prof) => setter({ name: prof.name, d: prof.day, m: prof.month, y: prof.year, h: prof.hour, min: prof.minute, ampm: prof.ampm, city: prof.place, lat: prof.lat, lon: prof.lon, tz: prof.tz || '6.5' });
-      const [personA, setPersonA] = useState({ name: 'လူ (က)', d: '15', m: '5', y: '1990', h: '8', min: '30', ampm: 'AM', city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
-      const [personB, setPersonB] = useState({ name: 'လူ (ခ)', d: '20', m: '8', y: '1992', h: '6', min: '15', ampm: 'PM', city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
+      const fillFromProfile = (setter) => (prof) => setter({ name: prof.name, d: prof.day, m: prof.month, y: prof.year, h: prof.hour, min: prof.minute, ampm: prof.ampm, city: prof.place, lat: prof.lat, lon: prof.lon, tz: prof.tz || '6.5', zone: prof.zone || '' });
+      const [personA, setPersonA] = useState({ name: 'လူ (က)', d: '15', m: '5', y: '1990', h: '8', min: '30', ampm: 'AM', city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5', zone: 'Asia/Yangon' });
+      const [personB, setPersonB] = useState({ name: 'လူ (ခ)', d: '20', m: '8', y: '1992', h: '6', min: '15', ampm: 'PM', city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5', zone: 'Asia/Yangon' });
       const [mode, setMode] = useState('business');
       const calc = (person) => {
         const iv = (v, fb) => { const n = parseInt(v, 10); return isNaN(n) ? fb : n; };
         let h24 = iv(person.h, 12) % 12; if (person.ampm === 'PM') h24 += 12;
         const y = iv(person.y, 1990), m = Math.min(12, Math.max(1, iv(person.m, 1))), d = Math.min(31, Math.max(1, iv(person.d, 1)));
-        const jd = getJulianDay(y, m, d, h24, iv(person.min, 0), parseFloat(person.tz) || 6.5);
+        const jd = getJulianDay(y, m, d, h24, iv(person.min, 0), personEffTz(person, y, m, d, h24, iv(person.min, 0)));
         const planets = calculateNASA_JPL_Planets(jd, parseFloat(person.lat) || 16.84, parseFloat(person.lon) || 96.17, ayanamsa, nodeType);
         const dasha = calculateDashaTree(planets.Moon, new Date(y, m - 1, d, h24, iv(person.min, 0)));
         let kp = null;
@@ -3806,7 +3860,7 @@
                 {this.state.error ? this.state.error.toString() : ''}
               </pre>
               <button
-                onClick={() => { localStorage.clear(); window.location.reload(); }}
+                onClick={() => { try { localStorage.removeItem('jyotish_agreed_v1'); localStorage.removeItem('saved_jyotish_pwa'); } catch (e) {} window.location.reload(); }}
                 className="bg-red-700 text-white px-3 py-1.5 rounded font-bold mt-2 shadow"
               >
                 မူလအခြေအနေသို့ ပြန်လည်စတင်မည်
@@ -3839,6 +3893,7 @@
       const [transitLat, setTransitLat] = useState('16.8409');
       const [transitLon, setTransitLon] = useState('96.1735');
       const [transitTz, setTransitTz] = useState('6.5');
+      const [transitZone, setTransitZone] = useState('');
 
       const initH = now.getHours();
       const initAmPm = initH >= 12 ? 'PM' : 'AM';
@@ -3853,6 +3908,7 @@
       const [birthLat, setBirthLat] = useState('16.8409');
       const [birthLon, setBirthLon] = useState('96.1735');
       const [birthTz, setBirthTz] = useState('6.5');
+      const [birthZone, setBirthZone] = useState('');
 
       // Free-text Prashna State
       const [prashnaCustomText, setPrashnaCustomText] = useState('စာမေးပွဲ အောင်ပါ့မလား');
@@ -3876,7 +3932,7 @@
         if (evs.length === 0) { setRectResults([]); return; }
         setRectBusy(true);
         setTimeout(() => {
-          try { setRectResults(rectifyBirthTime({ dateStr, fromMin, toMin, tz: parseFloat(birthTz) || 6.5, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17, ayanamsa, nodeType, events: evs, appearanceSign: rectAppSign === '' ? null : parseInt(rectAppSign, 10) })); }
+          try { setRectResults(rectifyBirthTime({ dateStr, fromMin, toMin, tz: birthTzEffForRect, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17, ayanamsa, nodeType, events: evs, appearanceSign: rectAppSign === '' ? null : parseInt(rectAppSign, 10) })); }
           catch (e) { setRectResults([]); }
           setRectBusy(false);
         }, 30);
@@ -3886,9 +3942,9 @@
       const [houseSel, setHouseSel] = useState(null);
 
       // Boy & Girl state with specific Timezone
-      const [boy, setBoy] = useState({ name: 'သတို့သား', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
-      const [girl, setGirl] = useState({ name: 'သတို့သမီး', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
-      const [rival, setRival] = useState({ name: 'ပြိုင်ဘက်', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5' });
+      const [boy, setBoy] = useState({ name: 'သတို့သား', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5', zone: 'Asia/Yangon' });
+      const [girl, setGirl] = useState({ name: 'သတို့သမီး', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5', zone: 'Asia/Yangon' });
+      const [rival, setRival] = useState({ name: 'ပြိုင်ဘက်', d: now.getDate().toString(), m: (now.getMonth() + 1).toString(), y: now.getFullYear().toString(), h: ((initH % 12) || 12).toString(), min: now.getMinutes().toString(), ampm: initAmPm, city: 'ရန်ကုန်', lat: '16.8409', lon: '96.1735', tz: '6.5', zone: 'Asia/Yangon' });
       const [rivalOn, setRivalOn] = useState(false);
       const [rpContext, setRpContext] = useState('marriage');
       const [rpCenter, setRpCenter] = useState('girl');
@@ -3905,10 +3961,10 @@
             const lat = pos.coords.latitude.toFixed(4);
             const lon = pos.coords.longitude.toFixed(4);
             const autoTz = estimateTimezone(lat, lon).toString();
-            setTransitLat(lat); setTransitLon(lon); setTransitTz(autoTz);
-            setBirthLat(lat); setBirthLon(lon); setBirthTz(autoTz);
-            setBoy((prev) => ({ ...prev, lat, lon, tz: autoTz }));
-            setGirl((prev) => ({ ...prev, lat, lon, tz: autoTz }));
+            setTransitLat(lat); setTransitLon(lon); setTransitTz(autoTz); setTransitZone('');
+            setBirthLat(lat); setBirthLon(lon); setBirthTz(autoTz); setBirthZone('');
+            setBoy((prev) => ({ ...prev, lat, lon, tz: autoTz, zone: '' }));
+            setGirl((prev) => ({ ...prev, lat, lon, tz: autoTz, zone: '' }));
           }, () => {});
         }
         try {
@@ -3918,7 +3974,7 @@
       }, []);
 
       const saveProfile = () => {
-        const p = { id: Date.now().toString(), name: birthName, year: birthYear, month: birthMonth, day: birthDay, hour: birthHour, minute: birthMinute, ampm: birthAmPm, place: birthPlace, lat: birthLat, lon: birthLon, tz: birthTz };
+        const p = { id: Date.now().toString(), name: birthName, year: birthYear, month: birthMonth, day: birthDay, hour: birthHour, minute: birthMinute, ampm: birthAmPm, place: birthPlace, lat: birthLat, lon: birthLon, tz: birthTz, zone: birthZone };
         const updated = [p].concat(savedProfiles);
         setSavedProfiles(updated);
         try { localStorage.setItem('saved_jyotish_pwa', JSON.stringify(updated)); } catch(e){}
@@ -3928,7 +3984,7 @@
       const loadProfile = (p) => {
         setBirthName(p.name); setBirthYear(p.year); setBirthMonth(p.month); setBirthDay(p.day);
         setBirthHour(p.hour); setBirthMinute(p.minute); setBirthAmPm(p.ampm);
-        setBirthPlace(p.place); setBirthLat(p.lat); setBirthLon(p.lon); setBirthTz(p.tz || '6.5');
+        setBirthPlace(p.place); setBirthLat(p.lat); setBirthLon(p.lon); setBirthTz(p.tz || '6.5'); setBirthZone(p.zone || '');
         setShowSavedModal(false);
       };
 
@@ -3993,13 +4049,13 @@
       };
 
       const clearSynastryInputs = () => {
-        setBoy({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5' });
-        setGirl({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5' });
-        setRival({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5' });
+        setBoy({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5', zone: '' });
+        setGirl({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5', zone: '' });
+        setRival({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5', zone: '' });
         setRivalOn(false);
       };
       const clearRivalOnly = () => {
-        setRival({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5' });
+        setRival({ name: '', d: '', m: '', y: '', h: '12', min: '0', ampm: 'AM', city: '', lat: '', lon: '', tz: '6.5', zone: '' });
         setRivalOn(false);
       };
 
@@ -4007,7 +4063,7 @@
         if (!text) return;
         setSearchTarget(target);
         try {
-          const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(text) + '&limit=5', {
+          const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=' + encodeURIComponent(text) + '&limit=5', {
             headers: { 'User-Agent': 'JyotishPWA/18.0' }
           });
           const data = await res.json();
@@ -4023,15 +4079,16 @@
         const lat = parseFloat(item.lat).toFixed(4);
         const lon = parseFloat(item.lon).toFixed(4);
         const autoTz = estimateTimezone(lat, lon).toString();
+        const zone = zoneForAddress(item.address);
 
         if (searchTarget === 'birth') {
-          setBirthPlace(name); setBirthLat(lat); setBirthLon(lon); setBirthTz(autoTz);
+          setBirthPlace(name); setBirthLat(lat); setBirthLon(lon); setBirthTz(autoTz); setBirthZone(zone);
         } else if (searchTarget === 'transit') {
-          setTransitCity(name); setTransitLat(lat); setTransitLon(lon); setTransitTz(autoTz);
+          setTransitCity(name); setTransitLat(lat); setTransitLon(lon); setTransitTz(autoTz); setTransitZone(zone);
         } else if (searchTarget === 'boy') {
-          setBoy((prev) => ({ ...prev, city: name, lat, lon, tz: autoTz }));
+          setBoy((prev) => ({ ...prev, city: name, lat, lon, tz: autoTz, zone }));
         } else if (searchTarget === 'girl') {
-          setGirl((prev) => ({ ...prev, city: name, lat, lon, tz: autoTz }));
+          setGirl((prev) => ({ ...prev, city: name, lat, lon, tz: autoTz, zone }));
         }
         setCitySuggestions([]);
       };
@@ -4052,7 +4109,15 @@
 
       const birthDateObj = new Date(sY, sM - 1, sD, sH, sMin);
 
-      const birthJD = getJulianDay(sY, sM, sD, sH, sMin, birthTz);
+      const birthTzEff = birthZone ? (zoneOffsetHours(birthZone, sY, sM, sD, sH, sMin) ?? (parseFloat(birthTz) || 6.5)) : (parseFloat(birthTz) || 6.5);
+      const birthTzEffForRect = birthTzEff;
+      useEffect(() => {
+        if (!birthZone) return;
+        const z = zoneOffsetHours(birthZone, sY, sM, sD, sH, sMin);
+        if (z != null && String(z) !== String(birthTz)) setBirthTz(String(z));
+      }, [birthZone, sY, sM, sD, sH, sMin]);
+      const transitTzEff = transitZone ? (zoneOffsetAtInstant(transitZone, transitDate) ?? (parseFloat(transitTz) || 6.5)) : (parseFloat(transitTz) || 6.5);
+      const birthJD = getJulianDay(sY, sM, sD, sH, sMin, birthTzEff);
       const birthPlanets = calculateNASA_JPL_Planets(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
       const birthPlanetsNext = calculateNASA_JPL_Planets(birthJD + 1, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
       const kpCusps = ayanamsa === 'kp' ? calculatePlacidusCusps(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa) : null;
@@ -4081,11 +4146,11 @@
       const careerBenefit = calculateCareerBenefitSummary(birthPlanets, dashaTree);
       const spouseProfile = buildSpouseProfile(birthPlanets, dashaTree);
       const ayuReading = generateAyuReading(birthPlanets, dashaTree);
-      const eventWindows = calculateEventWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, tz: parseFloat(birthTz) || 6.5, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
-      const healthWindows = calculateHealthWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, tz: parseFloat(birthTz) || 6.5, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
+      const eventWindows = calculateEventWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, tz: birthTzEff, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
+      const healthWindows = calculateHealthWindows(birthPlanets, dashaTree, {ayanamsa, nodeType, tz: birthTzEff, lat: parseFloat(birthLat) || 16.84, lon: parseFloat(birthLon) || 96.17});
       const placementReading = buildPlacementReading(birthPlanets, placementPlanet, birthPlanetsNext);
       const lifetimeMilestones = generateLifetimeMilestones(birthDateObj, dashaTree, birthPlanets);
-      const annualForecast = generateAnnualForecast(birthDateObj, birthPlanets, transitPlanets, transitDate, transitLat, transitLon, ayanamsa, nodeType, parseFloat(transitTz) || 6.5);
+      const annualForecast = generateAnnualForecast(birthDateObj, birthPlanets, transitPlanets, transitDate, transitLat, transitLon, ayanamsa, nodeType, transitTzEff);
       const conjunctionsAndAspects = analyzeConjunctionsAndAspects(birthPlanets);
       const liveTransitPredictions = analyzeLiveTransit(birthPlanets, transitPlanets);
 
@@ -4120,8 +4185,8 @@
       const girlDateObj = new Date(safeYear(girl.y, curY), safeMonth(girl.m, 1) - 1, safeDay(girl.d, 1), girlH, safeMinute(girl.min, 0));
       
       // Dynamic Julian Day calculation using individual timezones
-      const boyJD = getJulianDay(safeYear(boy.y, curY), safeMonth(boy.m, 1), safeDay(boy.d, 1), boyH, safeMinute(boy.min, 0), parseFloat(boy.tz) || 6.5);
-      const girlJD = getJulianDay(safeYear(girl.y, curY), safeMonth(girl.m, 1), safeDay(girl.d, 1), girlH, safeMinute(girl.min, 0), parseFloat(girl.tz) || 6.5);
+      const boyJD = getJulianDay(safeYear(boy.y, curY), safeMonth(boy.m, 1), safeDay(boy.d, 1), boyH, safeMinute(boy.min, 0), personEffTz(boy, safeYear(boy.y, curY), safeMonth(boy.m, 1), safeDay(boy.d, 1), boyH, safeMinute(boy.min, 0)));
+      const girlJD = getJulianDay(safeYear(girl.y, curY), safeMonth(girl.m, 1), safeDay(girl.d, 1), girlH, safeMinute(girl.min, 0), personEffTz(girl, safeYear(girl.y, curY), safeMonth(girl.m, 1), safeDay(girl.d, 1), girlH, safeMinute(girl.min, 0)));
       const boyPlanets = calculateNASA_JPL_Planets(boyJD, boy.lat, boy.lon, ayanamsa);
       const girlPlanets = calculateNASA_JPL_Planets(girlJD, girl.lat, girl.lon, ayanamsa);
       const matchResult = calculateSynastry(boyPlanets, girlPlanets, ayanamsa, boyDateObj, girlDateObj);
@@ -4131,7 +4196,7 @@
       const rpMain = calculateRightPerson(boyPlanets, girlPlanets, boyTreeRP, girlTreeRP, rpContext, matchResult ? matchResult.total : 0, boy.name || 'ပထမလူ', girl.name || 'ဒုတိယလူ', kpMatch ? kpMatch.score : null);
       const rivalH = to24(safeHour(rival.h, 12), rival.ampm);
       const rivalDateObj = new Date(safeYear(rival.y, curY), safeMonth(rival.m, 1) - 1, safeDay(rival.d, 1), rivalH, safeMinute(rival.min, 0));
-      const rivalJD = getJulianDay(safeYear(rival.y, curY), safeMonth(rival.m, 1), safeDay(rival.d, 1), rivalH, safeMinute(rival.min, 0), parseFloat(rival.tz) || 6.5);
+      const rivalJD = getJulianDay(safeYear(rival.y, curY), safeMonth(rival.m, 1), safeDay(rival.d, 1), rivalH, safeMinute(rival.min, 0), personEffTz(rival, safeYear(rival.y, curY), safeMonth(rival.m, 1), safeDay(rival.d, 1), rivalH, safeMinute(rival.min, 0)));
       const rivalPlanets = rivalOn ? calculateNASA_JPL_Planets(rivalJD, rival.lat, rival.lon, ayanamsa) : null;
       const rivalTreeRP = rivalPlanets ? calculateDashaTree(rivalPlanets.Moon, rivalDateObj) : null;
       const rivalSynastry = rivalPlanets ? (rpCenter === 'girl' ? calculateSynastry(rivalPlanets, girlPlanets, ayanamsa, rivalDateObj, girlDateObj) : calculateSynastry(boyPlanets, rivalPlanets, ayanamsa, boyDateObj, rivalDateObj)) : null;
@@ -4399,15 +4464,15 @@
               <div className="grid grid-cols-3 gap-1 text-[11px] bg-slate-100 p-2 rounded border border-slate-200">
                 <div>
                   <label className="text-slate-500 block text-[9px]">Latitude (လတ္တီတွဒ်):</label>
-                  <input value={birthLat} onChange={(e) => setBirthLat(e.target.value)} placeholder="16.8409" className="w-full bg-white border rounded p-1 text-center" />
+                  <input value={birthLat} onChange={(e) => { setBirthLat(e.target.value); setBirthZone(''); }} placeholder="16.8409" className="w-full bg-white border rounded p-1 text-center" />
                 </div>
                 <div>
                   <label className="text-slate-500 block text-[9px]">Longitude (လောင်ဂျီတွဒ်):</label>
-                  <input value={birthLon} onChange={(e) => setBirthLon(e.target.value)} placeholder="96.1735" className="w-full bg-white border rounded p-1 text-center" />
+                  <input value={birthLon} onChange={(e) => { setBirthLon(e.target.value); setBirthZone(''); }} placeholder="96.1735" className="w-full bg-white border rounded p-1 text-center" />
                 </div>
                 <div>
                   <label className="text-emerald-800 block text-[9px] font-bold">Timezone (TZ စံတော်ချိန်):</label>
-                  <input value={birthTz} onChange={(e) => setBirthTz(e.target.value)} placeholder="6.5" className="w-full bg-emerald-50 border border-emerald-400 rounded p-1 text-center font-bold text-emerald-900" />
+                  <input value={birthTz} onChange={(e) => { setBirthTz(e.target.value); setBirthZone(); }} placeholder="6.5" className="w-full bg-emerald-50 border border-emerald-400 rounded p-1 text-center font-bold text-emerald-900" />
                 </div>
               </div>
 
@@ -4538,7 +4603,7 @@
                         <div key={i} className="grid grid-cols-5 p-1.5 border-t border-slate-100 text-[10px] items-center">
                           <span className="font-bold text-emerald-900">House {i + 1}</span>
                           <span>{RASI_NAMES_EN[rasiIdx]}</span>
-                          <span>{(startDeg % 30).toFixed(1)}° - {((startDeg + 30) % 30).toFixed(1)}°</span>
+                          <span>{RASI_NAMES_EN[Math.floor(startDeg / 30) % 12]} {(startDeg % 30).toFixed(1)}° → {RASI_NAMES_EN[Math.floor(norm360(startDeg + 30) / 30) % 12]} {((startDeg + 30) % 30).toFixed(1)}°</span>
                           <span className="font-semibold text-slate-700">{RASI_LORDS[rasiIdx]}</span>
                           <span className="text-blue-700">{kp.starLord}</span>
                         </div>
@@ -5270,7 +5335,7 @@
                   </div>
                   <div>
                     <label className="text-emerald-700 font-bold block text-[9px]">Timezone (TZ):</label>
-                    <input value={boy.tz} onChange={(e) => setBoy({ ...boy, tz: e.target.value })} placeholder="6.5" className="w-full border border-emerald-400 bg-emerald-50/50 p-0.5 rounded text-center text-xs font-bold text-emerald-900" />
+                    <input value={boy.tz} onChange={(e) => setBoy({ ...boy, tz: e.target.value, zone: '' })} placeholder="6.5" className="w-full border border-emerald-400 bg-emerald-50/50 p-0.5 rounded text-center text-xs font-bold text-emerald-900" />
                   </div>
                 </div>
               </div>
@@ -5329,7 +5394,7 @@
                   </div>
                   <div>
                     <label className="text-emerald-700 font-bold block text-[9px]">Timezone (TZ):</label>
-                    <input value={girl.tz} onChange={(e) => setGirl({ ...girl, tz: e.target.value })} placeholder="6.5" className="w-full border border-emerald-400 bg-emerald-50/50 p-0.5 rounded text-center text-xs font-bold text-emerald-900" />
+                    <input value={girl.tz} onChange={(e) => setGirl({ ...girl, tz: e.target.value, zone: '' })} placeholder="6.5" className="w-full border border-emerald-400 bg-emerald-50/50 p-0.5 rounded text-center text-xs font-bold text-emerald-900" />
                   </div>
                 </div>
               </div>
@@ -5383,7 +5448,7 @@
                   </div>
                   <div>
                     <label className="text-rose-700 font-bold block text-[9px]">Timezone (TZ):</label>
-                    <input value={rival.tz} onChange={(e) => setRival({ ...rival, tz: e.target.value })} placeholder="6.5" className="w-full border border-rose-400 bg-rose-50/50 p-0.5 rounded text-center text-xs font-bold text-rose-900" />
+                    <input value={rival.tz} onChange={(e) => setRival({ ...rival, tz: e.target.value, zone: '' })} placeholder="6.5" className="w-full border border-rose-400 bg-rose-50/50 p-0.5 rounded text-center text-xs font-bold text-rose-900" />
                   </div>
                 </div>
               </div>
