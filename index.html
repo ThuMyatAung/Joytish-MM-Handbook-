@@ -1890,12 +1890,30 @@
         const hasMaha = stack.some((y) => /Mahapurusha/i.test(y.name));
         const rajaCount = stack.filter((y) => /Raja/i.test(y.name)).length;
         const combustBad = keyLordSet.filter((n) => _isCombust(p, n)).length;
-        const axisA = wealthScore >= 88 && stack.length >= 3 && (hasMaha || rajaCount >= 2) && strongCount >= 3 && ownExalt >= 2 && d9ok >= 2 && S(L(1)) >= 50 && combustBad <= 1;
-        let band = null;
-        if (axisA) {
+        // v6.23: percentage-weighted gate — every facet weighed; ~50/50 stays hidden, a clear lean shows; the top bands (50B/100B+) stay near-impossible.
+        const clamp01 = (x) => Math.max(0, Math.min(1, x));
+        const fScore = clamp01((wealthScore - 68) / 32);
+        const fStack = Math.min(1, stack.length / 3);
+        const fStrong = Math.min(1, strongCount / 3);
+        const fOwnEx = Math.min(1, ownExalt / 2);
+        const fD9 = Math.min(1, d9ok / 2);
+        const fLagna = clamp01((S(L(1)) - 40) / 60);
+        const combustW = keyLordSet.reduce((a, n) => a + (_isCombust(p, n) ? ((n === 'Mercury' || n === 'Venus') ? 0.5 : 1) : 0), 0);
+        const fCombust = 1 - Math.min(1, combustW * 0.45);
+        let fConc = 0;
+        [1, 2, 5, 9, 10, 11].forEach((hh) => { const inHouse = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'].filter((n) => H(n) === hh); const withKey = inHouse.some((n) => keyLordSet.includes(n)); if (withKey && inHouse.length >= 3) fConc = 1; else if (withKey && inHouse.length === 2) fConc = Math.max(fConc, 0.5); });
+        let _bHits = 0; ['Jupiter', 'Venus', 'Mercury', 'Moon'].forEach((n) => { asp(n).forEach((hh) => { if ([2, 5, 9, 11].includes(hh)) _bHits++; }); });
+        let _pari = 0; { const hs2 = [1, 2, 5, 9, 10, 11]; for (let i = 0; i < hs2.length; i++) for (let j = i + 1; j < hs2.length; j++) { if (L(hs2[i]) !== L(hs2[j]) && H(L(hs2[i])) === hs2[j] && H(L(hs2[j])) === hs2[i]) _pari++; } }
+        const fStruct = Math.min(1, _pari * 0.6 + _bHits * 0.2);
+        const gatePct = Math.round(26 * fScore + 12 * fStack + 12 * fStrong + 8 * fOwnEx + 8 * fD9 + 8 * fLagna + 6 * fCombust + 12 * fConc + 8 * fStruct);
+        let band = null, gatePctOut = null;
+        if (wealthScore >= 78 && gatePct >= 60) {
           const BANDS = ['Ultra Wealth — သန်း ၁၀၀ ပတ်လည် အင်အား', 'Ultra Wealth — သန်း ၂၀၀ ပတ်လည် အင်အား', 'Ultra Wealth — သန်း ၅၀၀ ပတ်လည် အင်အား', 'Super Wealth — သန်း ၈၀၀ ပတ်လည် အင်အား', 'Super Wealth — တစ်ဘီလျံ အင်အား', 'Super Wealth — ဘီလျံ ၅၀ ပတ်လည် အင်အား', 'Super Wealth — ဘီလျံ ၁၀၀ ကျော် အင်အား'];
-          const pts = (wealthScore - 88) + stack.length * 2 + ownExalt + d9ok;
-          band = BANDS[Math.max(0, Math.min(6, Math.floor((pts - 6) / 5)))];
+          const power = gatePct * 0.6 + wealthScore * 0.6;
+          let idx = power >= 112 ? 4 : power >= 102 ? 3 : power >= 92 ? 2 : power >= 82 ? 1 : 0;
+          if (gatePct >= 92 && wealthScore >= 97) idx = 5;
+          if (gatePct >= 97 && wealthScore >= 100) idx = 6;
+          band = BANDS[idx]; gatePctOut = gatePct;
         }
         const fameBase = S('Moon') >= 55 && S('Sun') >= 55 && S(L(10)) >= 60 && stack.length >= 2 && (S(L(5)) >= 60 || S('Venus') >= 65 || S('Jupiter') >= 65);
         let honor = null;
@@ -1907,7 +1925,7 @@
         if (S('Rahu') >= 65 && lordIn(12, [1, 4, 5, 7, 9, 10]) && s4 >= 60) luxury.push('ကိုယ်ပိုင် လေယာဉ် အဆင့် ထိ သုံး နိုင် တဲ့ အရိပ်');
         if ((S('Moon') >= 65 || S('Venus') >= 65) && [3, 7, 11].includes(signOf('Moon')) && s4 >= 60) luxury.push('ရွက်လှေ ပိုင် နိုင် တဲ့ အရိပ်');
         if (S('Venus') >= 80 && lordIn(5, [2, 5, 11])) luxury.push('အနုပညာ / ကား Collection စုဆောင်း နိုင် တဲ့ အရိပ်');
-        if (band || honor) exceptional = { band, honor, luxury };
+        if (band || honor) exceptional = { band, honor, luxury, pct: gatePctOut };
       } catch (e) { exceptional = null; }
       return { sources, assets, windows, exceptional };
     }
@@ -1925,7 +1943,9 @@
       try { let _hits=0; ['Jupiter','Venus','Mercury','Moon'].forEach((n)=>{ _aspectHouses(birthPlanets,n).forEach((h)=>{ if([2,5,9,11].includes(h)) _hits++; }); }); aspectPts=Math.min(8,_hits*1.5); } catch(e) {}
       try { const _hs=[1,2,5,9,10,11]; for(let i=0;i<_hs.length;i++) for(let j=i+1;j<_hs.length;j++){ const a=_lordOfHouse(birthPlanets,_hs[i]), b=_lordOfHouse(birthPlanets,_hs[j]); if(_planetHouse(birthPlanets,a)===_hs[j] && _planetHouse(birthPlanets,b)===_hs[i] && a!==b) pariPts+=4; } pariPts=Math.min(8,pariPts); } catch(e) {}
       try { [2,11].forEach((h)=>{ const ld=_lordOfHouse(birthPlanets,h); const d9v=calculateVarga(birthPlanets[ld],9); const d1v=calculateVarga(birthPlanets[ld],1); if(d9v===d1v || _ownSignsOf(ld).includes(d9v)) d9Pts+=3; }); } catch(e) {}
-      const wealthScore=Math.max(1,Math.min(100,Math.round(30+wealthH*6+wealthPlanets*6+savPts+aspectPts+pariPts+Math.min(12,dhanaYogaCount*4)+d9Pts)));
+      const _scoreV1=45+wealthH*7+wealthPlanets*8+Math.min(15,dhanaYogaCount*4);
+      const _scoreV2=30+wealthH*6+wealthPlanets*6+savPts+aspectPts+pariPts+Math.min(12,dhanaYogaCount*4)+d9Pts;
+      const wealthScore=Math.max(1,Math.min(100,Math.round(Math.max(_scoreV1,_scoreV2))));
       const tier=wealthScore>=82?'High Wealth — ဓန အင်အား အလွန် မြင့် (ခန့်မှန်း အင်အား တန်း: $50M–100M)':wealthScore>=68?'Strong Wealth — ဓန အင်အား မြင့် (ခန့်မှန်း အင်အား တန်း: $10M–50M)':wealthScore>=54?'Middle — ဓန အလယ်အလတ် (ခန့်မှန်း အင်အား တန်း: $2M–10M)':wealthScore>=40?'Moderate — ဓန အသင့်အတင့် (ခန့်မှန်း အင်အား တန်း: $0.5M–2M)':'Normal — ဓန ပုံမှန် (ခန့်မှန်း အင်အား တန်း: $0.5M အောက်)';
       const active=_activeDasha(dashaTree);
       const wealthRoute=`၂/၅/၉/၁၁ တန့်များနှင့် ၎င်းတို့၏ အရှင်များကို အဓိကထားဖတ်ရမည်။ ${_lordSignificatorText(birthPlanets,2)} ${_lordSignificatorText(birthPlanets,11)}`;
@@ -5013,7 +5033,7 @@
                     <span className="font-bold text-[13px] text-amber-300">👑 ထူးခြား ဇာတာ — Exceptional Pattern</span>
                     <span className="text-[9px] bg-amber-400/20 text-amber-200 px-2 py-0.5 rounded font-semibold">တင်းကျပ် တဲ့ စည်း ကိုက် ညီ မှ ပေါ် သည်</span>
                   </div>
-                  {lifeOverview.exceptional.band && (<div><div className="text-[11px] text-amber-300 font-bold">ဓန အင်အား အဆင့် (Capacity):</div><div className="text-sm font-bold mt-0.5">{lifeOverview.exceptional.band}</div></div>)}
+                  {lifeOverview.exceptional.band && (<div><div className="text-[11px] text-amber-300 font-bold">ဓန အင်အား အဆင့် (Capacity):</div><div className="text-sm font-bold mt-0.5">{lifeOverview.exceptional.band}</div>{lifeOverview.exceptional.pct != null && (<div className="text-[9px] text-amber-200/60 mt-0.5">အဖက်ဖက် ချိန်ညှိ အင်အား: {lifeOverview.exceptional.pct}%</div>)}</div>)}
                   {lifeOverview.exceptional.honor && (<div><div className="text-[11px] text-amber-300 font-bold">ဂုဏ် / ဆု အဆင့်:</div><div className="text-[12px] font-bold mt-0.5">{lifeOverview.exceptional.honor}</div></div>)}
                   {lifeOverview.exceptional.luxury?.length > 0 && (<div className="space-y-0.5">{lifeOverview.exceptional.luxury.map((x, i) => (<p key={i} className="text-[11px] text-indigo-100 leading-relaxed">✦ {x}</p>))}</div>)}
                   <p className="text-[10px] text-indigo-200/80 leading-relaxed border-t border-white/10 pt-1.5">ဒီ အကွက် ဟာ ဇာတာ ရဲ့ အထောက် အထား ဘက် စုံ (ယုဂ အထပ်, ဂြိုဟ် အင် အား, D9 အတည်ပြု ချက်, လဂ် အရှင် အခြေအနေ) စုံပြီး တင်းကျပ် တဲ့ စည်း ကျော် မှ သာ ပေါ် ပါ တယ်။ အင်အား အဆင့် ကို ပြ တာ ဖြစ်ပြီး ပမာဏ အာမ ခံချက် မဟုတ် ပါ — ဒဿာ အချိန် နဲ့ ကိုယ်တိုင် ကြိုးစား မှု က အကောင် အထည် ဖော် မှု ကို ဆုံးဖြတ် ပါ တယ်။</p>
