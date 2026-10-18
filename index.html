@@ -5150,8 +5150,18 @@ function runAstroMMCoreTests() {
         return empty.mode === 'insufficient' && current.low === 10000 && current.high === 10000 && proj.mode === 'projection' && proj.high >= proj.low;
     });
     test('Lunar Sunapha/Anapha logic excludes the Sun from the qualifying planet list', () => {
-        const src = checkAllYogas.toString();
-        return src.includes("const moonYogaPlanets=['Mars','Mercury','Jupiter','Venus','Saturn']") && !src.includes("const moonOthers=['Sun'") && !src.includes("const moonPrev=['Sun'");
+        // Normalize whitespace: this is a source invariant, not a formatting test.
+        const src = checkAllYogas.toString().replace(/\s+/g, '');
+        return src.includes("constmoonYogaPlanets=['Mars','Mercury','Jupiter','Venus','Saturn']") && !src.includes("constmoonOthers=['Sun'") && !src.includes("constmoonPrev=['Sun'");
+    });
+    test('Ashtakoota matching score is bounded to 0–36 and returns eight koota rows', () => {
+        const a = { Moon: 12.5 }, b = { Moon: 217.25 };
+        const out = calculateSynastry(a, b, 'lahiri', new Date(1990, 0, 1), new Date(1992, 5, 1));
+        return Number.isFinite(out.total) && out.total >= 0 && out.total <= 36 && Array.isArray(out.breakdown) && out.breakdown.length === 8 && out.breakdown.every(x => Number.isFinite(x.score) && x.score >= 0 && x.score <= x.max);
+    });
+    test('Matching module handles missing Moon data without throwing', () => {
+        const out = calculateSynastry({}, { Moon: 10 }, 'lahiri', new Date(1990, 0, 1), new Date(1992, 5, 1));
+        return out.total === 0 && Array.isArray(out.breakdown) && out.futureWindow === null;
     });
     test('D2 wealth indicator does not treat the Hora chart as a 12-house chart', () => {
         const src = generateLifeOverview.toString();
@@ -5168,6 +5178,14 @@ function runAstroMMCoreTests() {
     test('Dasha tree generates a valid first major period from a valid Moon longitude', () => {
         const tree = calculateDashaTree(123.456, new Date(1990, 0, 1, 12, 0));
         return !!tree && Array.isArray(tree) && tree.length > 0 && !!tree[0].lord && !!tree[0].start && !!tree[0].end;
+    });
+    test('Relationship scoring smoke test returns bounded scores for marriage, friendship, and business modes', () => {
+        const a = { Lagna: 12, Sun: 30, Moon: 52, Mars: 85, Mercury: 111, Jupiter: 140, Venus: 190, Saturn: 245, Rahu: 300, Ketu: 120 };
+        const b = { Lagna: 75, Sun: 96, Moon: 132, Mars: 168, Mercury: 204, Jupiter: 236, Venus: 270, Saturn: 315, Rahu: 25, Ketu: 205 };
+        return ['marriage', 'friend', 'business'].every(mode => {
+            const out = calculateRelationship(a, b, [], [], mode, null, null, 'A', 'B');
+            return Number.isFinite(out.total) && out.total >= 0 && out.total <= 100 && Array.isArray(out.areas) && out.areas.length >= 3 && out.areas.every(x => Number.isFinite(x.score));
+        });
     });
     return { ranAt: new Date().toISOString(), total: results.length, passed: results.filter(x => x.pass).length, failed: results.filter(x => !x.pass).length, results };
 }
