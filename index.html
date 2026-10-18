@@ -3137,7 +3137,7 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
     const combustBad = keyLordSet.filter(n => _isCombust(p, n)).length;
     // v6.23: percentage-weighted gate — every facet weighed; ~50/50 stays hidden, a clear lean shows; the top bands (50B/100B+) stay near-impossible.
     const clamp01 = x => Math.max(0, Math.min(1, x));
-    const fScore = clamp01((wealthScore - 68) / 32);
+    const fScore = clamp01((wealthScore - 58) / 32);
     const fStack = Math.min(1, stack.length / 3);
     const fStrong = Math.min(1, strongCount / 3);
     const fOwnEx = Math.min(1, ownExalt / 2);
@@ -3168,12 +3168,12 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
     const gatePct = Math.round(26 * fScore + 12 * fStack + 12 * fStrong + 8 * fOwnEx + 8 * fD9 + 8 * fLagna + 6 * fCombust + 12 * fConc + 8 * fStruct);
     let band = null,
       gatePctOut = null;
-    if (wealthScore >= 78 && gatePct >= 50) {
+    if (wealthScore >= 76 && gatePct >= 50) {
       const BANDS = ['Ultra Wealth — သန်း ၁၀၀ ပတ်လည် အင်အား', 'Ultra Wealth — သန်း ၂၀၀ ပတ်လည် အင်အား', 'Ultra Wealth — သန်း ၅၀၀ ပတ်လည် အင်အား', 'Super Wealth — သန်း ၈၀၀ ပတ်လည် အင်အား', 'Super Wealth — တစ်ဘီလျံ အင်အား', 'Super Wealth — ဘီလျံ ၅၀ ပတ်လည် အင်အား', 'Super Wealth — ဘီလျံ ၁၀၀ ကျော် အင်အား'];
-      const power = gatePct * 0.6 + wealthScore * 0.6;
+      const power = gatePct * 0.65 + wealthScore * 0.65;
       let idx = power >= 112 ? 4 : power >= 102 ? 3 : power >= 92 ? 2 : power >= 82 ? 1 : 0;
-      if (gatePct >= 92 && wealthScore >= 97) idx = 5;
-      if (gatePct >= 97 && wealthScore >= 100) idx = 6;
+      if (gatePct >= 92 && wealthScore >= 90) idx = 5;
+      if (gatePct >= 97 && wealthScore >= 95) idx = 6;
       band = BANDS[idx];
       gatePctOut = gatePct;
     }
@@ -3186,11 +3186,12 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
         if (v < 0.5) weakFacets.push(label);
       });
     }
-    const fameBase = S('Moon') >= 55 && S('Sun') >= 55 && S(L(10)) >= 60 && stack.length >= 2 && (S(L(5)) >= 60 || S('Venus') >= 65 || S('Jupiter') >= 65);
+    // v6.27: honor is judged by HONOR evidence only — the fame triad (Moon = public, Sun = authority, L10 = career lord): average strength + no collapsed leg. (The old rule also demanded the WEALTH yoga stack, which left the honor card dead: 0 fires in a 180-chart battery.)
+    const _fameAvg = (S('Moon') + S('Sun') + S(L(10))) / 3;
+    const _fameMin = Math.min(S('Moon'), S('Sun'), S(L(10)));
     let honor = null;
-    if (fameBase) {
-      const avg = (S('Moon') + S('Sun') + S(L(10))) / 3;
-      honor = avg >= 85 && stack.length >= 4 ? 'ကမ္ဘာ အဆင့် ဂုဏ် (Nobel တန်း) ထိ တက် နိုင် တဲ့ အင်အား' : avg >= 72 ? 'အပြည်ပြည်ဆိုင်ရာ အသိအမှတ် ပြု ရ နိုင် တဲ့ အင်အား' : 'နိုင်ငံတော် အဆင့် ဆု ရ နိုင် တဲ့ အင်အား';
+    if (_fameAvg >= 62 && _fameMin >= 45) {
+      honor = _fameAvg >= 78 ? 'ကမ္ဘာ အဆင့် ဂုဏ် (Nobel တန်း) ထိ တက် နိုင် တဲ့ အင်အား' : _fameAvg >= 64 ? 'အပြည်ပြည်ဆိုင်ရာ အသိအမှတ် ပြု ရ နိုင် တဲ့ အင်အား' : 'နိုင်ငံတော် အဆင့် ဆု ရ နိုင် တဲ့ အင်အား';
     }
     const luxury = [];
     if (S('Rahu') >= 65 && lordIn(12, [1, 4, 5, 7, 9, 10]) && s4 >= 60) luxury.push('ကိုယ်ပိုင် လေယာဉ် အဆင့် ထိ သုံး နိုင် တဲ့ အရိပ်');
@@ -3205,10 +3206,12 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
       luck: 'အခွင့်အလမ်း လာ ရင် ဖမ်း နိုင် တဲ့ ကံ ပုံစံ ပါ — အရံ အသင့် (ငွေ / အချိန် / မိတ်ဖက်) အမြဲ ပြင် ထား ရင် ကံ ပွင့် ချိန် မှာ ကြီး ကြီး ခုန် တက် နိုင် ပါ တယ်။',
       govt: 'အစိုးရ / အဖွဲ့အစည်း ကြီး တွေ နဲ့ ဆက် သွယ် တဲ့ လမ်း (တင်ဒါ, ပရော့ဂျက်, ခွင့်ပြုချက်) အားသာ ပါ တယ် — လုပ်ငန်းစဉ် နဲ့ စာရွက် စာတမ်း ကို စနစ် တကျ ပြင် ထား ပြီး ဆက်ဆံရေး ကို တည် ဆောက် ထား ရန်။',
       trade: 'ကုန်သွယ် လည်ပတ်မှု (ဝယ်-ရောင်း, ကြားခံ, ဖြန့်ချိ) မှာ စွမ်း အား ရှိ ပါ တယ် — အရောင်း လမ်းကြောင်း စုံ အောင် ဖြန့် ထား ရင် ပို ပေါက် ပါ တယ်။',
-      foreign: 'နိုင်ငံခြား နဲ့ ဆက် သွယ် တဲ့ လမ်း (ပို့ကုန်, နိုင်ငံခြား ဖောက် သည်, အွန် လိုင်း) အားသာ ပါ တယ် — ဘာသာ စကား နဲ့ နိုင်ငံခြား မိတ်ဖက် ကို ဦးစား ပေး တည် ဆောက် ရန်။'
+      foreign: 'နိုင်ငံခြား နဲ့ ဆက် သွယ် တဲ့ လမ်း (ပို့ကုန်, နိုင်ငံခြား ဖောက် သည်, အွန် လိုင်း) အားသာ ပါ တယ် — ဘာသာ စကား နဲ့ နိုင်ငံခြား မိတ်ဖက် ကို ဦးစား ပေး တည် ဆောက် ရန်။',
+      lead: 'လူ အများ ကို ဦးဆောင် / စီမံ ရ တဲ့ နေရာ မှာ အား ရှိ ပါ တယ် — တာဝန် ယူ ရ တဲ့ အဖွဲ့ အစည်း အလုပ် တွေ မှာ ကိုယ့် နေရာ ကို တည် ဆောက် ထား ရင် ရာထူး လမ်း ပွင့် လာ နိုင် ပါ တယ်။'
     };
     const artDom = Math.round(0.6 * S('Venus') + 0.4 * _srcScore('art') * 20);
     const fameDom = Math.round((S('Moon') + S('Sun') + S(L(10))) / 3);
+    const leadDom = Math.round((S('Sun') + S(L(10)) + S('Saturn')) / 3);
     const luckIdx = Math.round(0.55 * _srcScore('windfall') * 20 + 0.45 * S('Jupiter'));
     const govtIdx = Math.round(0.55 * _srcScore('govt') * 20 + 0.45 * ((S('Sun') + S(L(10))) / 2));
     const tradeIdx = Math.round(0.55 * _srcScore('trade') * 20 + 0.45 * S('Mercury'));
@@ -3261,6 +3264,7 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
       if (tradeIdx >= 72 && _srcScore('trade') >= 3) traces.push(['trade', tradeIdx]);
       if (foreignIdx >= 72 && _srcScore('foreign') >= 3) traces.push(['foreign', foreignIdx]);
       if (fameDom >= 75 && gatePct >= 30) traces.push(['fame', fameDom]);
+      if (leadDom >= 70 && gatePct >= 25) traces.push(['lead', leadDom]);
       if (traces.length) {
         traces.sort((a, b) => b[1] - a[1]);
         traceVal = traces[0][1];
@@ -3299,6 +3303,78 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
     windows,
     exceptional
   };
+}
+
+// v6.29: hard-season analysis — a strictly-gated 'worst period' pattern (user's design: shows only when factors converge; event families named plainly in a bounded, light frame; timing windows so the period can be prepared for; the teacher's two-branch guidance; lifespan/maraka never touched).
+function hardSeasonAnalysis(p, yogas, dashaTree) {
+  try {
+    const H = n => _planetHouse(p, n),
+      L = h => _lordOfHouse(p, h),
+      S = n => _planetStrength(p, n);
+    const dust = n => [6, 8, 12].includes(H(n));
+    const withMal = n => {
+      const s = calculateVarga(p[n], 1);
+      return ['Saturn', 'Mars', 'Rahu'].some(m => m !== n && calculateVarga(p[m], 1) === s);
+    };
+    const sameSign = (a, b) => calculateVarga(p[a], 1) === calculateVarga(p[b], 1);
+    let sav2 = 25;
+    try {
+      const av = computeAshtakavarga(p);
+      sav2 = av.sav[(calculateVarga(p.Lagna, 1) + 1) % 12] || 25;
+    } catch (e) {}
+    const F = [];
+    const fam = (id, label, form, act, lords, factors) => {
+      const hit = factors.filter(f => f[0]);
+      if (hit.length) F.push({
+        id,
+        label,
+        form,
+        act,
+        lords,
+        score: hit.length,
+        ev: hit.map(f => f[1])
+      });
+    };
+    fam('legal', 'ဥပဒေ / အချုပ်အနှောင်', 'ဥပဒေ ပြဿနာ / အငြင်းပွား မှု က နေ အချုပ်အနှောင် အဆင့် ထိ ရောက် နိုင် တဲ့ ပုံစံ ပါ။', 'စာချုပ် / အငြင်းပွား / အာဏာပိုင် နဲ့ ထိတွေ့ တဲ့ အလုပ်', [...new Set([L(6), L(8), L(12), 'Saturn', 'Rahu'])], [[dust(L(1)), 'လဂ် အရှင် 6/8/12 မှာ'], [_isCombust(p, L(1)) && withMal(L(1)), 'လဂ် အရှင် လောင်ကျွမ်း + အဆိုး နဲ့'], [dust('Saturn') && dust('Rahu'), 'စနေ နဲ့ ရာဟု 6/8/12 မှာ'], [[L(6), L(8), L(12)].some(ld => H(ld) === 1), '6/8/12 အရှင် လဂ် မှာ ရှိ'], [sameSign('Saturn', 'Rahu'), 'စနေ–ရာဟု တွဲ ရပ်'], [dust('Saturn') && dust('Mars'), 'စနေ နဲ့ အင်္ဂါ 6/8/12 မှာ'], [dust(L(10)) && withMal(L(10)), '10 တန့် အရှင် 6/8/12 မှာ အဆိုး နဲ့']]);
+    fam('loss', 'ဆုံးရှုံး ကြီး / စီးပွား ပျက်', 'ပိုင်ဆိုင် မှု အများ စု ဆုံးရှုံး တာ / စီးပွား လုံးဝ ပျက် တာ မျိုး ကြုံ နိုင် တဲ့ ပုံစံ ပါ။', 'အရင်းနှီး ကြီး ကြီး / ကြွေး ယူ / သူများ အတွက် အာမခံ ပေး တဲ့ ကိစ္စ', [...new Set([L(2), L(11), L(12)])], [[dust(L(2)), 'ဓန အရှင် 6/8/12 မှာ'], [dust(L(11)), 'လာဘ် အရှင် 6/8/12 မှာ'], [H(L(12)) === 2 || H(L(2)) === 12, '2 တန့်–12 တန့် အရှင် အပြန် အလှန်'], [H('Saturn') === 2 || H('Rahu') === 2, 'စနေ/ရာဟု ဓန အိမ် မှာ'], [S(L(2)) <= 30 && (dust(L(2)) || withMal(L(2))), 'ဓန အရှင် အား အလွန် နည်း + အဖျက် နဲ့'], [sav2 <= 24, 'ဓန အိမ် SAV နိမ့်']]);
+    fam('reputation', 'နာမည်ပျက်', 'လူ အများ ဝိုင်း ပြော စရာ ဖြစ် ပြီး နာမည် ထိခိုက် တဲ့ အဖြစ် မျိုး ကြုံ နိုင် တဲ့ ပုံစံ ပါ။', 'လူ အများ ရှေ့ ထွက် တာ / ဆိုရှယ် လှုပ်ရှား မှု', [...new Set([L(10), 'Rahu'])], [[sameSign('Moon', 'Rahu'), 'တနင်္လာ–ရာဟု တွဲ ရပ်'], [[8, 12].includes(H('Moon')) && withMal('Moon'), 'တနင်္လာ 8/12 မှာ အဆိုး နဲ့'], [[8, 12].includes(H(L(10))), '10 တန့် အရှင် 8/12 မှာ'], [dust('Sun'), 'နေ 6/8/12 မှာ'], [H('Rahu') === 10, 'ရာဟု 10 တန့် မှာ'], [S(L(10)) <= 30, '10 တန့် အရှင် အား အလွန် နည်း']]);
+    fam('fall', 'ရာထူးကျ / နေရပ်စွန့်', 'ရာထူး / နေရာ က နေ ကျ သွား တာ, နေရပ် စွန့် ပြောင်း ရ တာ မျိုး ကြုံ နိုင် တဲ့ ပုံစံ ပါ။', 'ရာထူး / အဖွဲ့အစည်း / နိုင်ငံရေး နဲ့ ဆိုင် တဲ့ ဆုံးဖြတ် ချက်', [...new Set([L(10), L(9), 'Saturn'])], [[dust(L(10)), '10 တန့် အရှင် 6/8/12 မှာ'], [H('Saturn') === 10, 'စနေ 10 တန့် မှာ'], [S(L(9)) <= 30, '9 တန့် အရှင် အား အလွန် နည်း'], [H('Rahu') === 4, 'ရာဟု 4 တန့် (အိမ် အခြေခံ) မှာ'], [H(L(4)) === 12, '4 တန့် အရှင် 12 တန့် မှာ']]);
+    fam('shock', 'ထိခိုက် / ကျန်းမာ အကြီးစား', 'ထိခိုက် ဒဏ်ရာ / ကျန်းမာ ရေး အကြီးအကျယ် တုန်လှုပ် တာ မျိုး ကြုံ နိုင် တဲ့ ပုံစံ ပါ — ဂရုစိုက် ရန် သာ ဖြစ်ပြီး ရောဂါ အမည် ဟော တာ မဟုတ် ပါ။', 'ခရီး ရှည် / ယာဉ် / အန္တရာယ် များ တဲ့ အလုပ်', [...new Set([L(8), 'Mars', 'Saturn'])], [[H('Mars') === 8, 'အင်္ဂါ 8 တန့် မှာ'], [H('Saturn') === 8, 'စနေ 8 တန့် မှာ'], [H(L(8)) === 1 || sameSign(L(8), 'Moon'), '8 တန့် အရှင် လဂ် / တနင်္လာ နဲ့'], [[6, 8].includes(H('Moon')) && withMal('Moon'), 'တနင်္လာ 6/8 မှာ အဆိုး နဲ့'], [S(L(1)) <= 25, 'လဂ် အရှင် အား အလွန် နည်း']]);
+    fam('family', 'အိမ်ထောင် / မိသားစု ကွဲကွာ', 'အိမ်ထောင် ကွဲ တာ / မိသားစု အတွင်း ကြီး ကြီး မား မား အပြောင်းအလဲ မျိုး ကြုံ နိုင် တဲ့ ပုံစံ ပါ။', 'အိမ်ထောင် / မိတ်ဖက် / မိသားစု ပစ္စည်း ခွဲ ဝေ တဲ့ ဆုံးဖြတ် ချက်', [...new Set([L(7), 'Venus'])], [[dust(L(7)), '7 တန့် အရှင် 6/8/12 မှာ'], [dust('Venus') && withMal('Venus'), 'သောကြာ 6/8/12 မှာ အဆိုး နဲ့'], [_isCombust(p, 'Venus') && dust(L(7)), 'သောကြာ လောင်ကျွမ်း + 7 တန့် အရှင် 6/8/12 မှာ'], [H('Rahu') === 7, 'ရာဟု 7 တန့် မှာ'], [H('Saturn') === 7 || H('Mars') === 7, 'စနေ/အင်္ဂါ 7 တန့် မှာ'], [dust(L(4)), '4 တန့် အရှင် 6/8/12 မှာ']]);
+    const _qual = F.filter(f => f.score >= 3).sort((a, b) => b.score - a.score);
+    const shown = _qual.length >= 2 || _qual.length === 1 && _qual[0].score >= 4 ? _qual.slice(0, 3) : [];
+    if (!shown.length) return null;
+    const lordSet = new Set();
+    shown.forEach(f => f.lords.forEach(x => lordSet.add(x)));
+    const today = new Date().toISOString().split('T')[0];
+    const wins = [];
+    if (Array.isArray(dashaTree)) {
+      for (const m of dashaTree) for (const a of m.antars || []) {
+        if (a.end < today || a.start > '2065-01-01') continue;
+        if (lordSet.has(a.lord) && (lordSet.has(m.lord) || m.lord === L(1))) wins.push({
+          lord: a.lord,
+          mLord: m.lord,
+          start: a.start,
+          end: a.end
+        });
+      }
+      wins.sort((a, b) => a.start < b.start ? -1 : 1);
+    }
+    const windows = wins.slice(0, 3);
+    let recovery = false;
+    if (windows.length && Array.isArray(dashaTree)) {
+      const lastEnd = windows[windows.length - 1].end;
+      const after = dashaTree.find(m => m.start > lastEnd);
+      if (after && (['Jupiter', 'Venus', 'Mercury', 'Moon'].includes(after.lord) || after.lord === L(9) || after.lord === L(11)) && S(after.lord) >= 50) recovery = true;
+    }
+    return {
+      families: shown,
+      windows,
+      recovery
+    };
+  } catch (e) {
+    return null;
+  }
 }
 function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
   if (!birthPlanets || typeof birthPlanets.Lagna !== 'number') return {
@@ -3355,10 +3431,65 @@ function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
       if (d9v === d1v || _ownSignsOf(ld).includes(d9v)) d9Pts += 3;
     });
   } catch (e) {}
-  const _scoreV1 = 45 + wealthH * 7 + wealthPlanets * 8 + Math.min(15, dhanaYogaCount * 4);
-  const _scoreV2 = 30 + wealthH * 6 + wealthPlanets * 6 + savPts + aspectPts + pariPts + Math.min(12, dhanaYogaCount * 4) + d9Pts;
+  const _scoreV1 = 34 + wealthH * 7 + wealthPlanets * 8 + Math.min(15, dhanaYogaCount * 4);
+  const _scoreV2 = 25 + wealthH * 6 + wealthPlanets * 6 + savPts + aspectPts + pariPts + Math.min(12, dhanaYogaCount * 4) + d9Pts;
   const wealthScore = Math.max(1, Math.min(100, Math.round(Math.max(_scoreV1, _scoreV2))));
-  const tier = wealthScore >= 82 ? 'High Wealth — ဓန အင်အား အလွန် မြင့် (ခန့်မှန်း အင်အား တန်း: $50M–100M)' : wealthScore >= 68 ? 'Strong Wealth — ဓန အင်အား မြင့် (ခန့်မှန်း အင်အား တန်း: $10M–50M)' : wealthScore >= 54 ? 'Middle — ဓန အလယ်အလတ် (ခန့်မှန်း အင်အား တန်း: $2M–10M)' : wealthScore >= 40 ? 'Moderate — ဓန အသင့်အတင့် (ခန့်မှန်း အင်အား တန်း: $0.5M–2M)' : 'Normal — ဓန ပုံမှန် (ခန့်မှန်း အင်အား တန်း: $0.5M အောက်)';
+  // v6.28: evidence-checked tier — the score proposes a band; the chart's own support (yoga stack, key-lord strength, own/exalt, D9, Lagna lord, combust cleanliness, concentration, exchange/aspect structure) and afflictions (combust pile-up, dhana lords in dusthana, a collapsed key lord) confirm or trim it. Genuine middle charts keep their band; only score-without-evidence drops.
+  let _sup = 0,
+    _aff = 0;
+  try {
+    const _H = n => _planetHouse(birthPlanets, n),
+      _L = h => _lordOfHouse(birthPlanets, h),
+      _S = n => _planetStrength(birthPlanets, n);
+    const _key = [...new Set([1, 2, 5, 9, 10, 11].map(h => _L(h)))];
+    const _stack = (yogas || []).filter(y => /Dhana|Lakshmi|Raja|Mahapurusha|Gajakesari|Vasumati|Chandra-Mangala/i.test(y.name) && (y.strength || 0) >= 4).length;
+    const _c01 = x => Math.max(0, Math.min(1, x));
+    const _fStack = Math.min(1, _stack / 3),
+      _fStrong = Math.min(1, _key.filter(n => _S(n) >= 60).length / 3),
+      _fOwnEx = Math.min(1, _key.filter(n => _S(n) >= 80).length / 2);
+    const _fD9 = Math.min(1, _key.filter(n => {
+      const d9 = calculateVarga(birthPlanets[n], 9);
+      return d9 === calculateVarga(birthPlanets[n], 1) || _ownSignsOf(n).includes(d9);
+    }).length / 2);
+    const _fLagna = _c01((_S(_L(1)) - 40) / 60);
+    const _cW = _key.reduce((a, n) => a + (_isCombust(birthPlanets, n) ? n === 'Mercury' || n === 'Venus' ? 0.5 : 1 : 0), 0);
+    const _fCombust = 1 - Math.min(1, _cW * 0.45);
+    let _fConc = 0;
+    [1, 2, 5, 9, 10, 11].forEach(hh => {
+      const ih = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'].filter(n => _H(n) === hh);
+      if (ih.some(n => _key.includes(n)) && ih.length >= 3) _fConc = 1;else if (ih.some(n => _key.includes(n)) && ih.length === 2) _fConc = Math.max(_fConc, 0.5);
+    });
+    let _bH = 0;
+    ['Jupiter', 'Venus', 'Mercury', 'Moon'].forEach(n => {
+      _aspectHouses(birthPlanets, n).forEach(hh => {
+        if ([2, 5, 9, 11].includes(hh)) _bH++;
+      });
+    });
+    let _pari2 = 0;
+    {
+      const hs3 = [1, 2, 5, 9, 10, 11];
+      for (let i = 0; i < hs3.length; i++) for (let j = i + 1; j < hs3.length; j++) {
+        if (_L(hs3[i]) !== _L(hs3[j]) && _H(_L(hs3[i])) === hs3[j] && _H(_L(hs3[j])) === hs3[i]) _pari2++;
+      }
+    }
+    const _fStruct = Math.min(1, _pari2 * 0.6 + _bH * 0.2);
+    _sup = Math.round(100 * (12 * _fStack + 12 * _fStrong + 8 * _fOwnEx + 8 * _fD9 + 8 * _fLagna + 6 * _fCombust + 12 * _fConc + 8 * _fStruct) / 74);
+    if (_key.filter(n => _isCombust(birthPlanets, n)).length >= 2) _aff++;
+    if ([6, 8, 12].includes(_H(_L(2))) || [6, 8, 12].includes(_H(_L(11)))) _aff++;
+    if (_key.some(n => _S(n) <= 25)) _aff++;
+  } catch (e) {
+    _sup = 50;
+    _aff = 0;
+  }
+  const _bandOf = sc => sc >= 82 ? 4 : sc >= 68 ? 3 : sc >= 54 ? 2 : sc >= 40 ? 1 : 0;
+  let _band = _bandOf(wealthScore),
+    _adjusted = false;
+  if (_band < 4 && (_sup < 22 || _sup < 32 && _aff >= 1)) {
+    _band = Math.max(0, _band - 1);
+    _adjusted = true;
+  }
+  const _TIERS = ['Normal — ဓန ပုံမှန် (ခန့်မှန်း အင်အား တန်း: $0.5M အောက်)', 'Moderate — ဓန အသင့်အတင့် (ခန့်မှန်း အင်အား တန်း: $0.5M–2M)', 'Middle — ဓန အလယ်အလတ် (ခန့်မှန်း အင်အား တန်း: $2M–10M)', 'Strong Wealth — ဓန အင်အား မြင့် (ခန့်မှန်း အင်အား တန်း: $10M–50M)', 'High Wealth — ဓန အင်အား အလွန် မြင့် (ခန့်မှန်း အင်အား တန်း: $50M–100M)'];
+  const tier = _TIERS[_band];
   const active = _activeDasha(dashaTree);
   const wealthRoute = `၂/၅/၉/၁၁ တန့်များနှင့် ၎င်းတို့၏ အရှင်များကို အဓိကထားဖတ်ရမည်။ ${_lordSignificatorText(birthPlanets, 2)} ${_lordSignificatorText(birthPlanets, 11)}`;
   const pillars = {
@@ -3370,13 +3501,15 @@ function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
     marriage: `၇ တန့်အရှင် ${_lordOfHouse(birthPlanets, 7)} နှင့် ၂/၈/၁၁ တန့်တို့ကို ဒသာ-Transit ဖြင့် activate ဖြစ်ချိန်မှာ commitment ၏အလေးချိန် ပိုတက်မည်။ Natal promise မရှိလျှင် transit တစ်ခုတည်းနဲ့ အိမ်ထောင်ဖြစ်မည်ဟု မသတ်မှတ်သင့်။`
   };
   const _wp = wealthPatternAnalysis(birthPlanets, yogas, dashaTree, wealthScore);
+  const _hsz = hardSeasonAnalysis(birthPlanets, yogas, dashaTree);
   return {
     netWorthTier: tier,
     incomeSources: _wp.sources,
     assetProfile: _wp.assets,
     wealthWindows: _wp.windows,
     exceptional: _wp.exceptional,
-    netWorthDesc: `ဓန Potential Score ${wealthScore}/100။ ${wealthScore >= 70 ? 'ဓနတိုးတက်ရန် အခြေခံ promise ကောင်းသည်၊ သို့သော် အကျိုးပေးသည့်ကာလကို ဒသာ/Transit ဖြင့် ချိန်ရမည်။' : 'အမြဲတမ်းမြင့်မားမည်ဟု မဆိုနိုင်ဘဲ အချိန်ကာလနှင့် စီမံခန့်ခွဲမှုက အဓိကဖြစ်သည်။'} လက်ရှိ ${active ? active.lord + ' မဟာဒသာ' : ''} ကို trigger အဖြစ်ထည့်တွက်ထားသည်။`,
+    hardSeason: _hsz,
+    netWorthDesc: `ဓန Potential Score ${wealthScore}/100။ ${wealthScore >= 62 ? 'ဓနတိုးတက်ရန် အခြေခံ promise ကောင်းသည်၊ သို့သော် အကျိုးပေးသည့်ကာလကို ဒသာ/Transit ဖြင့် ချိန်ရမည်။' : 'အမြဲတမ်းမြင့်မားမည်ဟု မဆိုနိုင်ဘဲ အချိန်ကာလနှင့် စီမံခန့်ခွဲမှုက အဓိကဖြစ်သည်။'}${_adjusted ? ' တန်း ကို ဇာတာ အတွင်း အထောက်/အဖျက် နဲ့ ပြန် ချိန် ထား ပါ တယ်။' : ''} လက်ရှိ ${active ? active.lord + ' မဟာဒသာ' : ''} ကို trigger အဖြစ်ထည့်တွက်ထားသည်။`,
     pillars,
     evidence: [_lordSignificatorText(birthPlanets, 2), _lordSignificatorText(birthPlanets, 10), _lordSignificatorText(birthPlanets, 11)]
   };
@@ -9491,7 +9624,43 @@ function MainApp() {
     className: "text-[11px] text-indigo-100 leading-relaxed"
   }, "✦ ", x))), /*#__PURE__*/React.createElement("p", {
     className: "text-[10px] text-indigo-200/80 leading-relaxed border-t border-white/10 pt-1.5"
-  }, "ဒီ အကွက် ဟာ ဇာတာ ရဲ့ အထောက် အထား ဘက် စုံ (ယုဂ အထပ်, ဂြိုဟ် အင် အား, D9 အတည်ပြု ချက်, လဂ် အရှင် အခြေအနေ) စုံပြီး တင်းကျပ် တဲ့ စည်း ကျော် မှ သာ ပေါ် ပါ တယ်။ အင်အား အဆင့် ကို ပြ တာ ဖြစ်ပြီး ပမာဏ အာမ ခံချက် မဟုတ် ပါ — ဒဿာ အချိန် နဲ့ ကိုယ်တိုင် ကြိုးစား မှု က အကောင် အထည် ဖော် မှု ကို ဆုံးဖြတ် ပါ တယ်။")), /*#__PURE__*/React.createElement("div", {
+  }, "ဒီ အကွက် ဟာ ဇာတာ ရဲ့ အထောက် အထား ဘက် စုံ (ယုဂ အထပ်, ဂြိုဟ် အင် အား, D9 အတည်ပြု ချက်, လဂ် အရှင် အခြေအနေ) စုံပြီး တင်းကျပ် တဲ့ စည်း ကျော် မှ သာ ပေါ် ပါ တယ်။ အင်အား အဆင့် ကို ပြ တာ ဖြစ်ပြီး ပမာဏ အာမ ခံချက် မဟုတ် ပါ — ဒဿာ အချိန် နဲ့ ကိုယ်တိုင် ကြိုးစား မှု က အကောင် အထည် ဖော် မှု ကို ဆုံးဖြတ် ပါ တယ်။")), lifeOverview.hardSeason && /*#__PURE__*/React.createElement("div", {
+    className: "bg-gradient-to-r from-slate-800 via-[#2b2135] to-slate-900 text-white p-3.5 rounded-lg shadow space-y-2 border border-rose-200/30"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between gap-2 flex-wrap"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-bold text-[13px] text-rose-100"
+  }, "🌑 အဆိုးဆုံး ကာလ — Life's Hard Season"), /*#__PURE__*/React.createElement("span", {
+    className: "text-[9px] bg-rose-300/15 text-rose-100 px-2 py-0.5 rounded font-semibold"
+  }, "ပုံစံ ရှိ မှ သာ ပေါ် — လူ တိုင်း မှာ မရှိ")), /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] leading-relaxed text-slate-200"
+  }, "ဒီ ဇာတာ မှာ ဘဝ မှာ တစ်ချိန်�ော့ အဆိုးဆုံး လို့ ပြော လို့ ရ တဲ့ ကာလ မျိုး ကြုံ နိုင် တဲ့ ပုံစံ ပါ ပါ တယ်။ ကာလ ကို သိ ထား ရင် ရှောင် လို့ ရ တယ် — ကြောက် ရန် မဟုတ်, ပြင် ထား ရန် ပါ။"), lifeOverview.hardSeason.families.map((f, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "bg-white/5 rounded p-2 space-y-0.5"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] font-bold text-rose-100"
+  }, f.label), /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] leading-relaxed"
+  }, f.form), /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] text-slate-300/80 leading-relaxed"
+  }, "ဆက်စပ် အလုပ် ဆိုတာ: ", f.act), /*#__PURE__*/React.createElement("p", {
+    className: "text-[9px] text-slate-300/60 leading-relaxed"
+  }, "အထောက်: ", f.ev.join(' · ')))), lifeOverview.hardSeason.windows.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-0.5"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] font-bold text-amber-200"
+  }, "သတိ ထား သင့် တဲ့ ပြတင်း ကာလ:"), lifeOverview.hardSeason.windows.map((w, i) => /*#__PURE__*/React.createElement("p", {
+    key: i,
+    className: "text-[11px] leading-relaxed"
+  }, "· ", PLANET_MY[w.lord] || w.lord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာ အတွင်း) — ", w.start, " → ", w.end))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white/5 rounded p-2"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] leading-relaxed text-slate-200"
+  }, "ဆရာ တွေ ပေး တဲ့ ပုံစံ အတိုင်း ဆို: ဒီ ပုံစံ တွေ နဲ့ ဆက်စပ် တဲ့ အလုပ် တွေ ကို လုပ် ဖြစ် နေ တဲ့ သူ ဆို ရင် — ပြတင်း ကာလ မှာ ခဏ ရပ် ပြီး ဘာသာရေး, အလှူ အတန်း, လူ့ အဖွဲ့ အစည်း ကောင်းမှု တွေ များ များ လုပ် ထား ပါ။ အဲ့ဒီ လို မလုပ် ဖြစ် တဲ့ သူ ဆို ရင် တော့ ပုံမှန် အတိုင်း နေ လို့ ရ ပါ တယ် — ကာလ ကို မှတ်ထား ရုံ ပါ ပဲ။")), lifeOverview.hardSeason.recovery && /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] leading-relaxed text-emerald-200"
+  }, "ကာလ ကျော် သွား ရင် ပြန် တက် လာ နိုင် တဲ့ အထောက် လည်း ဇာတာ မှာ ရှိ ပါ တယ် — ဒီ လို ကာလ ကျော် ဖူး တဲ့ လူ တွေ က စိတ် ပို ခိုင် သွား ကြ တာ များ ပါ တယ်။"), /*#__PURE__*/React.createElement("p", {
+    className: "text-[9px] text-slate-300/60 leading-relaxed"
+  }, "ဒီ ကတ် က ဇာတာ အချက် အများ အပြား ဆုံ မှ သာ ပေါ် ပါ တယ်။ ပုံစံ ကို ပြ တာ ဖြစ်ပြီး ဖြစ် ကို ဖြစ် ရ မယ် လို့ အာမ ခံ တာ မဟုတ် ပါ — သက်တမ်း / မာရက ကို ဒီ app က လုံးဝ မဟော ပါ။")), /*#__PURE__*/React.createElement("div", {
     className: "bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex justify-between items-baseline border-b pb-1"
