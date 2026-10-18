@@ -50,6 +50,7 @@
   </div>
 
   <script type="text/javascript">
+// v6.32 (2026-10-18): Art income source — the evidence line now lists the reasons that ACTUALLY fired for this chart (Venus strength / yogakaraka / star-lord channel / lordship / placement only when the placement itself scores). v6.31's bare Venus-placement caption could imply a non-scoring house (e.g. Venus in the 9th) was a reason; engine scores unchanged.
 // v6.15 (2026-10-15): Tropical = pure Western — CircleChart (Placidus), Western-format tables, Western readings + synastry; Astrocartography shows ONLY under Tropical. Vedic layers (nakshatra, dasha, Ashtakoota, yogas, Prashna, Job/Place layers) are sidereal-only. Sidereal code paths unchanged from v6.14.
 // v6.16 (2026-10-15): Western Layer 2 — Solar Return + Secondary Progressions (Readings), aspect patterns (Yoga), Composite chart + partner profiles (Matching/Relate), Vocational + Relocation (Place). All tropical-only; sidereal unchanged.
 // v6.17 (2026-10-16): Strength layer — Shadbala (six-fold, main components) + Ashtakavarga (classical BAV/SAV, total 337) as one additive card in the sidereal Birth Chart tab. No existing reading or calculation changed.
@@ -2848,6 +2849,189 @@ function checkAllYogas(p) {
     l10 = _lordOfHouse(p, 10);
   if (l1 && l5 && l9 && [l5, l9].includes(l10)) add('Raja Yoga Pattern', 'Trikona lord နှင့် Kendra lord ဆက်နွယ်မှု', 'အာဏာ၊ အောင်မြင်မှုနှင့် အခွင့်အရေးကို တစ်ချိန်ချိန်တွင် ထင်ရှားစေနိုင်သည်။', 4, [l1, l5, l9, l10]);
   if (!moonOthers.length && !moonPrev.length) add('Kemadruma Yoga', 'Moon ၏ ၂/၁၂ တန့်တွင် အဓိကဂြိုဟ်မရှိခြင်း', 'စိတ်ပိုင်းဆိုင်ရာ မတည်ငြိမ်မှု သို့မဟုတ် ကိုယ့်အားကိုယ်ကိုးရမှုကို ဖြစ်စေနိုင်သော်လည်း cancellation factors များကိုပါ စစ်ရမည်။', 2, ['Moon']);
+  // ===== v6.30: classical yoga library expansion (BPHS / Phaladeepika / Jaimini definitions) =====
+  const L = hh => _lordOfHouse(p, hh);
+  const GRAHAS = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
+  const EXALT = {
+    Sun: 0,
+    Moon: 1,
+    Mars: 9,
+    Mercury: 5,
+    Jupiter: 3,
+    Venus: 11,
+    Saturn: 6
+  };
+  const DEB = {
+    Sun: 6,
+    Moon: 7,
+    Mars: 3,
+    Mercury: 11,
+    Jupiter: 9,
+    Venus: 5,
+    Saturn: 0
+  };
+  const elong = ((p.Moon - p.Sun) % 360 + 360) % 360;
+  const isBen = n => n === 'Jupiter' || n === 'Venus' || n === 'Mercury' || n === 'Moon' && elong < 180;
+  const isMal = n => n === 'Saturn' || n === 'Mars' || n === 'Sun';
+  const strongish = n => !_isCombust(p, n) && s(n) !== DEB[n] && _planetStrength(p, n) >= 35;
+  const conjOrMutual = (a, b) => a !== b && (s(a) === s(b) || _aspectHouses(p, a).includes(h(b)) && _aspectHouses(p, b).includes(h(a)));
+  const exchange = (x, y) => L(x) !== L(y) && h(L(x)) === y && h(L(y)) === x;
+  const lordLink = (x, y) => L(x) !== L(y) && (exchange(x, y) || conjOrMutual(L(x), L(y)));
+  const inKendraFrom = (refH, n) => [1, 4, 7, 10].includes((h(n) - refH + 12) % 12 + 1);
+  // --- specific Raja yogas: kendra lord x trikona lord, linked by conjunction / mutual aspect / exchange ---
+  [1, 4, 7, 10].forEach(kh => {
+    [5, 9].forEach(th => {
+      if (lordLink(kh, th)) add('Raja Yoga (' + kh + '\u2013' + th + ')', kh + ' တန့် အရှင် ' + (PLANET_MY[L(kh)] || L(kh)) + ' နှင့် ' + th + ' တန့် အရှင် ' + (PLANET_MY[L(th)] || L(th)) + ' ဆက်နွယ် (တွဲရပ်/အမြင်/လဲလှယ်)', 'အာဏာ, ရာထူး, အခွင့်အရေး ထင်ရှား စေ နိုင် တဲ့ ရာဇ ယောဂ ပါ — သက်ဆိုင် ရာ ဒဿာ မှာ အကျိုး ပို ထင် ပါ တယ်။', 4, [L(kh), L(th)]);
+    });
+  });
+  // --- specific Dhana yogas: wealth-lord pairs linked the same three ways ---
+  [[2, 5], [2, 9], [2, 11], [5, 9], [5, 11], [9, 11], [1, 2], [1, 5], [1, 9], [1, 11]].forEach(pr => {
+    if (lordLink(pr[0], pr[1])) add('Dhana Yoga (' + pr[0] + '\u2013' + pr[1] + ')', pr[0] + ' တန့် အရှင် ' + (PLANET_MY[L(pr[0])] || L(pr[0])) + ' နှင့် ' + pr[1] + ' တန့် အရှင် ' + (PLANET_MY[L(pr[1])] || L(pr[1])) + ' ဆက်နွယ် (တွဲရပ်/အမြင်/လဲလှယ်)', 'ဝင်ငွေ နဲ့ ပိုင်ဆိုင်မှု တိုးတက် စေ နိုင် တဲ့ ဓန ယောဂ ပါ — သက်ဆိုင် ရာ ဒဿာ မှာ အကျိုး ထင် ပါ တယ်။', 4, [L(pr[0]), L(pr[1])]);
+  });
+  // --- Lakshmi Yoga: 9th lord in own/exaltation sign in kendra/trikona ---
+  if ((_ownSignsOf(L(9)).includes(s(L(9))) || EXALT[L(9)] === s(L(9))) && [1, 4, 5, 7, 9, 10].includes(h(L(9)))) add('Lakshmi Yoga', '9 တန့် အရှင် မိမိ/ဥစ္စ ရာသီ ၌ ကိန်း/တြိကုဏ် မှာ ရပ်', 'စည်းစိမ် နဲ့ ကံ ကောင်း မှု ကို အားပေး တဲ့ ယောဂ ပါ။', 4, [L(9)]);
+  // --- Saraswati Yoga: Jupiter/Venus/Mercury in kendra/trikona/2nd + Jupiter strongish ---
+  if (['Jupiter', 'Venus', 'Mercury'].every(n => [1, 2, 4, 5, 7, 9, 10].includes(h(n))) && strongish('Jupiter')) add('Saraswati Yoga', 'ကြာသပတေး/သောကြာ/ဗုဒ္ဓဟူး သုံး လုံး ကိန်း/တြိကုဏ်/ဓန အိမ် မှာ + ကြာသပတေး အခြေအနေ ကောင်း', 'ပညာ, အနုပညာ နဲ့ ဖန်တီး မှု ဉာဏ် ကို အားပေး တဲ့ ယောဂ ပါ။', 4, ['Jupiter', 'Venus', 'Mercury']);
+  // --- Amala Yoga: natural benefic in the 10th from Lagna or from Moon ---
+  {
+    const am = GRAHAS.filter(n => isBen(n) && (h(n) === 10 || (h(n) - h('Moon') + 12) % 12 + 1 === 10));
+    if (am.length) add('Amala Yoga', 'အကျိုးပြု ဂြိုဟ် လဂ်/တနင်္လာ မှ 10 တန့် မှာ ရှိ', 'နာမည် ကျော်ကြား မှု နဲ့ လူ အများ လေးစား မှု ကို အားပေး ပါ တယ်။', 3, am);
+  }
+  // --- Adhi Yoga (from Lagna / from Moon): benefics in 6/7/8 ---
+  {
+    const ad1 = GRAHAS.filter(n => isBen(n) && [6, 7, 8].includes(h(n)));
+    if (ad1.length) add('Lagna-Adhi Yoga', 'အကျိုးပြု ဂြိုဟ် လဂ် မှ 6/7/8 တန့် မှာ ရှိ', 'ကျော်ကြား မှု, ပညာ နဲ့ သက်သောင့်သက်သာ ဘဝ ကို အားပေး ပါ တယ် (အဆိုး ဂြိုဟ် ရော ရင် အား လျော့ ပါ တယ်)။', 3, ad1);
+    const ad2 = GRAHAS.filter(n => isBen(n) && [6, 7, 8].includes((h(n) - h('Moon') + 12) % 12 + 1));
+    if (ad2.length) add('Adhi Yoga', 'အကျိုးပြု ဂြိုဟ် တနင်္လာ မှ 6/7/8 တန့် မှာ ရှိ', 'အာဏာ နဲ့ လူမှု အထောက်အပံ့ ကို အားပေး တဲ့ ယောဂ ပါ။', 3, ad2);
+  }
+  // --- Vasumati Yoga: benefics in upachaya (3/6/10/11) from Lagna or Moon ---
+  {
+    const va = GRAHAS.filter(n => isBen(n) && ([3, 6, 10, 11].includes(h(n)) || [3, 6, 10, 11].includes((h(n) - h('Moon') + 12) % 12 + 1)));
+    if (va.length) add('Vasumati Yoga', 'အကျိုးပြု ဂြိုဟ် လဂ်/တနင်္လာ မှ Upachaya (3/6/10/11) မှာ ရှိ', 'ကိုယ်ပိုင် ကြိုးစား မှု နဲ့ စည်းစိမ် တိုးတက် စေ နိုင် ပါ တယ် (အကျိုးပြု ဂြိုဟ် များ လေ အား ကောင်း လေ)။', 3, va);
+  }
+  // --- Bheri Yoga: Lagna lord, 9th lord, Venus and Jupiter in kendras / strongish ---
+  if ([1, 4, 7, 10].includes(h('Venus')) && [1, 4, 7, 10].includes(h('Jupiter')) && strongish(L(9)) && strongish(L(1))) add('Bheri Yoga', 'သောကြာ + ကြာသပတေး ကိန်း မှာ + လဂ်/9 တန့် အရှင် အခြေအနေ ကောင်း', 'စည်းစိမ်, ပညာ နဲ့ အသက် ရှည် ကျန်းမာ မှု ကို အားပေး တဲ့ ယောဂ ပါ။', 3, ['Venus', 'Jupiter', L(9)]);
+  // --- Parvata Yoga: benefics in kendras, 6/8 free of malefics, Lagna lord strongish ---
+  {
+    const pb = GRAHAS.filter(n => isBen(n) && [1, 4, 7, 10].includes(h(n)));
+    const bad68 = GRAHAS.some(n => isMal(n) && [6, 8].includes(h(n)));
+    if (pb.length && !bad68 && strongish(L(1))) add('Parvata Yoga', 'အကျိုးပြု ဂြိုဟ် ကိန်း မှာ + 6/8 တန့် အဆိုး ကင်းရှင်း + လဂ် အရှင် အခြေအနေ ကောင်း', 'ဩဇာ နဲ့ စည်းစိမ် တည်တံ့ စေ နိုင် တဲ့ ယောဂ ပါ။', 3, pb);
+  }
+  // --- Kahala Yoga: 4th & 9th lords exchanged or in mutual kendras + Lagna lord strongish ---
+  if ((exchange(4, 9) || [0, 3, 6, 9].includes(((h(L(9)) - h(L(4))) % 12 + 12) % 12)) && strongish(L(1))) add('Kahala Yoga', '4 တန့် နဲ့ 9 တန့် အရှင် လဲလှယ် / အပြန် အလှန် ကိန်း + လဂ် အရှင် အခြေအနေ ကောင်း', 'ပစ္စည်း ဥစ္စာ နဲ့ ကံ အခွင့်အရေး ကို အားပေး ပါ တယ်။', 3, [L(4), L(9)]);
+  // --- Chamara Yoga: exalted Lagna lord in kendra aspected by Jupiter ---
+  if (EXALT[L(1)] === s(L(1)) && [1, 4, 7, 10].includes(h(L(1))) && _aspectHouses(p, 'Jupiter').includes(h(L(1)))) add('Chamara Yoga', 'လဂ် အရှင် ဥစ္စ + ကိန်း မှာ + ကြာသပတေး အမြင် ရ', 'ဩဇာ အာဏာ ထင်ရှား စေ နိုင် တဲ့ ယောဂ ပါ။', 4, [L(1), 'Jupiter']);
+  // --- Shankha Yoga: 5th & 6th lords in mutual kendras + Lagna lord strongish; or Lagna & 10th lords in movable signs + 9th lord strongish ---
+  if ([0, 3, 6, 9].includes(((h(L(6)) - h(L(5))) % 12 + 12) % 12) && strongish(L(1)) || [0, 3, 6, 9].includes(s(L(1))) && [0, 3, 6, 9].includes(s(L(10))) && strongish(L(9))) add('Shankha Yoga', '5/6 တန့် အရှင် အပြန် အလှန် ကိန်း + လဂ် အရှင် အခြေအနေ ကောင်း (သို့မဟုတ် လဂ်/10 အရှင် စရ ရာသီ မှာ + 9 အရှင် ကောင်း)', 'စည်းစိမ်, ပညာ နဲ့ အကျင့် သီလ ကို အားပေး တဲ့ ယောဂ ပါ။', 3, [L(5), L(6), L(1)]);
+  // --- Mridanga Yoga: two or more grahas in own/exaltation signs in kendra/trikona + Lagna lord strongish ---
+  {
+    const mr = GRAHAS.filter(n => (_ownSignsOf(n).includes(s(n)) || EXALT[n] === s(n)) && [1, 4, 5, 7, 9, 10].includes(h(n)));
+    if (mr.length >= 2 && strongish(L(1))) add('Mridanga Yoga', 'ဂြိုဟ် ၂ လုံး+ မိမိ/ဥစ္စ ရာသီ ၌ ကိန်း/တြိကုဏ် မှာ + လဂ် အရှင် အခြေအနေ ကောင်း', 'ဩဇာ, ပျော်ရွှင် မှု နဲ့ ကံ ကောင်း မှု ကို အားပေး တဲ့ ယောဂ ပါ။', 4, mr);
+  }
+  // --- Guru-Mangala Yoga: Jupiter and Mars conjoined or in mutual aspect ---
+  if (conjOrMutual('Jupiter', 'Mars')) add('Guru-Mangala Yoga', 'ကြာသပတေး နဲ့ အင်္ဂါ တွဲရပ် / အပြန် အလှန် အမြင်', 'စွမ်းအင် နဲ့ လမ်းညွှန် မှု ပေါင်း စပ် ပြီး လုပ်ငန်း အောင်မြင် စေ နိုင် ပါ တယ်။', 3, ['Jupiter', 'Mars']);
+  // --- Shakata Yoga: Jupiter in 6/8/12 from Moon (cancelled if Jupiter in kendra from Lagna) ---
+  if ([6, 8, 12].includes((h('Jupiter') - h('Moon') + 12) % 12 + 1) && ![1, 4, 7, 10].includes(h('Jupiter'))) add('Shakata Yoga', 'ကြာသပတေး တနင်္လာ မှ 6/8/12 တန့် မှာ (လဂ် မှ ကိန်း မှာ မဟုတ်)', 'ကံ အတက်အကျ များ တတ် ပါ တယ် — ဒဿာ အလိုက် ပြောင်း လဲ နိုင် ပါ တယ်။', 2, ['Jupiter', 'Moon']);
+  // --- Kemadruma-Bhanga: Kemadruma present but cancelled ---
+  if (!moonOthers.length && !moonPrev.length && (GRAHAS.some(n => inKendraFrom(h('Moon'), n)) || GRAHAS.some(n => [1, 4, 7, 10].includes(h(n))) || _aspectHouses(p, 'Jupiter').includes(h('Moon')))) add('Kemadruma-Bhanga', 'Kemadruma ဖြစ် ပေ မယ့် ကိန်း ဂြိုဟ် / ကြာသပတေး အမြင် နဲ့ ပျက်ပြယ်', 'Kemadruma ရဲ့ အဆိုး သက်ရောက် မှု ပျက်ပြယ် သွား ပါ တယ် — အခြေခံ ခိုင် လာ စေ နိုင် ပါ တယ်။', 3, ['Moon']);
+  // --- Neecha-Bhanga Raja Yoga: debilitated graha whose debilitation is cancelled ---
+  // (exaltLord below = lord of the sign where the debilitated planet exalts — table corrected in v6.31)
+  GRAHAS.forEach(n => {
+    if (s(n) !== DEB[n]) return;
+    const dispLord = ['Mars', 'Venus', 'Mercury', 'Moon', 'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Saturn', 'Jupiter'][DEB[n]];
+    const exaltLord = {
+      0: 'Venus',
+      3: 'Saturn',
+      5: 'Jupiter',
+      6: 'Mars',
+      7: 'Venus',
+      9: 'Moon',
+      11: 'Mercury'
+    }[DEB[n]];
+    const kendraLM = x => [1, 4, 7, 10].includes(h(x)) || [1, 4, 7, 10].includes((h(x) - h('Moon') + 12) % 12 + 1);
+    const srcs = [];
+    if (kendraLM(n)) srcs.push('ဂြိုဟ် ကိုယ် တိုင် လဂ်/တနင်္လာ မှ ကိန်း မှာ');
+    if (dispLord && kendraLM(dispLord)) srcs.push('နစ်ချ ရာသီ အရှင် ကိန်း မှာ');
+    if (exaltLord && kendraLM(exaltLord)) srcs.push('ဥစ္စ အရှင် ကိန်း မှာ');
+    if (srcs.length) add('Neecha-Bhanga Raja Yoga', (PLANET_MY[n] || n) + ' နစ်ချ ဖြစ် ပေ မယ့် ပျက်ပြယ် (' + srcs.join(' · ') + ')', 'အစ ပိုင်း ရုန်းကန် ရ ပေ မယ့် နောက်ပိုင်း အောင်မြင် တတ် ပါ တယ် — နစ်ချ ဂြိုဟ် ရဲ့ ဒဿာ မှာ အကျိုး ပြောင်း လဲ နိုင် ပါ တယ်။', 4, [n]);
+  });
+  // --- Arishta Yoga: Lagna lord and 6th lord linked ---
+  if (lordLink(1, 6)) add('Arishta Yoga', 'လဂ် အရှင် နဲ့ 6 တန့် အရှင် ဆက်နွယ် (တွဲရပ်/အမြင်/လဲလှယ်)', 'ကျန်းမာရေး နဲ့ အတိုက် အခိုက် ကိစ္စ တွေ မှာ ဂရုစိုက် ရန် လို တတ် ပါ တယ် — သက်ဆိုင် ရာ ဒဿာ မှာ ပို သတိ ထား ပါ။', 2, [L(1), L(6)]);
+  // ===== Nabhasa yogas (32 classical sign/house patterns; 7 grahas, nodes excluded) =====
+  {
+    const HS = new Set(GRAHAS.map(n => h(n)));
+    const SS = new Set(GRAHAS.map(n => s(n)));
+    const sub = arr => arr.every(x => HS.has(x)) && [...HS].every(x => arr.includes(x));
+    const snk = {
+      1: 'Veena',
+      2: 'Daama',
+      3: 'Paasha',
+      4: 'Kedaara',
+      5: 'Shoola',
+      6: 'Yuga',
+      7: 'Gola'
+    }[SS.size];
+    if (snk) add(snk + ' Yoga (Nabhasa-Sankhya)', 'ဂြိုဟ် ၇ လုံး ရာသီ ' + SS.size + ' ခု မှာ ပျံ့နှံ့ (Nabhasa Sankhya)', 'ဘဝ ပုံစံ အခြေခံ သဘော ကို ပြ တဲ့ Nabhasa ယောဂ ပါ။', 2, GRAHAS.slice());
+    {
+      const bk = [1, 4, 7, 10].filter(x => GRAHAS.some(n => isBen(n) && h(n) === x));
+      if (bk.length >= 3) add('Maala Yoga (Nabhasa-Dala)', 'အကျိုးပြု ဂြိုဟ် ကိန်း ၃ ခု မှာ (Nabhasa Dala)', 'ယာဉ် ပိုင်ဆိုင်မှု နဲ့ သက်သောင့်သက်သာ ဘဝ ကို အားပေး ပါ တယ် (အဆိုး ဂြိုဟ် ကိန်း မှာ ရော ရင် အား လျော့)။', 3, GRAHAS.filter(n => isBen(n)));
+      const mk = [1, 4, 7, 10].filter(x => GRAHAS.some(n => isMal(n) && h(n) === x));
+      if (mk.length >= 3) add('Sarpa Yoga (Nabhasa-Dala)', 'အဆိုး ဂြိုဟ် ကိန်း ၃ ခု မှာ (Nabhasa Dala)', 'ရုန်းကန် ရ တာ များ တတ် ပါ တယ် — ဒဿာ နဲ့ တွဲ ဖတ် ရန် လို ပါ တယ်။', 2, GRAHAS.filter(n => isMal(n)));
+    }
+    const ak = (nm, arr, rs, cover) => {
+      const inside = [...HS].every(x => arr.includes(x));
+      const cov = !cover || arr.every(x => HS.has(x));
+      if (inside && cov) add(nm + ' Yoga (Nabhasa-Aakriti)', 'ဂြိုဟ် အားလုံး အိမ် ' + arr.join('/') + ' အတွင်း မှာ ပဲ (Nabhasa Aakriti)', rs, 2, GRAHAS.slice());
+    };
+    ak('Gada', [1, 4], 'အာဏာ စုစည်း မှု ရှိ တတ် ပါ တယ်။');
+    ak('Sakata', [1, 7], 'ကံ အတက်အကျ ရှိ တတ် ပါ တယ်။');
+    ak('Shringataka', [1, 5, 9], 'ကံ ကောင်း မှု နဲ့ ပျော်ရွှင် မှု ကို အားပေး ပါ တယ်။');
+    ak('Bheri', [1, 2, 7, 12], 'အသက် ရှည် ကျန်းမာ ပြီး စည်းစိမ် ရှိ တတ် ပါ တယ်။');
+    ak('Vihaga', [4, 10], 'နေရာ ပြောင်း လဲ တတ် ပါ တယ်။');
+    ak('Kamala', [1, 4, 7, 10], 'နာမည် ကျော်ကြား မှု နဲ့ စည်းစိမ် ကို အားပေး ပါ တယ်။', true);
+    ak('Yupa', [1, 2, 3, 4], 'စိတ်ဓာတ် နဲ့ ကိုယ်ပိုင် တည်ဆောက် မှု အားကောင်း တတ် ပါ တယ်။');
+    ak('Sara', [5, 6, 7, 8], 'လုပ်ငန်း ဆောင် ချက် ပြင်း ထန် တတ် ပါ တယ်။');
+    ak('Shakti', [9, 10, 11, 12], 'တာဝန် နဲ့ အာဏာ ဘက် ယိုင် တတ် ပါ တယ်။');
+    ak('Naukaa', [1, 2, 3, 4, 5, 6, 7], 'ခရီး / ရေ နဲ့ ဆက် တဲ့ အလုပ် ကိုက် တတ် ပါ တယ်။');
+    ak('Koota', [4, 5, 6, 7, 8, 9, 10], 'နေအိမ် အခြေခံ က နေ တက် လာ တတ် ပါ တယ်။');
+    ak('Chhatra', [7, 8, 9, 10, 11, 12, 1], 'အခြေခံ နိမ့် က နေ တဖြည်းဖြည်း တက် လာ တတ် ပါ တယ်။');
+    ak('Chaapa', [10, 11, 12, 1, 2, 3, 4], 'ဘဝ ဒုတိယ ပိုင်း မှာ ပို ကောင်း လာ တတ် ပါ တယ်။');
+    {
+      let ardha = false;
+      [2, 3, 5, 6, 8, 9, 11, 12].forEach(st => {
+        const run = [];
+        for (let i = 0; i < 7; i++) run.push((st + i - 1) % 12 + 1);
+        if (run.every(x => run.includes(x)) && [...HS].every(x => run.includes(x))) ardha = true;
+      });
+      if (ardha) add('Ardha-Chandra Yoga (Nabhasa-Aakriti)', 'ဂြိုဟ် အားလုံး ဆက် တိုက် အိမ် ၇ ခု အတွင်း (ကိန်း မဟုတ် တဲ့ အိမ် က စ)', 'ဘဝ တစ်ပိုင်း မှာ ထင်ရှား တတ် ပါ တယ်။', 2, GRAHAS.slice());
+    }
+    ak('Samudra', [2, 4, 6, 8, 10, 12], 'စည်းစိမ် နဲ့ လူမှု ဆက်ဆံရေး အားကောင်း တတ် ပါ တယ်။');
+    ak('Chakra', [1, 3, 5, 7, 9, 11], 'အာဏာ ဩဇာ ထင်ရှား တတ် ပါ တယ်။');
+    if (![...HS].some(x => [1, 4, 7, 10].includes(x))) add('Vapi Yoga (Nabhasa-Aakriti)', 'ဂြိုဟ် အားလုံး ကိန်း ပြင် ပ (Panapara/Apoklima) မှာ ပဲ', 'အခြေအနေ နှေးနှေး ပြောင်း လဲ တတ် ပါ တယ်။', 2, GRAHAS.slice());
+    {
+      const benIn17 = GRAHAS.filter(n => isBen(n)).every(n => [1, 7].includes(h(n)));
+      const malIn410 = GRAHAS.filter(n => isMal(n)).every(n => [4, 10].includes(h(n)));
+      const benSome = GRAHAS.some(n => isBen(n) && [1, 7].includes(h(n)));
+      const malSome = GRAHAS.some(n => isMal(n) && [4, 10].includes(h(n)));
+      if (benIn17 && malIn410 && benSome && malSome) add('Vajra Yoga (Nabhasa-Aakriti)', 'အကျိုးပြု ဂြိုဟ် 1/7 မှာ + အဆိုး ဂြိုဟ် 4/10 မှာ', 'ဘဝ အစ နဲ့ အလယ် ပိုင်း မှာ ပျော်ရွှင် တတ် ပါ တယ်။', 2, GRAHAS.slice());
+      const malIn17 = GRAHAS.filter(n => isMal(n)).every(n => [1, 7].includes(h(n)));
+      const benIn410 = GRAHAS.filter(n => isBen(n)).every(n => [4, 10].includes(h(n)));
+      const malSome2 = GRAHAS.some(n => isMal(n) && [1, 7].includes(h(n)));
+      const benSome2 = GRAHAS.some(n => isBen(n) && [4, 10].includes(h(n)));
+      if (malIn17 && benIn410 && malSome2 && benSome2) add('Yava Yoga (Nabhasa-Aakriti)', 'အဆိုး ဂြိုဟ် 1/7 မှာ + အကျိုးပြု ဂြိုဟ် 4/10 မှာ', 'ဘဝ အလယ် ပိုင်း မှာ ပို ပျော်ရွှင် တတ် ပါ တယ်။', 2, GRAHAS.slice());
+    }
+  }
+  // ===== Jaimini Chara Karaka layer (7-karaka scheme) =====
+  {
+    const degIn = n => (p[n] % 30 + 30) % 30;
+    const ks = GRAHAS.slice().sort((a, b) => degIn(b) - degIn(a));
+    const AK = ks[0],
+      AmK = ks[1],
+      DKk = ks[6];
+    if ([5, 9].includes(h(AmK))) add('Raja Sambandha Yoga', 'Chara Amatyakaraka (' + (PLANET_MY[AmK] || AmK) + ') လဂ် မှ တြိကုဏ် မှာ', 'အာဏာ ပိုင် / အစိုးရ နဲ့ ဆက် စပ် အလုပ် လုပ် ရ တတ် ပါ တယ် (Jaimini)။', 3, [AmK]);
+    if ([1, 4, 5, 7, 9, 10].includes((h(AmK) - h(AK) + 12) % 12 + 1)) add('Raja Sambandha Yoga', 'Chara Amatyakaraka (' + (PLANET_MY[AmK] || AmK) + ') Atmakaraka (' + (PLANET_MY[AK] || AK) + ') မှ ကိန်း/တြိကုဏ် မှာ', 'အာဏာ ပိုင် နဲ့ ဆက် စပ် မှု ရှိ တတ် ပါ တယ် (Jaimini)။', 3, [AmK, AK]);
+    if ([5, 7, 9, 10].includes(h(AK)) && GRAHAS.some(n => isBen(n) && s(n) === s(AK))) add('Raja Sambandha Yoga', 'Chara Atmakaraka (' + (PLANET_MY[AK] || AK) + ') 5/7/9/10 တန့် မှာ အကျိုးပြု ဂြိုဟ် နဲ့ တွဲ', 'အာဏာ ပိုင် နဲ့ ဆက် စပ် မှု ရှိ တတ် ပါ တယ် (Jaimini)။', 3, [AK]);
+  }
   return y;
 }
 
@@ -3008,6 +3192,10 @@ function mindProfileRows(p) {
   lines.push(`တနင်္လာ သည် ${EL[moonEl]} ရာသီ မှာ ရှိ နေ တယ် — ${moonStyles[moonEl]}`);
   if (H('Saturn') === H('Moon') || _aspectHouses(p, 'Saturn').includes(H('Moon'))) lines.push('စနေ ရဲ့ ဖိအား တနင်္လာ အပေါ် ရှိ တယ် — စိတ် လေးလံ တတ် တယ်, တစ်ယောက် တည်း ပြန် အား ဖြည့် ချိန် လို တတ် တယ်, ဒါပေမယ့် ခံနိုင် ရည် နဲ့ ဇွဲ ကို လည်း အဲ့ဒီ က နေ ပဲ ရ တယ်။');
   if (H('Jupiter') === H('Moon') || _aspectHouses(p, 'Jupiter').includes(H('Moon'))) lines.push('ကြာသပတေး ရဲ့ အထောက် တနင်္လာ အပေါ် ရှိ တယ် — စိတ် ကျယ် ပြန့် တယ်, အကောင်း မြင် တတ် တယ်, လူကြီး ဆရာ အကြံ ကို ယူ ပြီး စိတ် ပြန် တည် လွယ် တယ်။');
+  if (calculateVarga(p.Moon, 1) === 7) {
+    const kendraLM = n => [1, 4, 7, 10].includes(H(n)) || [1, 4, 7, 10].includes((H(n) - H('Moon') + 12) % 12 + 1);
+    if (kendraLM('Moon') || kendraLM('Mars') || kendraLM('Venus')) lines.push('တနင်္လာ သည် နစ်ချ ရာသီ (Scorpio) မှာ ရှိ ပေ မယ့် ပျက်ပြယ် (Neecha-Bhanga) အချက် ရှိ တယ် — အစ ပိုင်း မှာ စိတ် ဖိစီး လွယ်, ယိမ်းယိုင် လွယ် ဖြစ် တတ် ပေ မယ့် အတွေ့ အကြုံ စုံ လာ တာ နဲ့ အမျှ အဲ့ဒီ က နေ ပဲ စိတ် ခိုင်မာ လာ တတ် တယ်။');else lines.push('တနင်္လာ သည် နစ်ချ ရာသီ (Scorpio) မှာ ရှိ တယ် — စိတ် ထိခိုက် လွယ် တတ် တယ်, အနား ယူ ချိန် နဲ့ စိတ် လုံခြုံ မှု ကို ပုံမှန် ပြင် ထား ဖို့ လို တတ် တယ်။');
+  }
   const merEl = elOf('Mercury');
   const merStyles = {
     0: 'အတွေး မြန် တယ်, ဆုံးဖြတ် မြန် ပြီး စိတ် ကို ချက်ချင်း လှုံ့ ဆော် တတ် တယ်။',
@@ -3047,7 +3235,45 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
   add('factory', 'စက်ရုံ / ထုတ်လုပ် မှု ဝင်ငွေ', (inH('Saturn', [2, 10, 11]) || L(10) === 'Saturn' ? 1 : 0) + (inH('Mars', [2, 10, 11]) || L(10) === 'Mars' ? 1 : 0) + (inH('Saturn', [2, 10, 11]) && inH('Mars', [2, 10, 11]) ? 1 : 0), `${fact('Saturn')} ${fact('Mars')}`);
   add('agri', 'စိုက်ပျိုး / မြေ ဝင်ငွေ', ([1, 5, 9].includes(signOf(L(4))) ? 1 : 0) + (inH('Moon', [4]) || inH('Venus', [4]) ? 1 : 0) + (L(4) === 'Saturn' || L(4) === 'Moon' ? 1 : 0), lfact(4));
   add('food', 'အစားအသောက် / ဟိုတယ် / ခရီးသွား ဝင်ငွေ', (L(2) === 'Moon' || L(2) === 'Venus' || L(10) === 'Moon' || L(10) === 'Venus' ? 1 : 0) + (inH('Moon', [2, 4, 10]) ? 1 : 0) + (inH('Venus', [2, 4, 10]) ? 1 : 0), `${fact('Moon')} ${fact('Venus')}`);
-  add('art', 'အနုပညာ / သရုပ်ဆောင် / ဂီတ ဝင်ငွေ', (S('Venus') >= 65 ? 1 : 0) + (inH('Venus', [3, 5, 10]) ? 1 : 0) + (aspH('Venus', 10) || aspH('Venus', 2) ? 1 : 0) + (L(5) === 'Venus' || L(10) === 'Venus' || L(2) === 'Venus' ? 1 : 0) + (H('Venus') === H(L(10)) && L(10) !== 'Venus' ? 1 : 0), fact('Venus'));
+  const _venYK = [1, 4, 7, 10].some(hh => L(hh) === 'Venus') && [5, 9].some(hh => L(hh) === 'Venus');
+  const _nakOf = n => Math.floor((p[n] % 360 + 360) % 360 / (360 / 27));
+  const _venStar = n => _nakOf(n) % 9 === 1;
+  const _artParts = [],
+    _artWhy = [];
+  if (S('Venus') >= 65) {
+    _artParts.push(1);
+    _artWhy.push('သောကြာ အား ကောင်း တယ်။');
+  }
+  if (inH('Venus', [3, 5, 10])) {
+    _artParts.push(1);
+    _artWhy.push(fact('Venus'));
+  }
+  if (aspH('Venus', 10) || aspH('Venus', 2)) {
+    _artParts.push(1);
+    _artWhy.push('သောကြာ ရဲ့ အမြင် ' + (aspH('Venus', 10) ? '10' : '2') + ' တန့် အပေါ် ရှိ တယ်။');
+  }
+  if (L(5) === 'Venus' || L(10) === 'Venus' || L(2) === 'Venus') {
+    _artParts.push(1);
+    _artWhy.push('သောကြာ သည် ' + [5, 10, 2].filter(hh => L(hh) === 'Venus').join('/') + ' တန့် အရှင် ဖြစ် တယ်။');
+  }
+  if (H('Venus') === H(L(10)) && L(10) !== 'Venus') {
+    _artParts.push(1);
+    _artWhy.push('သောကြာ သည် 10 တန့် အရှင် ' + PLANET_MY[L(10)] + ' နဲ့ တွဲ ရှိ တယ်။');
+  }
+  if (_venYK && S('Venus') >= 60) {
+    _artParts.push(2);
+    _artWhy.push('သောကြာ သည် ဒီ လဂ် အတွက် ယောဂကာရက (ကိန်း + တြိကောဏ အရှင်) ဖြစ် တယ်။');
+  }
+  if (_venStar(L(5)) || _venStar(L(10))) {
+    _artParts.push(1);
+    const _sn = _venStar(L(5)) ? L(5) : L(10);
+    _artWhy.push(PLANET_MY[_sn] + ' သည် သောကြာ ရဲ့ နက္ခတ် ' + NAKSHATRAS[_nakOf(_sn)] + ' မှာ ရှိ တယ်။');
+  }
+  if (H(L(5)) === 7 && S('Venus') >= 60) {
+    _artParts.push(1);
+    _artWhy.push('5 တန့် အရှင် ' + PLANET_MY[L(5)] + ' သည် 7 တန့် (လူ အများ/ဈေးကွက်) မှာ ရှိ တယ်။');
+  }
+  add('art', 'အနုပညာ / သရုပ်ဆောင် / ဂီတ ဝင်ငွေ', _artParts.reduce((a, b) => a + b, 0), _artWhy.length ? _artWhy.slice(0, 4).join(' ') : fact('Venus'));
   add('writing', 'စာပေ / ပုံနှိပ် ဝင်ငွေ', (inH('Mercury', [3, 5, 10]) ? 1 : 0) + (S('Jupiter') >= 50 && inH('Mercury', [3, 5, 10]) ? 1 : 0) + (L(3) === 'Mercury' || L(3) === 'Jupiter' || L(5) === 'Mercury' ? 1 : 0), `${fact('Mercury')} ${fact('Jupiter')}`);
   add('tech', 'နည်းပညာ / Startup ဝင်ငွေ', (inH('Rahu', [3, 5, 10, 11]) ? 1 : 0) + (inH('Mercury', [10, 11]) || inH('Mars', [10, 11]) ? 1 : 0) + (inH('Rahu', [3, 5, 10, 11]) && S('Mercury') >= 50 ? 1 : 0), fact('Rahu'));
   add('finance', 'ဘဏ္ / ရင်းနှီး မြှုပ်နှံ ဝင်ငွေ (ရှယ်ယာ အပါ)', (inH('Jupiter', [2, 5, 11]) && S('Jupiter') >= 65 ? 2 : 0) + (H(L(5)) === 11 || H(L(11)) === 5 ? 1 : 0) + (aspH('Jupiter', 5) || aspH('Jupiter', 11) ? 1 : 0), fact('Jupiter'));
@@ -3131,7 +3357,7 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
       const d9 = calculateVarga(p[n], 9);
       return d9 === signOf(n) || _ownSignsOf(n).includes(d9);
     }).length;
-    const stack = (yogas || []).filter(y => /Dhana|Lakshmi|Raja|Mahapurusha|Gajakesari|Vasumati|Chandra-Mangala/i.test(y.name) && (y.strength || 0) >= 4);
+    const stack = _yogaStructures((yogas || []).filter(y => (y.strength || 0) >= 4)).reps;
     const hasMaha = stack.some(y => /Mahapurusha/i.test(y.name));
     const rajaCount = stack.filter(y => /Raja/i.test(y.name)).length;
     const combustBad = keyLordSet.filter(n => _isCombust(p, n)).length;
@@ -3209,7 +3435,7 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
       foreign: 'နိုင်ငံခြား နဲ့ ဆက် သွယ် တဲ့ လမ်း (ပို့ကုန်, နိုင်ငံခြား ဖောက် သည်, အွန် လိုင်း) အားသာ ပါ တယ် — ဘာသာ စကား နဲ့ နိုင်ငံခြား မိတ်ဖက် ကို ဦးစား ပေး တည် ဆောက် ရန်။',
       lead: 'လူ အများ ကို ဦးဆောင် / စီမံ ရ တဲ့ နေရာ မှာ အား ရှိ ပါ တယ် — တာဝန် ယူ ရ တဲ့ အဖွဲ့ အစည်း အလုပ် တွေ မှာ ကိုယ့် နေရာ ကို တည် ဆောက် ထား ရင် ရာထူး လမ်း ပွင့် လာ နိုင် ပါ တယ်။'
     };
-    const artDom = Math.round(0.6 * S('Venus') + 0.4 * _srcScore('art') * 20);
+    const artDom = Math.round(0.6 * S('Venus') + 0.4 * Math.min(5, _srcScore('art')) * 20);
     const fameDom = Math.round((S('Moon') + S('Sun') + S(L(10))) / 3);
     const leadDom = Math.round((S('Sun') + S(L(10)) + S('Saturn')) / 3);
     const luckIdx = Math.round(0.55 * _srcScore('windfall') * 20 + 0.45 * S('Jupiter'));
@@ -3306,6 +3532,38 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
 }
 
 // v6.29: hard-season analysis — a strictly-gated 'worst period' pattern (user's design: shows only when factors converge; event families named plainly in a bounded, light frame; timing windows so the period can be prepared for; the teacher's two-branch guidance; lifespan/maraka never touched).
+// v6.30: count distinct yoga STRUCTURES, not name matches — one linked lord-pair is one structure however many named yogas describe it (keeps the score/gate honest with the full classical library). reps = one representative entry per structure.
+function _yogaStructures(yogas) {
+  const pairMap = new Map();
+  const reps = [];
+  let dhanaNamed = 0;
+  (yogas || []).forEach(y => {
+    const nm = y.name || '';
+    const m = /^(Raja|Dhana) Yoga \((\d+)\u2013(\d+)\)/.exec(nm);
+    if (m) {
+      const key = m[1] + m[2] + '-' + m[3];
+      if (!pairMap.has(key)) {
+        pairMap.set(key, y);
+        reps.push(y);
+      }
+      return;
+    }
+    if (/Mahapurusha/.test(nm) || /Gajakesari/.test(nm) || /Neecha-Bhanga/.test(nm) || nm === 'Raja Yoga Pattern') {
+      reps.push(y);
+      return;
+    }
+    if (/Lakshmi/.test(nm) || /Vasumati/.test(nm) || /Chandra-Mangala/.test(nm) || nm === 'Dhana Pattern') {
+      dhanaNamed++;
+      reps.push(y);
+    }
+  });
+  return {
+    pairs: pairMap.size,
+    majors: reps.length - pairMap.size - dhanaNamed,
+    dhanaNamed,
+    reps
+  };
+}
 function hardSeasonAnalysis(p, yogas, dashaTree) {
   try {
     const H = n => _planetHouse(p, n),
@@ -3342,7 +3600,9 @@ function hardSeasonAnalysis(p, yogas, dashaTree) {
     fam('shock', 'ထိခိုက် / ကျန်းမာ အကြီးစား', 'ထိခိုက် ဒဏ်ရာ / ကျန်းမာ ရေး အကြီးအကျယ် တုန်လှုပ် တာ မျိုး ကြုံ နိုင် တဲ့ ပုံစံ ပါ — ဂရုစိုက် ရန် သာ ဖြစ်ပြီး ရောဂါ အမည် ဟော တာ မဟုတ် ပါ။', 'ခရီး ရှည် / ယာဉ် / အန္တရာယ် များ တဲ့ အလုပ်', [...new Set([L(8), 'Mars', 'Saturn'])], [[H('Mars') === 8, 'အင်္ဂါ 8 တန့် မှာ'], [H('Saturn') === 8, 'စနေ 8 တန့် မှာ'], [H(L(8)) === 1 || sameSign(L(8), 'Moon'), '8 တန့် အရှင် လဂ် / တနင်္လာ နဲ့'], [[6, 8].includes(H('Moon')) && withMal('Moon'), 'တနင်္လာ 6/8 မှာ အဆိုး နဲ့'], [S(L(1)) <= 25, 'လဂ် အရှင် အား အလွန် နည်း']]);
     fam('family', 'အိမ်ထောင် / မိသားစု ကွဲကွာ', 'အိမ်ထောင် ကွဲ တာ / မိသားစု အတွင်း ကြီး ကြီး မား မား အပြောင်းအလဲ မျိုး ကြုံ နိုင် တဲ့ ပုံစံ ပါ။', 'အိမ်ထောင် / မိတ်ဖက် / မိသားစု ပစ္စည်း ခွဲ ဝေ တဲ့ ဆုံးဖြတ် ချက်', [...new Set([L(7), 'Venus'])], [[dust(L(7)), '7 တန့် အရှင် 6/8/12 မှာ'], [dust('Venus') && withMal('Venus'), 'သောကြာ 6/8/12 မှာ အဆိုး နဲ့'], [_isCombust(p, 'Venus') && dust(L(7)), 'သောကြာ လောင်ကျွမ်း + 7 တန့် အရှင် 6/8/12 မှာ'], [H('Rahu') === 7, 'ရာဟု 7 တန့် မှာ'], [H('Saturn') === 7 || H('Mars') === 7, 'စနေ/အင်္ဂါ 7 တန့် မှာ'], [dust(L(4)), '4 တန့် အရှင် 6/8/12 မှာ']]);
     const _qual = F.filter(f => f.score >= 3).sort((a, b) => b.score - a.score);
-    const shown = _qual.length >= 2 || _qual.length === 1 && _qual[0].score >= 4 ? _qual.slice(0, 3) : [];
+    const _secondBest = F.reduce((a, f) => _qual.includes(f) ? a : Math.max(a, f.score), 0);
+    const _top3 = F.map(f => f.score).sort((a, b) => b - a).slice(0, 3).reduce((a, x) => a + x, 0);
+    const shown = _qual.length >= 2 || _qual.length === 1 && _qual[0].score >= 4 || _qual.length === 1 && _secondBest >= 2 && _top3 >= 7 ? _qual.slice(0, 3) : []; // v6.30: one family at 3 + a second thread (>= 2) + top-3 convergence >= 7 also opens — convergent evidence, not a lone signal (battery prevalence 7% -> 12%)
     if (!shown.length) return null;
     const lordSet = new Set();
     shown.forEach(f => f.lords.forEach(x => lordSet.add(x)));
@@ -3392,7 +3652,8 @@ function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
     lord11 = _lordOfHouse(birthPlanets, 11);
   const wealthH = [2, 5, 9, 11].reduce((n, h) => n + ([2, 5, 9, 11].includes(_planetHouse(birthPlanets, _lordOfHouse(birthPlanets, h))) ? 1 : 0), 0);
   const wealthPlanets = ['Jupiter', 'Venus', 'Mercury', 'Saturn'].reduce((n, k) => n + _planetStrength(birthPlanets, k) / 100, 0);
-  const dhanaYogaCount = (yogas || []).filter(y => /Dhana|Lakshmi|Vasumati|Chandra-Mangala|Raja/i.test(y.name)).length;
+  const _ys = _yogaStructures((yogas || []).filter(y => (y.strength || 0) >= 4));
+  const dhanaYogaCount = _ys.pairs + _ys.dhanaNamed; // v6.30: only strength>=4 structures feed the score (a weak yoga gives weak fruit)
   let savPts = 0,
     aspectPts = 0,
     pariPts = 0,
@@ -3431,8 +3692,8 @@ function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
       if (d9v === d1v || _ownSignsOf(ld).includes(d9v)) d9Pts += 3;
     });
   } catch (e) {}
-  const _scoreV1 = 34 + wealthH * 7 + wealthPlanets * 8 + Math.min(15, dhanaYogaCount * 4);
-  const _scoreV2 = 25 + wealthH * 6 + wealthPlanets * 6 + savPts + aspectPts + pariPts + Math.min(12, dhanaYogaCount * 4) + d9Pts;
+  const _scoreV1 = 28 + wealthH * 7 + wealthPlanets * 8 + Math.min(15, dhanaYogaCount * 3); // v6.30 recalibration for the full yoga library (bases 34/25 -> 28/19, yoga x4 -> x3, strength-filtered structures): battery median back on Middle, Dre/Lisa anchors kept
+  const _scoreV2 = 19 + wealthH * 6 + wealthPlanets * 6 + savPts + aspectPts + pariPts + Math.min(12, dhanaYogaCount * 3) + d9Pts;
   const wealthScore = Math.max(1, Math.min(100, Math.round(Math.max(_scoreV1, _scoreV2))));
   // v6.28: evidence-checked tier — the score proposes a band; the chart's own support (yoga stack, key-lord strength, own/exalt, D9, Lagna lord, combust cleanliness, concentration, exchange/aspect structure) and afflictions (combust pile-up, dhana lords in dusthana, a collapsed key lord) confirm or trim it. Genuine middle charts keep their band; only score-without-evidence drops.
   let _sup = 0,
@@ -3500,6 +3761,9 @@ function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
     love: `၅ တန့်သည် attraction/romance၊ ၇ တန့်သည် partnership ဖြစ်သဖြင့် နှစ်ခုကို မရောသင့်ပါ။ လက်ရှိ chart သည် ${houses.Venus === 5 ? 'ချစ်ခြင်းနှင့် ဖန်တီးမှုကို အားကောင်းစွာဖော်ပြ' : 'relationship ကို အခြေအနေ၊ အချိန်နှင့် နှစ်ဦးဖက်၏ရွေးချယ်မှုတို့က ပိုမိုဆုံးဖြတ်စေ'}သည်။`,
     marriage: `၇ တန့်အရှင် ${_lordOfHouse(birthPlanets, 7)} နှင့် ၂/၈/၁၁ တန့်တို့ကို ဒသာ-Transit ဖြင့် activate ဖြစ်ချိန်မှာ commitment ၏အလေးချိန် ပိုတက်မည်။ Natal promise မရှိလျှင် transit တစ်ခုတည်းနဲ့ အိမ်ထောင်ဖြစ်မည်ဟု မသတ်မှတ်သင့်။`
   };
+  const _pairNames = (yogas || []).filter(yy => /^(Raja|Dhana) Yoga \(/.test(yy.name) && (yy.strength || 0) >= 4).slice(0, 2).map(yy => yy.name);
+  if ((yogas || []).some(yy => yy.name === 'Lakshmi Yoga' && (yy.strength || 0) >= 4)) _pairNames.push('Lakshmi Yoga');
+  const yogaWeave = _pairNames.length ? ' ဇာတာ ထဲ မှာ ' + _pairNames.join(', ') + ' ဖွဲ့စည်းပုံ တွေ က ဒီ အဆင့် ကို အထောက် ပြု ထား တယ်။' : '';
   const _wp = wealthPatternAnalysis(birthPlanets, yogas, dashaTree, wealthScore);
   const _hsz = hardSeasonAnalysis(birthPlanets, yogas, dashaTree);
   return {
@@ -3509,7 +3773,7 @@ function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
     wealthWindows: _wp.windows,
     exceptional: _wp.exceptional,
     hardSeason: _hsz,
-    netWorthDesc: `ဓန Potential Score ${wealthScore}/100။ ${wealthScore >= 62 ? 'ဓနတိုးတက်ရန် အခြေခံ promise ကောင်းသည်၊ သို့သော် အကျိုးပေးသည့်ကာလကို ဒသာ/Transit ဖြင့် ချိန်ရမည်။' : 'အမြဲတမ်းမြင့်မားမည်ဟု မဆိုနိုင်ဘဲ အချိန်ကာလနှင့် စီမံခန့်ခွဲမှုက အဓိကဖြစ်သည်။'}${_adjusted ? ' တန်း ကို ဇာတာ အတွင်း အထောက်/အဖျက် နဲ့ ပြန် ချိန် ထား ပါ တယ်။' : ''} လက်ရှိ ${active ? active.lord + ' မဟာဒသာ' : ''} ကို trigger အဖြစ်ထည့်တွက်ထားသည်။`,
+    netWorthDesc: `ဓန Potential Score ${wealthScore}/100။ ${wealthScore >= 62 ? 'ဓနတိုးတက်ရန် အခြေခံ promise ကောင်းသည်၊ သို့သော် အကျိုးပေးသည့်ကာလကို ဒသာ/Transit ဖြင့် ချိန်ရမည်။' : 'အမြဲတမ်းမြင့်မားမည်ဟု မဆိုနိုင်ဘဲ အချိန်ကာလနှင့် စီမံခန့်ခွဲမှုက အဓိကဖြစ်သည်။'}${_adjusted ? ' တန်း ကို ဇာတာ အတွင်း အထောက်/အဖျက် နဲ့ ပြန် ချိန် ထား ပါ တယ်။' : ''}${yogaWeave} လက်ရှိ ${active ? active.lord + ' မဟာဒသာ' : ''} ကို trigger အဖြစ်ထည့်တွက်ထားသည်။`,
     pillars,
     evidence: [_lordSignificatorText(birthPlanets, 2), _lordSignificatorText(birthPlanets, 10), _lordSignificatorText(birthPlanets, 11)]
   };
@@ -10238,7 +10502,7 @@ function MainApp() {
     className: "text-amber-700"
   }, hs.cuspSubLord)), kpEffects && /*#__PURE__*/React.createElement("div", {
     className: "text-[11px] text-emerald-800 mt-1 bg-emerald-50/60 rounded p-1.5"
-  }, /*#__PURE__*/React.createElement("strong", null, "အနှစ်ချုပ်:"), " ", kpEffects[hs.house - 1].summary)))), !(ayanamsa === 'kp' && kpData) && yogas.map((y, idx) => /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("strong", null, "အနှစ်ချုပ်:"), " ", kpEffects[hs.house - 1].summary)))), !(ayanamsa === 'kp' && kpData) && [...yogas].sort((a, b) => (b.strength || 0) - (a.strength || 0)).map((y, idx) => /*#__PURE__*/React.createElement("div", {
     key: idx,
     className: "bg-white border border-emerald-200 p-2.5 rounded"
   }, /*#__PURE__*/React.createElement("div", {
