@@ -51,8 +51,7 @@
   </div>
 
   <script type="text/javascript">// v6.15 (2026-10-15): Tropical = pure Western — CircleChart (Placidus), Western-format tables, Western readings + synastry; Astrocartography shows ONLY under Tropical. Vedic layers (nakshatra, dasha, Ashtakoota, yogas, Prashna, Job/Place layers) are sidereal-only. Sidereal code paths unchanged from v6.14.
-// v6.24.1 (2026-10-18): Fixed Exceptional Pattern TDZ bug (fameBase declared after use); expanded achievement-domain rules and added transparent modern net-worth classification + historical-to-modern wealth methodology note.
-    // v6.24 (2026-10-18): Fixed D2 Hora scoring so it is not treated as a 12-house chart; corrected KP rectification property lookup; excluded Sun from Sunapha/Anapha and added Moon-conjunction check for Kemadruma; corrected Burmese typos; expanded exceptional blue card with explicit USD wealth tiers and special-achievement indicators. These are interpretive indicators, not verified outcome predictions.
+// v6.24 (2026-10-18): Fixed D2 Hora scoring so it is not treated as a 12-house chart; corrected KP rectification property lookup; excluded Sun from Sunapha/Anapha and added Moon-conjunction check for Kemadruma; corrected Burmese typos; expanded exceptional blue card with explicit USD wealth tiers and special-achievement indicators. These are interpretive indicators, not verified outcome predictions.
 // v6.23 (2026-10-17): Added an in-app Core Audit Lab with repeatable invariant tests, JSON export/copy, and explicit provider/accuracy disclosures. This is a test harness, not a claim that every traditional method is fully validated.
 // v6.22 (2026-10-17): Correctness pass — preserve valid zero coordinates/UTC offsets; pass selected node mode through matching charts; clamp impossible calendar dates; extend Vimshottari timelines to cover long lifetimes; evaluate current dasha dates in the birth-place timezone and parse date-only year labels without device-timezone shifts; correct Mahapurusha sign sets and require actual Kendra–Trikona association for Raja Yoga patterns; exclude lunar nodes from Western stellium counts. Wealth USD is now a separate transparent savings/investment scenario and is never inferred from the astrology score. Extended Swiss Ephemeris spot-check (1900–2100 sample dates): Moon error up to 2.41 arcmin, Jupiter 6.01 arcmin, Saturn 12.03 arcmin; these are sampled errors, not guaranteed bounds. Approximate modules remain explicitly labelled rather than claimed as classical-complete.
 // v6.16 (2026-10-15): Western Layer 2 — Solar Return + Secondary Progressions (Readings), aspect patterns (Yoga), Composite chart + partner profiles (Matching/Relate), Vocational + Relocation (Place). All tropical-only; sidereal unchanged.
@@ -2377,6 +2376,7 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore, todayStr) {
         }
         const specialAchievements = [];
         const addAchievement = (label, reason) => specialAchievements.push({ label, reason });
+        const fameBase = S('Moon') >= 55 && S('Sun') >= 55 && S(L(10)) >= 60 && stack.length >= 2 && (S(L(5)) >= 60 || S('Venus') >= 65 || S('Jupiter') >= 65);
         const mercuryJupiterStrong = S('Mercury') >= 65 && S('Jupiter') >= 65;
         const researchYoga = (yogas || []).some(y => /Budha-Aditya|Raja Yoga|Hamsa|Bhadra|Mahapurusha/i.test(y.name) && (y.strength || 0) >= 4);
         if (mercuryJupiterStrong && (researchYoga || (inH('Mercury', [1, 5, 9, 10]) && inH('Jupiter', [1, 5, 9, 10]))))
@@ -2385,23 +2385,10 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore, todayStr) {
             addAchievement('ဂန္တဝင်အနုပညာ၊ ဖျော်ဖြေရေးနှင့် ဖန်တီးမှု', 'Venus အားနှင့် ဖန်တီးမှု/လူသိများမှုဆိုင်ရာ အညွှန်းများ ပေါင်းစည်းနေသည်။');
         if (S('Sun') >= 70 && S(L(10)) >= 70 && (stack.length >= 2 || rajaCount >= 1))
             addAchievement('ခေါင်းဆောင်မှု၊ အစိုးရ/နိုင်ငံတော်အဆင့် ဂုဏ်ထူး', 'Sun၊ ၁၀ တန့်အရှင်နှင့် Yoga အညွှန်းများ ပေါင်းစည်းနေသည်။ အမှန်တကယ်ရာထူး/ဘွဲ့ရရှိမည်ဟု မဆိုလိုပါ။');
-        // Define fameBase BEFORE any achievement rule reads it; the former order threw a TDZ error
-        // and the catch block silently erased the whole Exceptional Pattern card.
-        const fameBase = S('Moon') >= 55 && S('Sun') >= 55 && S(L(10)) >= 60 && stack.length >= 2 && (S(L(5)) >= 60 || S('Venus') >= 65 || S('Jupiter') >= 65);
         if (fameBase && (((S('Moon') + S('Sun') + S(L(10))) / 3) >= 75))
-            addAchievement('ကမ္ဘာ့အဆင့်ကျော်ကြားမှု သို့မဟုတ် သက်ရောက်မှုကြီးမားသော အလုပ်', 'လူသိများမှု၊ အလုပ်အကိုင်နှင့် ဂြိုဟ်အားဆိုင်ရာ အညွှန်းများ ပေါင်းစည်းနေသည်။ နိုင်ငံတကာ/ပြည်ပဆက်နွယ်မှုအချက်များကိုလည်း သီးခြားစစ်ဆေးရန်လိုသည်။');
+            addAchievement('ကမ္ဘာ့အဆင့်ကျော်ကြားမှု သို့မဟုတ် သက်ရောက်မှုကြီးမားသော အလုပ်', 'လူသိများမှု၊ အလုပ်အကိုင်နှင့် ဂြိုဟ်အားဆိုင်ရာ အညွှန်းများ ပေါင်းစည်းနေသည်။');
         if (S('Saturn') >= 70 && S('Sun') >= 65 && (stack.length >= 2 || rajaCount >= 1))
             addAchievement('အဖွဲ့အစည်းကြီး/လူမှုအဆင့် ဦးဆောင်မှု', 'တာဝန်ယူမှု၊ အာဏာနှင့် ရေရှည်တည်ဆောက်မှုကို ကိုယ်စားပြုသော အညွှန်းများ ပေါင်းစည်းနေသည်။');
-        if (S('Mercury') >= 65 && (inH('Mercury', [1, 3, 5, 9, 10, 11]) || S(L(5)) >= 65))
-            addAchievement('စာရေးဆရာ၊ မီဒီယာ၊ စီးပွားရေးဆက်သွယ်မှုနှင့် နည်းပညာ', `Mercury အား ${Math.round(S('Mercury'))}/100; ဉာဏ်ပညာ၊ ဆက်သွယ်ရေး၊ အရောင်းအဝယ်နှင့် ဖန်တီးထုတ်လုပ်မှုဆိုင်ရာ အညွှန်းများ။`);
-        if (S('Mars') >= 68 && (inH('Mars', [1, 3, 6, 10, 11]) || rajaCount >= 1))
-            addAchievement('အားကစား၊ စွန့်ဦးတီထွင်မှုနှင့် အရေးပေါ်ဆုံးဖြတ်ချက်', `Mars အား ${Math.round(S('Mars'))}/100; လုပ်ဆောင်နိုင်စွမ်း၊ ယှဉ်ပြိုင်မှုနှင့် စွန့်စားမှုဆိုင်ရာ အညွှန်းများ။`);
-        if (S('Jupiter') >= 68 && (inH('Jupiter', [1, 2, 5, 9, 10, 11]) || stack.length >= 2))
-            addAchievement('ပညာရေး၊ ဥပဒေ၊ အကြံပေးမှုနှင့် ဂုဏ်ထူးဘွဲ့', `Jupiter အား ${Math.round(S('Jupiter'))}/100; ပညာ၊ ဆရာ/အကြံပေး၊ ဥပဒေ၊ အဖွဲ့အစည်းအသိအမှတ်ပြုမှုဆိုင်ရာ အညွှန်းများ။`);
-        if (lordIn(9, [1, 3, 7, 9, 10, 11]) && S('Rahu') >= 60 && (S('Mercury') >= 60 || S('Venus') >= 60 || S('Jupiter') >= 60))
-            addAchievement('နိုင်ငံတကာ/ပြည်ပဈေးကွက်သို့ ရောက်ရှိနိုင်မှု', '၉ တန့်၊ Rahu နှင့် ဆက်သွယ်ရေး/ဖန်တီးမှု/ပညာဆိုင်ရာ အားတို့ ပေါင်းစည်းမှုကို ပြည်ပဆက်နွယ်မှု အညွှန်းအဖြစ် ဖတ်နိုင်သည်။ တစ်ကမ္ဘာလုံးကျော်ကြားမည်ဟု အာမမခံပါ။');
-        if (S('Sun') >= 65 && S(L(10)) >= 65 && (rajaCount >= 1 || hasMaha))
-            addAchievement('အစိုးရ၊ နိုင်ငံရေး၊ အုပ်ချုပ်ရေးနှင့် အဆင့်မြင့်တာဝန်', 'Sun၊ ၁၀ တန့်အရှင်နှင့် Raja/Mahapurusha ဆိုင်ရာ အညွှန်းများ ပေါင်းစည်းမှု။ ဝန်ကြီး/ဝန်ကြီးချုပ်ရာထူးကို တိုက်ရိုက်ခန့်မှန်းခြင်းမဟုတ်ပါ။');
         let honor = null;
         if (fameBase) {
             const avg = (S('Moon') + S('Sun') + S(L(10))) / 3;
@@ -2414,8 +2401,32 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore, todayStr) {
             luxury.push('အပန်းဖြေခရီးနှင့် အဆင့်မြင့်အတွေ့အကြုံများကို စိတ်ဝင်စားနိုင်သည့် အညွှန်း');
         if (S('Venus') >= 80 && lordIn(5, [2, 5, 11]))
             luxury.push('အနုပညာပစ္စည်း၊ ဒီဇိုင်း သို့မဟုတ် စုဆောင်းပစ္စည်းများကို တန်ဖိုးထားနိုင်သည့် အညွှန်း');
-        if (band || honor || specialAchievements.length)
-            exceptional = { band, honor, luxury, pct: gatePctOut, wealthTier, specialAchievements };
+        // Stage 2: cross-check each achievement domain with D9/D10 and house/lord/yoga evidence.
+        // Scores measure rule-support inside this astrology model, NOT calibrated real-world probabilities.
+        const yogaHit = (re) => (yogas || []).some(y => re.test(y.name || '') && (y.strength || 0) >= 3);
+        const lordLink = (a, b) => H(L(a)) === b || H(L(b)) === a || L(a) === L(b);
+        const ownD = (n, d) => { try { return _ownSignsOf(n).includes(calculateVarga(p[n], d)); } catch (_) { return false; } };
+        const d10Career = [...new Set(['Sun', 'Mercury', 'Jupiter', 'Venus', L(10)])].filter(n => ownD(n, 10)).length;
+        const d9Key = keyLordSet.filter(n => ownD(n, 9)).length;
+        const artScore = Math.min(100, (S('Venus') >= 60 ? 18 : 0) + (inH('Venus', [1,3,5,10,11]) ? 18 : 0) + ((L(5)==='Venus'||L(10)==='Venus'||L(2)==='Venus') ? 12 : 0) + (yogaHit(/Malavya|Raja Yoga|Lakshmi|Mahapurusha/i) ? 14 : 0) + (d10Career>=2 ? 12 : d10Career===1 ? 6 : 0) + (ownD('Venus',9) ? 8 : 0) + (lordLink(5,10) ? 8 : 0));
+        const leaderScore = Math.min(100, (S('Sun')>=60?14:0) + (S(L(10))>=60?16:0) + (inH('Sun',[1,5,9,10,11])?12:0) + (lordLink(1,10)?10:0) + (stack.length>=2?12:stack.length===1?6:0) + (d10Career>=2?14:d10Career===1?7:0) + (ownD('Sun',10)?8:0) + (d9Key>=2?8:0));
+        const innovationScore = Math.min(100, (S('Mercury')>=60?14:0) + (S('Jupiter')>=60?12:0) + (inH('Mercury',[1,3,5,9,10,11])?12:0) + (inH('Rahu',[3,5,9,10,11])?8:0) + (yogaHit(/Budha-Aditya|Bhadra|Hamsa|Mahapurusha|Raja Yoga/i)?14:0) + (lordLink(5,10)?10:0) + (d10Career>=2?10:d10Career===1?5:0) + (ownD('Mercury',9)?5:0));
+        const fameScore = Math.min(100, (S('Moon')>=60?10:0) + (S('Sun')>=60?10:0) + (S(L(10))>=60?14:0) + (stack.length>=2?12:stack.length===1?6:0) + (inH('Moon',[1,5,10,11])?8:0) + (inH('Sun',[1,5,9,10,11])?8:0) + (d10Career>=2?12:d10Career===1?6:0) + (d9Key>=2?8:0) + (lordLink(5,10)?8:0));
+        const domains = [
+            {id:'wealth',label:'ဓန / စီးပွားရေး တည်ဆောက်မှု',score:Math.min(100,gatePct),evidence:`ဓနအခြေခံ ${wealthScore}/100 · ဘက်စုံစစ်ဆေးမှု ${gatePct}/100`,advice:'ဝင်ငွေတိုးရေး၊ စုဆောင်းရေး၊ ရင်းနှီးမြှုပ်နှံမှုအန္တရာယ်စီမံရေးနှင့် စီးပွားရေးစနစ်တည်ဆောက်မှုကို ဦးစားပေးပါ။'},
+            {id:'art',label:'အနုပညာ / ဖန်တီးမှု / ဖျော်ဖြေရေး',score:artScore,evidence:'သောကြာ၊ ၅/၁၀ တန့်၊ ယောဂ၊ D9/D10 အညွှန်းများ',advice:'လက်ရာကို ပုံမှန်ထုတ်လုပ်ခြင်း၊ portfolio၊ ပြပွဲနှင့် ပရိသတ်တည်ဆောက်ခြင်းကို ဦးစားပေးပါ။'},
+            {id:'leadership',label:'ခေါင်းဆောင်မှု / အဖွဲ့အစည်း / ပြည်သူ့အခန်းကဏ္ဍ',score:leaderScore,evidence:'နေ၊ ၁/၁၀ တန့်အရှင်၊ ယောဂ၊ D9/D10 အညွှန်းများ',advice:'တာဝန်ယူမှု၊ စီမံခန့်ခွဲမှု၊ အဖွဲ့လိုက်အလုပ်နှင့် ယုံကြည်မှုတည်ဆောက်ခြင်းကို ဦးစားပေးပါ။'},
+            {id:'innovation',label:'သုတေသန / နည်းပညာ / တီထွင်ဖန်တီးမှု',score:innovationScore,evidence:'ဗုဒ္ဓဟူး၊ ကြာသပတေး၊ ရာဟု၊ ၅/၉/၁၀ တန့်၊ D9/D10 အညွှန်းများ',advice:'လေ့လာမှု၊ စမ်းသပ်မှု၊ ကျွမ်းကျင်မှုနှင့် အလုပ်ဖြစ်သော project များကို ဦးစားပေးပါ။'},
+            {id:'fame',label:'လူသိများမှု / အများပြည်သူအပေါ် သက်ရောက်မှု',score:fameScore,evidence:'လ၊ နေ၊ ၁၀ တန့်၊ ယောဂ၊ D9/D10 အညွှန်းများ',advice:'အလုပ်ရလဒ်အရည်အသွေး၊ တစ်သမတ်တည်းရှိမှုနှင့် လူမှု/နိုင်ငံတကာချိတ်ဆက်မှုကို တည်ဆောက်ပါ。'}
+        ].sort((a,b)=>b.score-a.score);
+        const relevantDomains = domains.filter(d=>d.score>=30).slice(0,4);
+        const topScore = relevantDomains.length ? relevantDomains[0].score : 0;
+        const multiSupport = relevantDomains.filter(d=>d.score>=55).length>=2;
+        const supportPct = Math.round(Math.min(100,topScore*0.82+(multiSupport?10:0)+Math.min(8,d9Key*2)));
+        const isStrong = supportPct>=72 && (relevantDomains.some(d=>d.id==='wealth'&&d.score>=60) || relevantDomains.filter(d=>d.score>=65).length>=2);
+        if (band || honor || specialAchievements.length || relevantDomains.length) {
+            exceptional = { band:isStrong?band:null, honor:isStrong?honor:null, luxury:isStrong?luxury:[], pct:isStrong?supportPct:null, wealthTier:isStrong?wealthTier:null, specialAchievements:isStrong?specialAchievements:[], isStrong, supportPct, domains:relevantDomains, gatePct, wealthScore };
+        }
     }
     catch (e) {
         exceptional = null;
@@ -6268,7 +6279,7 @@ function MainApp() {
                         w.start,
                         " \u2192 ",
                         w.end))))))),
-            lifeOverview.exceptional && (React.createElement("div", { className: "bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-3.5 rounded-lg shadow space-y-2 border border-amber-400/50" },
+            lifeOverview.exceptional && lifeOverview.exceptional.isStrong && (React.createElement("div", { className: "bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-3.5 rounded-lg shadow space-y-2 border border-amber-400/50" },
                 React.createElement("div", { className: "flex justify-between items-center border-b border-white/15 pb-1.5" },
                     React.createElement("span", { className: "font-bold text-[13px] text-amber-300" }, "\uD83D\uDC51 \u1011\u1030\u1038\u1001\u103C\u102C\u1038 \u1007\u102C\u1010\u102C \u2014 Exceptional Pattern"),
                     React.createElement("span", { className: "text-[9px] bg-amber-400/20 text-amber-200 px-2 py-0.5 rounded font-semibold" }, "\u1010\u1004\u103A\u1038\u1000\u103B\u1015\u103A \u1010\u1032\u1037 \u1005\u100A\u103A\u1038 \u1000\u102D\u102F\u1000\u103A \u100A\u102E \u1019\u103E \u1015\u1031\u102B\u103A \u101E\u100A\u103A")),
@@ -6293,11 +6304,6 @@ function MainApp() {
                             "\u2726 ",
                             a.label),
                         React.createElement("div", { className: "text-[10px] leading-relaxed text-indigo-100/80" }, a.reason)))))),
-                React.createElement("div", { className: "rounded-lg border border-white/15 bg-white/5 p-3 space-y-1" },
-                    React.createElement("div", { className: "text-[11px] font-bold text-slate-100" }, "ခေတ်သစ်ပိုင်ဆိုင်မှုအဆင့် — Modern Wealth Classification (USD)"),
-                    React.createElement("p", { className: "text-[10px] leading-relaxed text-indigo-100/90" }, "Typical / အခြေခံပိုင်ဆိုင်မှု — $0–$50,000 · Working / လူတန်းစေ့ — $50,000–$250,000 · Middle Wealth / လူလတ်တန်းစား — $250,000–$1 million · Wealthy / ချမ်းသာသူ — $1–$20 million · Very Wealthy / အလွန်ချမ်းသာသူ — $20–$50 million။ ဤအပိုင်းများသည် ပိုင်ဆိုင်မှုအသားတင်တန်ဖိုး (net worth) အတွက် သတ်မှတ်ထားသော ခန့်မှန်းအမျိုးအစားများသာဖြစ်သည်။"),
-                    React.createElement("p", { className: "text-[10px] leading-relaxed text-amber-100/90" }, "မှတ်ချက် — ခန့်မှန်းငွေကြေးပမာဏနှင့် လူမှုအဆင့်နှိုင်းယှဉ်မှုသည် နေထိုင်ရာနိုင်ငံ၏ ဖွံ့ဖြိုးတိုးတက်မှု၊ ဝယ်ယူနိုင်စွမ်း (PPP)၊ ငွေဖောင်းပွမှုနှင့် ပိုင်ဆိုင်မှုတန်ဖိုးပေါ်မူတည်၍ ပြောင်းလဲနိုင်သည်။"),
-                    React.createElement("div", { className: "text-[10px] leading-relaxed text-indigo-100/90" }, "Historical-to-Modern Wealth — ကျမ်းရင်းက ဓနယောဂ/လူမှုအဆင့်ကို ဖော်ပြသည့်အချက်များနှင့် သမိုင်းခေတ်၊ ရွှေ/မြေယာ/လုပ်အားခ၊ GDP နှင့် ယနေ့ခေတ်ဝယ်ယူနိုင်စွမ်းတို့ကို နှိုင်းယှဉ်၍ အနီးစပ်ဆုံးအပိုင်းအခြားကို သီးခြားခန့်မှန်းရန်။ ဇာတာအမှတ်တစ်ခုတည်းမှ USD ပမာဏကို တိုက်ရိုက်တွက်မည်မဟုတ်ပါ။")),
                 lifeOverview.exceptional.honor && (React.createElement("div", null,
                     React.createElement("div", { className: "text-[11px] text-amber-300 font-bold" }, "\u1002\u102F\u100F\u103A / \u1006\u102F \u1021\u1006\u1004\u1037\u103A:"),
                     React.createElement("div", { className: "text-[12px] font-bold mt-0.5" }, lifeOverview.exceptional.honor))),
@@ -6305,6 +6311,17 @@ function MainApp() {
                     "\u2726 ",
                     x))))),
                 React.createElement("p", { className: "text-[10px] text-indigo-200/80 leading-relaxed border-t border-white/10 pt-1.5" }, "\u1024\u1021\u1015\u102D\u102F\u1004\u103A\u1038\u101E\u100A\u103A \u101A\u1031\u102C\u1002\u1019\u103B\u102C\u1038\u104A \u1002\u103C\u102D\u102F\u101F\u103A\u1021\u1004\u103A\u1021\u102C\u1038\u104A D9 \u1021\u1010\u100A\u103A\u1015\u103C\u102F\u1001\u103B\u1000\u103A\u1014\u103E\u1004\u1037\u103A \u101C\u1002\u103A\u1021\u101B\u103E\u1004\u103A\u1021\u1001\u103C\u1031\u1021\u1014\u1031\u1010\u102D\u102F\u1037\u1000\u102D\u102F \u1005\u102F\u1015\u1031\u102B\u1004\u103A\u1038\u1005\u1005\u103A\u1006\u1031\u1038\u1015\u103C\u102E\u1038 \u101E\u1010\u103A\u1019\u103E\u1010\u103A\u1001\u103B\u1000\u103A\u1019\u103B\u102C\u1038 \u1015\u103C\u100A\u1037\u103A\u1019\u102E\u1019\u103E\u101E\u102C \u1015\u1031\u102B\u103A\u101C\u102C\u101E\u100A\u103A\u104B \u1013\u1014\u1010\u100A\u103A\u1006\u1031\u102C\u1000\u103A\u1014\u102D\u102F\u1004\u103A\u1019\u103E\u102F\u1006\u102D\u102F\u1004\u103A\u101B\u102C \u1021\u100A\u103D\u103E\u1014\u103A\u1038\u101E\u102C\u1016\u103C\u1005\u103A\u1015\u103C\u102E\u1038 \u1021\u1019\u103E\u1014\u103A\u1010\u1000\u101A\u103A\u1015\u102D\u102F\u1004\u103A\u1006\u102D\u102F\u1004\u103A\u1019\u100A\u1037\u103A \u1015\u1019\u102C\u100F\u1000\u102D\u102F \u1021\u102C\u1019\u1001\u1036\u1001\u103C\u1004\u103A\u1038\u1019\u101F\u102F\u1010\u103A\u1015\u102B\u104B \u1012\u101E\u102C\u1000\u102C\u101C\u104A \u1000\u102D\u102F\u101A\u103A\u1015\u102D\u102F\u1004\u103A\u1006\u102F\u1036\u1038\u1016\u103C\u1010\u103A\u1001\u103B\u1000\u103A\u1014\u103E\u1004\u1037\u103A \u101C\u1000\u103A\u1010\u103D\u1031\u1037\u1021\u1001\u103C\u1031\u1021\u1014\u1031\u1019\u103B\u102C\u1038\u1000 \u101B\u101C\u1012\u103A\u1000\u102D\u102F \u101E\u1000\u103A\u101B\u1031\u102C\u1000\u103A\u1005\u1031\u101E\u100A\u103A\u104B"))),
+            lifeOverview.exceptional && !lifeOverview.exceptional.isStrong && (React.createElement("div", { className: "bg-slate-50 text-slate-700 p-3 rounded-lg border border-slate-200 shadow-sm space-y-2" },
+                React.createElement("div", { className: "flex items-center justify-between border-b border-slate-200 pb-1.5" },
+                    React.createElement("span", { className: "font-bold text-[12px] text-slate-600" }, "✧ ထူးခြားကွက်များ — ဦးစားပေးလုပ်ငန်း လမ်းညွှန်"),
+                    React.createElement("span", { className: "text-[10px] rounded-full bg-slate-200 px-2 py-0.5" }, "အထောက်အပံ့အညွှန်း ", lifeOverview.exceptional.supportPct, "%")),
+                React.createElement("p", { className: "text-[10px] leading-relaxed text-slate-500" }, "ထူးခြားအညွှန်းအချို့ တွေ့ရသော်လည်း အထောက်အပံ့အလွှာအားလုံး မပြည့်စုံသေးပါ။ အောက်ပါကဏ္ဍများကို အာမခံချက်အဖြစ်မယူဘဲ လက်တွေ့ကျွမ်းကျင်မှုနှင့် အခွင့်အလမ်းဖြင့် စမ်းသပ်တည်ဆောက်ရန် လမ်းညွှန်အဖြစ်သာ သုံးပါ။"),
+                (lifeOverview.exceptional.domains || []).length > 0 && (React.createElement("div", { className: "space-y-2" }, lifeOverview.exceptional.domains.map((d,i) => React.createElement("div", { key:d.id || i, className:"rounded-md bg-white border border-slate-200 p-2" },
+                    React.createElement("div", { className:"flex items-center justify-between gap-2" }, React.createElement("span", { className:"text-[11px] font-semibold text-slate-700" },d.label), React.createElement("span", { className:"text-[10px] font-bold text-slate-500" },d.score,"/100")),
+                    React.createElement("div", { className:"h-1.5 rounded-full bg-slate-100 mt-1 mb-1 overflow-hidden" },React.createElement("div",{className:"h-full rounded-full bg-slate-300",style:{width:`${d.score}%`}})),
+                    React.createElement("p",{className:"text-[10px] text-slate-500 leading-relaxed"},"စစ်ဆေးထားသောအချက်များ — ",d.evidence),
+                    React.createElement("p",{className:"text-[10px] text-slate-600 leading-relaxed mt-1"},"ဦးစားပေးရန် — ",d.advice))))),
+                React.createElement("p",{className:"text-[9px] text-slate-400 border-t border-slate-200 pt-1.5"},"ရာခိုင်နှုန်းသည် ဇာတာစည်းမျဉ်းအညွှန်းများ၏ ပေါင်းစည်းမှုသာဖြစ်ပြီး အမှန်တကယ်ဖြစ်ရပ်၏ probability မဟုတ်ပါ။"))),
             React.createElement("div", { className: "bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2" },
                 React.createElement("div", { className: "flex justify-between items-baseline border-b pb-1" },
                     React.createElement("h3", { className: "font-bold text-slate-800 text-xs" }, "\uD83E\uDE90 \u1002\u103C\u102D\u102F\u101F\u103A\u101B\u1015\u103A \u1021\u101F\u1031\u102C\u1019\u103B\u102C\u1038"),
