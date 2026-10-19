@@ -3902,6 +3902,366 @@ function generateLifetimeMilestones(birthDate, dashaTree, birthPlanets) {
   });
   return out.slice(0, 12);
 }
+
+// ===== v6.34 (2026-10-19): Timing summary (whole-life dasha arc) + Marriage timing =====
+// His approved design: a computed summary at the TOP of the Lifetime Milestones (Dasha Timeline)
+// card with the existing period texts below; a do/avoid line under each period text; one pointer
+// line in the wealth card; marriage-timing windows beside the spouse profile.
+function _ownsHouses(bp, lord) {
+  const o = [];
+  for (let h = 1; h <= 12; h++) if (_lordOfHouse(bp, h) === lord) o.push(h);
+  return o;
+}
+function _periodWealthScore(bp, lord) {
+  const owns = _ownsHouses(bp, lord);
+  let s = 34;
+  owns.forEach(h => {
+    if ([2, 5, 9, 11].includes(h)) s += 11;else if (h === 10) s += 9;else if (h === 1) s += 6;else if (h === 8) s += 3;else if ([6, 12].includes(h)) s -= 4;
+  });
+  const h = _planetHouse(bp, lord);
+  if ([1, 2, 5, 9, 10, 11].includes(h)) s += 10;else if (h === 8) s += 4;else if ([6, 12].includes(h)) s -= 8;
+  s += Math.round((_planetStrength(bp, lord) - 50) / 5);
+  try {
+    const sg = calculateVarga(bp[lord], 1);
+    const boost = ['Venus', 'Jupiter', _lordOfHouse(bp, 2), _lordOfHouse(bp, 11)].filter((x, i, a) => x && x !== lord && a.indexOf(x) === i);
+    let b = 0;
+    boost.forEach(x => {
+      if (bp[x] != null && calculateVarga(bp[x], 1) === sg) b += 4;
+    });
+    s += Math.min(8, b);
+    if (lord === 'Rahu' && [2, 5, 9, 10, 11].includes(h)) s += 5;
+    if (lord === 'Ketu') s -= 4;
+  } catch (e) {}
+  return Math.max(5, Math.min(97, s));
+}
+const _CH_LABEL = {
+  job: 'အလုပ် အကိုင် လမ်းကြောင်း',
+  trade: 'ကုန်သွယ် လမ်းကြောင်း',
+  art: 'အနုပညာ/ဖန်တီး လမ်းကြောင်း',
+  others: 'အမွေ နဲ့ သူများ ဘက်က ငွေ လမ်းကြောင်း',
+  foreign: 'နိုင်ငံခြား လမ်းကြောင်း',
+  govt: 'အစိုးရ/အဖွဲ့အစည်း လမ်းကြောင်း',
+  steady: 'မှန်မှန် ကြိုးစား တဲ့ လမ်းကြောင်း',
+  rise: 'ရလဒ် တိုး လမ်းကြောင်း',
+  general: 'ကိုယ်ပိုင် အားထုတ် လမ်းကြောင်း'
+};
+function _periodChannel(bp, lord) {
+  const owns = _ownsHouses(bp, lord);
+  const h = _planetHouse(bp, lord);
+  let amk = null;
+  try {
+    amk = charaKarakas(bp).AmK;
+  } catch (e) {}
+  if (owns.includes(8) || h === 8) return 'others';
+  if (owns.includes(10) || h === 10 || lord === amk) return 'job';
+  if (lord === 'Rahu' || owns.includes(12) || h === 12) return 'foreign';
+  if (lord === 'Venus' || owns.includes(5)) return 'art';
+  if (lord === 'Mercury' || owns.includes(7)) return 'trade';
+  if (lord === 'Sun') return 'govt';
+  if (lord === 'Saturn') return 'steady';
+  if (owns.includes(2) || owns.includes(11) || owns.includes(9)) return 'rise';
+  return 'general';
+}
+function _periodFlow(lord, ch) {
+  if (ch === 'others' || lord === 'Rahu') return 'lump';
+  if (lord === 'Saturn' || lord === 'Mars') return 'build';
+  return 'flow';
+}
+const _FLOW_LABEL = {
+  flow: 'မှန်မှန် စီးဆင်း တဲ့ ပုံစံ',
+  lump: 'အစုလိုက် ဝင် တတ် တဲ့ ပုံစံ',
+  build: 'နှေးနှေး နဲ့ စုဆောင်း တည် ဆောက် တဲ့ ပုံစံ'
+};
+function _periodAdvice(score, ch) {
+  if (score >= 62) return {
+    do: 'ဝင်ငွေ ကို စု ဆောင်း ပြီး ရေရှည် အကျိုး ရှိ မယ့် နေရာ မှာ ရင်းနှီး ဖို့ အကောင်း ဆုံး အချိန် — အခွင့်အရေး ကို အပြည့် အဝ သုံး ပါ',
+    avoid: 'အာမခံ မ ရှိ တဲ့ အကြွေး ကြီး နဲ့ လောင်းကစား ဆန် တဲ့ စွန့်စား မှု'
+  };
+  if (ch === 'others') return {
+    do: 'ပူးပေါင်း လုပ် တဲ့ အခါ စာချုပ် စာတမ်း ကို သေချာ စစ် ဆေး ပြီး မှ လုပ် ပါ',
+    avoid: 'သူများ အတွက် အာမခံ ပေး ခြင်း၊ ကိုယ့် နာမည် နဲ့ ငွေ ချေး ပေး ခြင်း'
+  };
+  if (ch === 'job') return {
+    do: 'အလုပ် မှာ ထင် ပေါ် အောင် ကြိုးစား ပြီး ရာထူး/လစာ တိုး ကို ရဲရဲ တောင်း ဖို့ သင့် တဲ့ ကာလ',
+    avoid: 'စိတ် လိုက် မာန် ပါ အလုပ် ထွက် ခြင်း / ပြောင်း ခြင်း'
+  };
+  if (score < 40) return {
+    do: 'ရှိ နေ တာ ကို ထိန်း ထား၊ မှန်မှန် လုပ်၊ စု တဲ့ အလေ့ ကို ဒီ ကာလ မှာ စ ထား ပါ',
+    avoid: 'ကြီးမား တဲ့ ရင်းနှီး မြှုပ်နှံ မှု အသစ် နဲ့ စွန့်စား မှု'
+  };
+  return {
+    do: 'တစ်ဆင့် ချင်း တည် ဆောက် ပြီး စု ဆောင်း တဲ့ အလေ့ ကို မှန်မှန် ဆက် လုပ် ပါ',
+    avoid: 'အလျင် စလို ဆုံးဖြတ် ချက် နဲ့ စိတ် လိုက် လုပ် တဲ့ သုံး စွဲ မှု'
+  };
+}
+function wealthTimingSummary(bp, tree, birthDate) {
+  if (!bp || !Array.isArray(tree) || !tree.length) return null;
+  const by = birthDate && !isNaN(birthDate.getTime()) ? birthDate.getFullYear() : null;
+  const today = new Date().toISOString().split('T')[0];
+  const ageOf = ds => by == null ? null : Math.max(0, new Date(ds).getFullYear() - by);
+  const periods = tree.map(d => {
+    const score = _periodWealthScore(bp, d.lord);
+    const ch = _periodChannel(bp, d.lord);
+    return {
+      lord: d.lord,
+      start: d.start,
+      end: d.end,
+      score,
+      ch,
+      flow: _periodFlow(d.lord, ch),
+      ageFrom: ageOf(d.start),
+      ageTo: ageOf(d.end),
+      state: d.end < today ? 'passed' : d.start <= today ? 'now' : 'ahead'
+    };
+  });
+  const top = Math.max.apply(null, periods.map(x => x.score));
+  const peak = periods.reduce((a, b) => b.score > a.score ? b : a, periods[0]);
+  const standouts = periods.filter(x => x.score >= Math.max(60, top - 8));
+  const second = standouts.filter(x => x !== peak).sort((a, b) => b.score - a.score)[0] || null;
+  const cur = periods.find(x => x.state === 'now') || null;
+  const PM = pl => PLANET_MY[pl] || pl;
+  const stateTxt = x => x.state === 'passed' ? 'ကျော် သွား ခဲ့ ပြီ' : x.state === 'now' ? 'လက်ရှိ ဖြတ်သန်း နေ တယ်' : 'ရှေ့ မှာ ရောက် လာ မည်';
+  const lines = [];
+  if (top < 55) {
+    lines.push('ဓန အကျိုးပေး က ဘယ် ဒဿာ မှာ မှ ထူးထူး ခြားခြား ထွက် မ ပေါက် ဘဲ မှန်မှန် စီး တဲ့ ပုံစံ ဖြစ် တယ် — ဒီ ဇာတာ မှာ အချိန် ထက် ကိုယ့် အားထုတ် မှု နဲ့ စု ဆောင်း တဲ့ အလေ့ က ပို အရေး ကြီး တယ်။');
+  } else {
+    lines.push(`ဓန အကျိုးပေး အပြင်းဆုံး ကာလ သည် ${PM(peak.lord)} မဟာဒဿာ (အသက် ${peak.ageFrom}–${peak.ageTo}) ဖြစ် ပြီး ${stateTxt(peak)}။ အဲ့ဒီ့ ကာလ ရဲ့ အဓိက လမ်းကြောင်း က ${_CH_LABEL[peak.ch]} ဖြစ် ပြီး ${_FLOW_LABEL[peak.flow]} နဲ့ အကျိုးပေး နိုင် တယ်။`);
+    if (second) lines.push(`နောက် ထပ် အား ကောင်း တဲ့ ကာလ တစ် ခု က ${PM(second.lord)} မဟာဒဿာ (အသက် ${second.ageFrom}–${second.ageTo}) — ${stateTxt(second)}၊ ${_CH_LABEL[second.ch]} ဘက် က နေ အကျိုးပေး နိုင် တယ်။`);
+  }
+  const eraCh = (lo, hi) => {
+    const xs = periods.filter(x => x.ageFrom != null && (x.ageFrom + x.ageTo) / 2 >= lo && (x.ageFrom + x.ageTo) / 2 < hi && x.score >= 45).sort((a, b) => b.score - a.score);
+    return xs.length ? xs[0].ch : null;
+  };
+  const eras = [[eraCh(0, 30), 'ငယ် ရွယ် စဉ်'], [eraCh(30, 55), 'လယ် အရွယ်'], [eraCh(55, 200), 'နောက်ပိုင်း အရွယ်']].filter(x => x[0]);
+  if (eras.length >= 2 && new Set(eras.map(x => x[0])).size >= 2) lines.push('အရွယ် အလိုက် အဓိက စီး တဲ့ လမ်းကြောင်း က ပြောင်း တတ် တယ် — ' + eras.map(x => `${x[1]} မှာ ${_CH_LABEL[x[0]]}`).join('၊ ') + '။');
+  if (cur && cur !== peak && cur !== second) lines.push(`လက်ရှိ ${PM(cur.lord)} မဟာဒဿာ (အသက် ${cur.ageFrom}–${cur.ageTo}) မှာ တော့ ${_CH_LABEL[cur.ch]} က အဓိက စီး နေ ပြီး ${_FLOW_LABEL[cur.flow]} ဖြစ် တယ်။`);
+  const periodAdvice = {};
+  periods.forEach(x => {
+    periodAdvice[x.lord + '|' + new Date(x.start).getFullYear() + '–' + new Date(x.end).getFullYear()] = _periodAdvice(x.score, x.ch);
+  });
+  return {
+    lines,
+    periods,
+    periodAdvice,
+    topScore: top
+  };
+}
+function marriageTimingWindows(bp, tree, birthDate) {
+  if (!bp || !Array.isArray(tree) || !tree.length) return null;
+  const by = birthDate && !isNaN(birthDate.getTime()) ? birthDate.getFullYear() : null;
+  const ageOf = ds => by == null ? null : Math.max(0, new Date(ds).getFullYear() - by);
+  const today = new Date().toISOString().split('T')[0];
+  const L7 = _lordOfHouse(bp, 7),
+    L2 = _lordOfHouse(bp, 2),
+    L11 = _lordOfHouse(bp, 11);
+  let DK = null;
+  try {
+    DK = charaKarakas(bp).DK;
+  } catch (e) {}
+  const links = new Set([L7, 'Venus', L2, L11, DK].filter(Boolean));
+  const mScore = lord => {
+    let s = 0;
+    if (links.has(lord)) s += 3;
+    const h = _planetHouse(bp, lord);
+    if (h === 7) s += 2;else if ([6, 8, 12].includes(h)) s -= 1;
+    try {
+      const sg = calculateVarga(bp[lord], 1);
+      if (bp.Venus != null && lord !== 'Venus' && calculateVarga(bp.Venus, 1) === sg) s += 1;
+      if (bp[L7] != null && lord !== L7 && calculateVarga(bp[L7], 1) === sg) s += 1;
+    } catch (e) {}
+    if (_planetStrength(bp, lord) >= 65) s += 1;
+    return s;
+  };
+  const wins = [];
+  tree.forEach(m => {
+    const ms = mScore(m.lord);
+    (m.antars || []).forEach(a => {
+      const tot = ms + mScore(a.lord) + (links.has(a.lord) ? 1 : 0);
+      const af = ageOf(a.start),
+        at = ageOf(a.end);
+      if (tot >= 6 && (af == null || at >= 15) && (af == null || af <= 75)) wins.push({
+        mLord: m.lord,
+        aLord: a.lord,
+        start: a.start,
+        end: a.end,
+        score: tot,
+        ageFrom: af,
+        ageTo: at,
+        state: a.end < today ? 'passed' : a.start <= today ? 'now' : 'ahead'
+      });
+    });
+  });
+  const PM = pl => PLANET_MY[pl] || pl;
+  if (!wins.length) return {
+    summary: 'အိမ်ထောင် အချိန် အတွက် ထင်ရှား တဲ့ ပြတင်း သီး ခြား မ တွေ့ ပါ — ဒဿာ တွေ က အိမ်ထောင် အချက် တွေ ကို အား ကောင်း ကောင်း မ နှိုး တဲ့ ဇာတာ ဖြစ် တယ်။ ဆက်ဆံရေး ကို ကိုယ် တိုင် တည် ဆောက် ရ တဲ့ ပုံစံ ဖြစ် နိုင် တယ်။',
+    windows: []
+  };
+  const strongest = wins.reduce((a, b) => b.score > a.score ? b : a, wins[0]);
+  const st = strongest.state === 'passed' ? 'ကျော် သွား ခဲ့ ပြီ' : strongest.state === 'now' ? 'လက်ရှိ ရောက် နေ တယ်' : 'ရှေ့ မှာ ရောက် လာ မည်';
+  const summary = `အိမ်ထောင်/ချစ်ခြင်း အတွက် အား အကောင်း ဆုံး ပြတင်း သည် ${PM(strongest.aLord)} အန္တရ (${PM(strongest.mLord)} မဟာဒဿာ အတွင်း၊ အသက် ${strongest.ageFrom}–${strongest.ageTo}) ဖြစ် ပြီး ${st}။`;
+  const upcoming = wins.filter(w => w.state !== 'passed').slice(0, 3);
+  const show = upcoming.length ? upcoming : wins.slice(-2);
+  return {
+    summary,
+    windows: show,
+    strongest
+  };
+}
+
+// ===== v6.35 (2026-10-19): Relationship Timing — split OUT of Marriage Timing (his clarification) =====
+// Classical seed: 5th house = love (prema) vs 7th = marriage (vivaha); Venus karaka; KP outcome
+// logic (5th links firing without 7/2/11 links = does not settle). Modern stage labels (flirt /
+// date / situationship / committed / living together) grade each window by its significator
+// profile — modern vocabulary on classical mechanics, presented as resemblance, not certainty.
+// Heartbreak watch is GATED: natal Venus affliction + a stacked afflicting dasha window.
+function relationshipTimingWindows(bp, tree, birthDate) {
+  if (!bp || !Array.isArray(tree) || !tree.length) return null;
+  const by = birthDate && !isNaN(birthDate.getTime()) ? birthDate.getFullYear() : null;
+  const ageOf = ds => by == null ? null : Math.max(0, new Date(ds).getFullYear() - by);
+  const today = new Date().toISOString().split('T')[0];
+  const L4 = _lordOfHouse(bp, 4),
+    L5 = _lordOfHouse(bp, 5),
+    L7 = _lordOfHouse(bp, 7),
+    L2 = _lordOfHouse(bp, 2),
+    L11 = _lordOfHouse(bp, 11);
+  let DK = null,
+    ulLord = null;
+  try {
+    DK = charaKarakas(bp).DK;
+    ulLord = rpSignLord(rpUpapada(bp));
+  } catch (e) {}
+  const occ5 = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].filter(pl => _planetHouse(bp, pl) === 5);
+  const loveLinks = new Set([L5, 'Venus'].concat(occ5).filter(Boolean));
+  const settleLinks = new Set([L7, L2, L11, DK].filter(Boolean));
+  const homeLinks = new Set([L4, L2, ulLord].filter(Boolean));
+  const signOf = pl => {
+    try {
+      return calculateVarga(bp[pl], 1);
+    } catch (e) {
+      return null;
+    }
+  };
+  const conj = (a, b) => !!(a && b && a !== b && bp[a] != null && bp[b] != null && signOf(a) === signOf(b));
+  const profile = lord => {
+    let spark = 0,
+      bond = 0,
+      home = 0,
+      fog = 0;
+    if (loveLinks.has(lord)) spark += 2;
+    if (['Venus', 'Mars', 'Rahu'].includes(lord)) spark += 1;
+    if (_planetHouse(bp, lord) === 5) spark += 1;
+    if (settleLinks.has(lord)) bond += 2;
+    if (conj(lord, L7) || conj(lord, 'Venus')) bond += 1;
+    if (homeLinks.has(lord)) home += 2;
+    if (_planetHouse(bp, lord) === 4) home += 1;
+    if ([6, 8, 12].includes(_planetHouse(bp, lord))) fog += 1;
+    if (lord === 'Rahu' && bond === 0) fog += 1;
+    return {
+      spark,
+      bond,
+      home,
+      fog
+    };
+  };
+  const stageOf = pr => {
+    if (pr.bond >= 2 && pr.home >= 2) return 'အတူ နေ ပုံစံ (living together)';
+    if (pr.bond >= 2) return 'တည် ငြိမ် ချစ် သူ ပုံစံ (committed)';
+    if (pr.fog >= 1 && pr.spark >= 2) return 'အမည် မရှိ ဆက်ဆံရေး (situationship) ဆန်';
+    if (pr.spark >= 3) return 'ဒိတ်/တွေ့ဆုံ ပုံစံ (dating)';
+    return 'ပေါ့ပေါ့ ဆွဲဆောင် (flirt)';
+  };
+  const wins = [];
+  tree.forEach(m => {
+    const mp = profile(m.lord);
+    (m.antars || []).forEach(a => {
+      const ap = profile(a.lord);
+      const spark = ap.spark + (mp.spark >= 2 ? 1 : 0),
+        bond = ap.bond + (mp.bond >= 2 ? 1 : 0);
+      const tot = spark + bond;
+      const af = ageOf(a.start),
+        at = ageOf(a.end);
+      if (tot >= 3 && (af == null || at >= 14) && (af == null || af <= 70)) {
+        wins.push({
+          mLord: m.lord,
+          aLord: a.lord,
+          start: a.start,
+          end: a.end,
+          spark,
+          bond,
+          stage: stageOf({
+            spark,
+            bond,
+            home: ap.home,
+            fog: ap.fog
+          }),
+          canSettle: settleLinks.has(a.lord) || settleLinks.has(m.lord),
+          ageFrom: af,
+          ageTo: at,
+          state: a.end < today ? 'passed' : a.start <= today ? 'now' : 'ahead'
+        });
+      }
+    });
+  });
+  const PM = pl => PLANET_MY[pl] || pl;
+  let summary,
+    show = [];
+  if (!wins.length) {
+    summary = 'ချစ်ခြင်း အတွက် ထင်ရှား တဲ့ ပြတင်း သီး ခြား မ တွေ့ ပါ — ဒဿာ တွေ က အချစ်ရေး အချက် တွေ ကို အား ကောင်း ကောင်း မ နှိုး တဲ့ ဇာတာ ဖြစ် တယ်။';
+  } else {
+    const strongest = wins.reduce((a, b) => b.spark + b.bond > a.spark + a.bond ? b : a, wins[0]);
+    const st = strongest.state === 'passed' ? 'ကျော် သွား ခဲ့ ပြီ' : strongest.state === 'now' ? 'လက်ရှိ ရောက် နေ တယ်' : 'ရှေ့ မှာ ရောက် လာ မည်';
+    summary = `ချစ်ခြင်း အတွက် အား အကောင်း ဆုံး ပြတင်း သည် ${PM(strongest.aLord)} အန္တရ (${PM(strongest.mLord)} မဟာဒဿာ အတွင်း၊ အသက် ${strongest.ageFrom}–${strongest.ageTo}) — ${strongest.stage} နဲ့ ဆင် ပြီး ${st}။`;
+    const upcoming = wins.filter(w => w.state !== 'passed').slice(0, 3);
+    show = upcoming.length ? upcoming : wins.slice(-2);
+  }
+  // ---- heartbreak watch (gated) ----
+  let venusAff = false;
+  try {
+    const vh = _planetHouse(bp, 'Venus');
+    if ([6, 8, 12].includes(vh)) venusAff = true;
+    const vs = signOf('Venus');
+    if (['Saturn', 'Rahu', 'Ketu'].some(x => bp[x] != null && signOf(x) === vs)) venusAff = true;
+  } catch (e) {}
+  const watch = [];
+  if (venusAff) {
+    const loveLordSet = new Set([L5, L7, 'Venus'].filter(Boolean));
+    const hardSet = new Set(['Saturn', 'Rahu', 'Ketu']);
+    const horizonD = new Date();
+    horizonD.setFullYear(horizonD.getFullYear() + 10);
+    const horizon = horizonD.toISOString().split('T')[0];
+    tree.forEach(m => {
+      if (!loveLordSet.has(m.lord)) return;
+      (m.antars || []).forEach(a => {
+        const af = ageOf(a.start),
+          at = ageOf(a.end);
+        if (hardSet.has(a.lord) && a.end >= today && a.start <= horizon && (af == null || at >= 14) && (af == null || af <= 65)) watch.push({
+          mLord: m.lord,
+          aLord: a.lord,
+          start: a.start,
+          end: a.end,
+          ageFrom: af,
+          ageTo: at,
+          state: a.start <= today ? 'now' : 'ahead'
+        });
+      });
+    });
+  }
+  const watchShow = watch.slice(0, 2);
+  let recovery = false;
+  if (watchShow.length) {
+    const lastEnd = watchShow[watchShow.length - 1].end;
+    const after = tree.find(d => d.start >= lastEnd);
+    if (after && (settleLinks.has(after.lord) || after.lord === 'Jupiter' || after.lord === 'Venus')) recovery = true;
+  }
+  return {
+    summary,
+    windows: show,
+    heartbreak: venusAff && watchShow.length ? {
+      windows: watchShow,
+      recovery
+    } : null
+  };
+}
 function generateAnnualForecast(birthDate, birthPlanets, transitPlanets, transitDate, lat, lon, ayanamsa, nodeType, tz) {
   const now = new Date(),
     start = new Date(now.getFullYear(), now.getMonth(), 1),
@@ -8954,6 +9314,9 @@ function MainApp() {
   });
   const placementReading = buildPlacementReading(birthPlanets, placementPlanet, birthPlanetsNext);
   const lifetimeMilestones = generateLifetimeMilestones(birthDateObj, dashaTree, birthPlanets);
+  const wealthTiming = wealthTimingSummary(birthPlanets, dashaTree, birthDateObj);
+  const marriageTiming = marriageTimingWindows(birthPlanets, dashaTree, birthDateObj);
+  const relationshipTiming = relationshipTimingWindows(birthPlanets, dashaTree, birthDateObj);
   const annualForecast = generateAnnualForecast(birthDateObj, birthPlanets, transitPlanets, transitDate, transitLat, transitLon, ayanamsa, nodeType, transitTzEff);
   const conjunctionsAndAspects = analyzeConjunctionsAndAspects(birthPlanets);
   const liveTransitPredictions = analyzeLiveTransit(birthPlanets, transitPlanets);
@@ -9930,7 +10293,11 @@ function MainApp() {
   }, "ဓန အခွင့်အလမ်း ပြတင်းများ (ဒဿာ)"), lifeOverview.wealthWindows.map((w, i) => /*#__PURE__*/React.createElement("p", {
     key: i,
     className: "text-[11px] text-slate-600 leading-relaxed"
-  }, w.kind === 'windfall' ? '🍀 ရုတ်တရက် / အစုလိုက် ပြတင်း' : '📈 တက် လမ်း ပြတင်း', " — ", PLANET_MY[w.lord] || w.lord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာဒဿာ အတွင်း) · ", w.start, " → ", w.end)))), lifeOverview.exceptional && /*#__PURE__*/React.createElement("div", {
+  }, w.kind === 'windfall' ? '🍀 ရုတ်တရက် / အစုလိုက် ပြတင်း' : '📈 တက် လမ်း ပြတင်း', " — ", PLANET_MY[w.lord] || w.lord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာဒဿာ အတွင်း) · ", w.start, " → ", w.end))), /*#__PURE__*/React.createElement("div", {
+    className: "border-t pt-1.5"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-slate-500 leading-relaxed"
+  }, "⏳ ဘယ် ကာလ မှာ ဘယ် လမ်းကြောင်း က အကျိုးပေး မလဲ ဆိုတဲ့ ", /*#__PURE__*/React.createElement("strong", null, "အချိန် အကျဉ်း"), " ကို ဟောစာတမ်း အောက် ပိုင်း က '🚩 ဘဝမှတ်တိုင်များ (Dasha Timeline)' ကတ် ထိပ် မှာ ကြည့် နိုင် ပါ တယ်။"))), lifeOverview.exceptional && /*#__PURE__*/React.createElement("div", {
     className: lifeOverview.exceptional.faded ? "bg-gradient-to-r from-indigo-950 via-purple-950 to-slate-900 text-white p-3.5 rounded-lg shadow space-y-2 border border-purple-300/40" : "bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-3.5 rounded-lg shadow space-y-2 border border-amber-400/50"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex justify-between items-center border-b border-white/15 pb-1.5"
@@ -10147,7 +10514,16 @@ function MainApp() {
     className: "font-bold text-slate-800 text-xs"
   }, "🚩 ဘဝမှတ်တိုင်များ အချိန်ဇယား (Lifetime Milestones)"), /*#__PURE__*/React.createElement("span", {
     className: "text-[10px] text-emerald-800 bg-emerald-50 font-bold px-1.5 py-0.5 rounded"
-  }, "Dasha Timeline")), /*#__PURE__*/React.createElement("div", {
+  }, "Dasha Timeline")), wealthTiming && wealthTiming.lines.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "bg-indigo-50 border border-indigo-200 rounded p-2.5 space-y-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] font-bold text-indigo-900"
+  }, "⏳ အချိန် အကျဉ်း — ဘယ် ဒဿာ မှာ ဘယ် အကျိုးပေး ရ မလဲ (ဓန)"), wealthTiming.lines.map((ln, li) => /*#__PURE__*/React.createElement("p", {
+    key: li,
+    className: "text-[11px] text-slate-700 leading-relaxed"
+  }, ln)), /*#__PURE__*/React.createElement("div", {
+    className: "text-[9px] text-slate-400 leading-relaxed"
+  }, "မဟာဒဿာ အဆင့် နဲ့ သာ ချိန် ထား ပါ တယ် — အသေးစိတ် က အောက် က ကာလ စာသား တွေ မှာ ဖတ် နိုင် ပါ တယ်။")), /*#__PURE__*/React.createElement("div", {
     className: "space-y-2"
   }, lifetimeMilestones.map((m, idx) => /*#__PURE__*/React.createElement("div", {
     key: idx,
@@ -10160,7 +10536,20 @@ function MainApp() {
     className: "text-[10px] text-emerald-700 bg-emerald-100 font-bold px-1.5 py-0.5 rounded"
   }, m.age, " (", m.yearRange, ")")), /*#__PURE__*/React.createElement("p", {
     className: "text-slate-600 text-[11px] leading-relaxed"
-  }, m.desc))))), /*#__PURE__*/React.createElement("div", {
+  }, m.desc), (() => {
+    const adv = wealthTiming && wealthTiming.periodAdvice ? wealthTiming.periodAdvice[m.trigger.split(' ')[0] + '|' + m.yearRange] : null;
+    return adv ? /*#__PURE__*/React.createElement("p", {
+      className: "text-[11px] leading-relaxed"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "font-bold text-emerald-800"
+    }, "ဆောင်ရန်:"), " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-600"
+    }, adv.do), " ", /*#__PURE__*/React.createElement("span", {
+      className: "font-bold text-rose-800"
+    }, "ရှောင်ရန်:"), " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-600"
+    }, adv.avoid)) : null;
+  })())))), /*#__PURE__*/React.createElement("div", {
     className: "bg-white border-2 border-emerald-600 p-3 rounded-lg shadow space-y-2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex justify-between items-center border-b border-emerald-200 pb-1.5"
@@ -10293,7 +10682,44 @@ function MainApp() {
   }, spouseProfile.verdict), spouseProfile.lines.map((ln, j) => /*#__PURE__*/React.createElement("div", {
     key: j,
     className: "text-[10px] text-slate-600 leading-relaxed"
-  }, "• ", ln))))), activeTab === 'prashna' && isTrop && /*#__PURE__*/React.createElement("div", {
+  }, "• ", ln))), relationshipTiming && /*#__PURE__*/React.createElement("div", {
+    className: "border-t border-indigo-200 pt-1.5 mt-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-rose-900 text-[11px]"
+  }, "💞 ချစ်ခြင်း အချိန် (Relationship Timing)"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-slate-700 leading-relaxed mt-0.5"
+  }, relationshipTiming.summary), relationshipTiming.windows.map((w, j) => /*#__PURE__*/React.createElement("div", {
+    key: j,
+    className: "text-[10px] text-slate-600 leading-relaxed"
+  }, "• ", PLANET_MY[w.aLord] || w.aLord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာဒဿာ) · အသက် ", w.ageFrom, "–", w.ageTo, " · ", /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold text-rose-800"
+  }, w.stage), w.canSettle && w.bond < 2 ? ' · အိမ်ထောင် ဘက် ဆက် သွား နိုင် တဲ့ အရိပ် ရှိ' : '', " · ", w.start, " → ", w.end)), relationshipTiming.heartbreak && /*#__PURE__*/React.createElement("div", {
+    className: "bg-rose-50 border border-rose-200 rounded p-2 mt-1.5 space-y-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] font-bold text-rose-900"
+  }, "💔 စိတ် ထိခိုက် လွယ် တဲ့ ကာလ (သတိ ထား ရန်)"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-600 leading-relaxed"
+  }, "သောကြာ နဲ့ ချစ်ခြင်း အချက် တွေ ဖိ အား ခံ ထား ရ တဲ့ ဇာတာ မှာ ဒီ ကာလ တွေ က အချစ်ရေး ကြောင့် စိတ် ထိခိုက် လွယ် တတ် တယ် — ဖြစ် ကို ဖြစ် မယ် လို့ ပြော တာ မဟုတ် ဘူး၊ စိတ် ပြင် ဆင် ထား ဖို့ သာ ဖြစ် ပါ တယ်။"), relationshipTiming.heartbreak.windows.map((w, j) => /*#__PURE__*/React.createElement("div", {
+    key: j,
+    className: "text-[10px] text-slate-600 leading-relaxed"
+  }, "• ", PLANET_MY[w.aLord] || w.aLord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာဒဿာ) · အသက် ", w.ageFrom, "–", w.ageTo, " · ", w.start, " → ", w.end)), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-600 leading-relaxed"
+  }, "ဒီ အချိန် တွေ မှာ စိတ် လိုက် မာန် ပါ ဆုံးဖြတ် ချက် ကြီး တွေ ကို ရပ် ထား ပြီး ကိုယ့် ကိုယ် ကို ဂရုစိုက် တာ၊ မိတ် ကောင်း တွေ နဲ့ နီး နီး နေ တာ က အကောင်း ဆုံး ပါ။"), relationshipTiming.heartbreak.recovery && /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-emerald-800 leading-relaxed"
+  }, "ဒီ ကာလ ကျော် သွား ရင် ပြန် ထောက် ပံ့ မယ့် ဒဿာ က စောင့် နေ ပါ တယ် — ဒီ လို အတွေ့ အကြုံ တွေ က လူ ကို ပို ရင့် ကျက် စေ တတ် ပါ တယ်။")), /*#__PURE__*/React.createElement("div", {
+    className: "text-[9px] text-slate-400 leading-relaxed"
+  }, "Flirt / Date / Situationship စတဲ့ အမည် တွေ သည် ဂြိုဟ် ပုံစံ နဲ့ ဆင် တဲ့ အဆင့် ကို ပြ တဲ့ ခေတ်သစ် စကား လုံး များ ဖြစ် ပါ တယ် — ယန္တရား က ကျမ်းရင်း (၅ တန့် = ချစ်ခြင်း၊ ၇ တန့် = အိမ်ထောင်၊ သုကြ ကာရက) ပေါ် မှာ တည် ဆောက် ထား ပါ တယ်။ ပြတင်း များ သည် အလားအလာ သာ ဖြစ် ပြီး လူ့ ဆုံးဖြတ်ချက် ကို အစား မထိုး ပါ။")), marriageTiming && /*#__PURE__*/React.createElement("div", {
+    className: "border-t border-indigo-200 pt-1.5 mt-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-rose-900 text-[11px]"
+  }, "💞 အိမ်ထောင် အချိန် (Marriage Timing)"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-slate-700 leading-relaxed mt-0.5"
+  }, marriageTiming.summary), marriageTiming.windows.map((w, j) => /*#__PURE__*/React.createElement("div", {
+    key: j,
+    className: "text-[10px] text-slate-600 leading-relaxed"
+  }, "• ", PLANET_MY[w.aLord] || w.aLord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာဒဿာ) · အသက် ", w.ageFrom, "–", w.ageTo, " · ", w.start, " → ", w.end)), /*#__PURE__*/React.createElement("div", {
+    className: "text-[9px] text-slate-400 leading-relaxed"
+  }, "အချိန် ပြတင်း များ သည် အလားအလာ ကို ပဲ ပြ ပါ တယ် — လူ့ ဆုံးဖြတ်ချက် ကို အစား မထိုး ပါ။")))), activeTab === 'prashna' && isTrop && /*#__PURE__*/React.createElement("div", {
     className: "p-3 text-xs"
   }, /*#__PURE__*/React.createElement("div", {
     className: "bg-amber-50 border border-amber-300 p-3 rounded leading-relaxed text-amber-900"
