@@ -4246,6 +4246,50 @@ function relationshipTimingWindows(bp, tree, birthDate) {
       });
     });
   }
+  // ---- natal partner pattern (v6.36, his ruling): many-partners tendency, GATED ----
+  // Classical mechanics: Venus-Mars desire fire, Rahu insatiability / Rahu-star Venus,
+  // dual-sign Venus or L7 (unsteady), 12th-house link (bed pleasures / hidden liaisons);
+  // Saturn/Jupiter aspect or conjunction on Venus = restraint, counted against.
+  let partnerPattern = null;
+  try {
+    let ps = 0;
+    const pwhy = [];
+    const vS = signOf('Venus'),
+      mS = signOf('Mars'),
+      rS = signOf('Rahu');
+    if (vS != null && vS === mS) {
+      ps += 2;
+      pwhy.push('သုကြ–အင်္ဂါ ပူး နေ တယ်');
+    } else if ([0, 7].includes(vS) || [1, 6].includes(mS)) {
+      ps += 1;
+      pwhy.push('သုကြ–အင်္ဂါ ရာသီ အ ချင်း ချင်း ဆက် နေ တယ်');
+    }
+    const vNak = Math.floor((bp.Venus % 360 + 360) % 360 / (360 / 27));
+    if (rS != null && rS === vS || _planetHouse(bp, 'Rahu') === 5 || _planetHouse(bp, 'Rahu') === 7 || [5, 14, 23].includes(vNak)) {
+      ps += 2;
+      pwhy.push('ရာဟု အရိပ် ကျ နေ တယ်');
+    }
+    const l7S = L7 ? signOf(L7) : null;
+    if ([2, 5, 8, 11].includes(vS) || [2, 5, 8, 11].includes(l7S)) {
+      ps += 1;
+      pwhy.push('သုကြ / ၇ တန့် အရှင် က ဒွိ ရာသီ မှာ ရပ် နေ တယ်');
+    }
+    if (_planetHouse(bp, 'Venus') === 12 || L7 && _planetHouse(bp, L7) === 12) {
+      ps += 1;
+      pwhy.push('၁၂ တန့် နဲ့ ဆက် နေ တယ်');
+    }
+    const sS = signOf('Saturn'),
+      jS = signOf('Jupiter');
+    const restrained = sS != null && vS != null && (sS === vS || [2, 6, 9].includes((sS - vS + 12) % 12)) || jS != null && vS != null && (jS === vS || [4, 6, 8].includes((jS - vS + 12) % 12));
+    if (restrained) ps -= 2;
+    if (ps >= 4) partnerPattern = {
+      level: 2,
+      text: `လိုအင် ပြင်း ပြီး ဆက်ဆံရေး မ တည် မငြိမ် ဖြစ် တတ် တဲ့ ပုံစံ ဖြစ် တယ် — ${pwhy.join('၊ ')}။ တွဲဖော် များ တတ် ပြီး တို တို နဲ့ ပြတ် တတ် တာ မျိုး ရှိ နိုင် တယ်။ ဒါ သည် ပုံစံ အရိပ် သာ ဖြစ် ပြီး တည် မြဲ တဲ့ ဆက်ဆံရေး ကို တော့ ကိုယ့် ရွေး ချယ် မှု နဲ့ ပဲ တည် ဆောက် ရ တာ ဖြစ် ပါ တယ်။`
+    };else if (ps === 3) partnerPattern = {
+      level: 1,
+      text: `ချစ်ခြင်း မှာ စိတ် ရွေ့ လျား လွယ် တဲ့ အရိပ် ရှိ တယ် — ${pwhy.join('၊ ')}။ ရွေးချယ် မှု များ တတ် ပြီး တည် မြဲ ဖို့ အားထုတ် မှု ပို လို တတ် ပါ တယ်။`
+    };
+  } catch (e) {}
   const watchShow = watch.slice(0, 2);
   let recovery = false;
   if (watchShow.length) {
@@ -4256,6 +4300,7 @@ function relationshipTimingWindows(bp, tree, birthDate) {
   return {
     summary,
     windows: show,
+    partnerPattern,
     heartbreak: venusAff && watchShow.length ? {
       windows: watchShow,
       recovery
@@ -10688,7 +10733,11 @@ function MainApp() {
     className: "font-bold text-rose-900 text-[11px]"
   }, "💞 ချစ်ခြင်း အချိန် (Relationship Timing)"), /*#__PURE__*/React.createElement("div", {
     className: "text-[11px] text-slate-700 leading-relaxed mt-0.5"
-  }, relationshipTiming.summary), relationshipTiming.windows.map((w, j) => /*#__PURE__*/React.createElement("div", {
+  }, relationshipTiming.summary), relationshipTiming.partnerPattern && /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-600 leading-relaxed bg-amber-50 border border-amber-200 rounded p-1.5"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-bold text-amber-900"
+  }, "🔥 တွဲဖော် ပုံစံ:"), " ", relationshipTiming.partnerPattern.text), relationshipTiming.windows.map((w, j) => /*#__PURE__*/React.createElement("div", {
     key: j,
     className: "text-[10px] text-slate-600 leading-relaxed"
   }, "• ", PLANET_MY[w.aLord] || w.aLord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာဒဿာ) · အသက် ", w.ageFrom, "–", w.ageTo, " · ", /*#__PURE__*/React.createElement("span", {
