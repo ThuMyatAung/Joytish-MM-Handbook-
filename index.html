@@ -50,6 +50,7 @@
   </div>
 
   <script type="text/javascript">
+// v6.37 (2026-10-22): Classical-correctness fixes from an external (ChatGPT) audit, verified against the code before fixing — (A) Mahapurusha sign lists corrected to own/exaltation signs only (Hamsa [3,8,11] — Libra/Capricorn removed; Malavya [1,6,11] — Gemini/Scorpio removed; Ruchaka [0,7,9] — Aquarius replaced by Capricorn; Bhadra/Sasa were already correct). (B) Vimshottari first mahadasha now uses the elapsed method: antardashas fully elapsed before birth are skipped and the running one is trimmed to birth; mahadasha boundaries and MD2-9 antardashas are byte-identical to before. (C) Bhava Bala is now a REAL per-chart calculation (house lord's Shadbala + Dig Bala by sign class + Drig Bala by whole-sign aspects, benefic +15/malefic -15 as in Shadbala's Drik) — until v6.36 it returned a static score array identical for every chart. Nothing else changed: golden output identical to the v6.33 baseline; test45 27/27.
 // v6.33 (2026-10-18): Jaimini Chara Karaka SURFACED — charaKarakas() helper (checkAllYogas Jaimini block refactored onto it, yogas unchanged); AK/AmK/BK/MK/PK/GK/DK badges beside planet names in the Nakshatra table; new KarakaPanel card in the sidereal Birth Chart (all 7 with sign/degree/house/role + AK and AmK house-theme lines). Display layer only.
 // v6.32 (2026-10-18): Art income source — the evidence line now lists the reasons that ACTUALLY fired for this chart (Venus strength / yogakaraka / star-lord channel / lordship / placement only when the placement itself scores). v6.31's bare Venus-placement caption could imply a non-scoring house (e.g. Venus in the 9th) was a reason; engine scores unchanged.
 // v6.15 (2026-10-15): Tropical = pure Western — CircleChart (Placidus), Western-format tables, Western readings + synastry; Astrocartography shows ONLY under Tropical. Vedic layers (nakshatra, dasha, Ashtakoota, yogas, Prashna, Job/Place layers) are sidereal-only. Sidereal code paths unchanged from v6.14.
@@ -2720,17 +2721,43 @@ function calculateDashaTree(moonLong, birthDate) {
     let mEnd = new Date(cur.getTime() + dur * 365.25 * 86400000);
     const antars = [];
     let aCur = new Date(cur.getTime());
-    for (let j = 0; j < 9; j++) {
-      const aIdx = (mIdx + j) % 9;
-      const aLord = DASHA_LORDS[aIdx] || DASHA_LORDS[0];
-      const aDur = mLord.years * aLord.years / 120.0 * (dur / mLord.years);
-      let aEnd = new Date(aCur.getTime() + aDur * 365.25 * 86400000);
-      antars.push({
-        lord: aLord.name,
-        start: fmt(aCur),
-        end: fmt(aEnd)
-      });
-      aCur = aEnd;
+    if (i === 0) {
+      /* v6.37 elapsed method: the native is born partway through the first mahadasha, so antardashas
+         that fully elapsed before birth are skipped and the running antardasha is trimmed to start
+         at birth (classical method). Before v6.37 all nine were proportionally compressed instead. */
+      const elapsed = mLord.years - balanceYears;
+      let cum = 0;
+      for (let j = 0; j < 9; j++) {
+        const aLord = DASHA_LORDS[(mIdx + j) % 9] || DASHA_LORDS[0];
+        const aFull = mLord.years * aLord.years / 120.0;
+        const aEndElapsed = cum + aFull;
+        if (aEndElapsed <= elapsed + 1e-9) {
+          cum = aEndElapsed;
+          continue;
+        }
+        const aDur = aEndElapsed - Math.max(cum, elapsed);
+        let aEnd = new Date(aCur.getTime() + aDur * 365.25 * 86400000);
+        antars.push({
+          lord: aLord.name,
+          start: fmt(aCur),
+          end: fmt(aEnd)
+        });
+        aCur = aEnd;
+        cum = aEndElapsed;
+      }
+    } else {
+      for (let j = 0; j < 9; j++) {
+        const aIdx = (mIdx + j) % 9;
+        const aLord = DASHA_LORDS[aIdx] || DASHA_LORDS[0];
+        const aDur = mLord.years * aLord.years / 120.0;
+        let aEnd = new Date(aCur.getTime() + aDur * 365.25 * 86400000);
+        antars.push({
+          lord: aLord.name,
+          start: fmt(aCur),
+          end: fmt(aEnd)
+        });
+        aCur = aEnd;
+      }
     }
     list.push({
       lord: mLord.name,
@@ -2743,23 +2770,62 @@ function calculateDashaTree(moonLong, birthDate) {
   }
   return list;
 }
-function calculateBhavaBala(p) {
+function calculateBhavaBala(p, jd, lat, lon, ayanamsaType, nodeType) {
   const lSign = calculateVarga(p.Lagna, 1);
-  const baseScores = [502.37, 487.50, 407.00, 395.85, 469.95, 510.10, 551.86, 470.36, 448.04, 444.33, 501.83, 419.33];
   const significations = ['ကိုယ်ခန္ဓာ၊ စရိုက်နှင့် အသက်ရှည်မှု', 'ဓနဥစ္စာ၊ မိသားစုနှင့် စကားပြော', 'မွေးချင်း၊ ရဲရင့်မှုနှင့် ဆက်သွယ်ရေး', 'မိခင်၊ နေအိမ်၊ ယာဉ်ရထားနှင့် စိတ်ချမ်းသာမှု', 'ဉာဏ်ပညာ၊ သားသမီးနှင့် ပညာရေး', 'ရန်သူ၊ ရောဂါ၊ အကြွေးနှင့် အတိုက်အခိုက်', 'အိမ်ထောင်ဖက်၊ အချစ်ရေးနှင့် စီးပွားဖက်', 'အသက်ဘေး၊ လျှို့ဝှက်ချက်နှင့် အမွေအနှစ်', 'ကံကြမ္မာ၊ ဖခင်၊ တရားဓမ္မနှင့် ဘာသာရေး', 'အလုပ်အကိုင်၊ ဂုဏ်သိက္ခာနှင့် အာဏာ', 'လာဘ်လာဘ၊ မိတ်ဆွေနှင့် ဆန္ဒပြည့်ဝမှု', 'ဆုံးရှုံးမှု၊ နိုင်ငံရပ်ခြားနှင့် တရားမွေ့လျော်မှု'];
+  /* v6.37: REAL Bhava Bala. Until v6.36 this returned a static baseScores array — identical scores for
+     every chart (only the rasi labels rotated). Now computed per chart in shastiamsas, whole-sign:
+     1) Bhavadhipati Bala = the house lord's Shadbala total (computeShadbala);
+     2) Bhava Dig Bala — sign-class power point: human signs strongest at the 1st house, quadruped signs
+        at the 10th, water signs at the 4th; 60 at the power point, falling linearly to 0 opposite;
+     3) Bhava Drig Bala — whole-sign aspects on the house, benefic +15 / malefic -15 (the same
+        simplified scheme as Shadbala's Drik component). */
+  let sb = null;
+  try {
+    if (typeof jd === 'number' && isFinite(jd)) sb = computeShadbala(p, jd, lat, lon, ayanamsaType, nodeType);
+  } catch (e) {
+    sb = null;
+  }
+  const HUMAN = [2, 5, 6, 10],
+    QUAD = [0, 1, 4, 8, 9];
   const bhavas = [];
   for (let i = 0; i < 12; i++) {
+    const house = i + 1;
     const rasiIdx = (lSign + i) % 12;
-    const score = baseScores[i];
+    const lord = RASI_LORDS[rasiIdx];
+    const adhipati = sb && sb[lord] ? sb[lord].total : _planetStrength(p, lord) * 3.6;
+    const power = HUMAN.includes(rasiIdx) ? 1 : QUAD.includes(rasiIdx) ? 10 : 4;
+    const hDist = Math.abs(house - power);
+    const dig = 60 - Math.min(hDist, 12 - hDist) * 10;
+    let drig = 0;
+    GRAHAS7.forEach(q => {
+      const qSign = Math.floor(norm360(p[q]) / 30) % 12;
+      const rel = ((rasiIdx - qSign) % 12 + 12) % 12 + 1;
+      let asp = rel === 7;
+      if (q === 'Mars' && (rel === 4 || rel === 8)) asp = true;
+      if (q === 'Jupiter' && (rel === 5 || rel === 9)) asp = true;
+      if (q === 'Saturn' && (rel === 3 || rel === 10)) asp = true;
+      if (asp) drig += ['Jupiter', 'Venus', 'Mercury', 'Moon'].includes(q) ? 15 : -15;
+    });
+    const score = Math.round((adhipati + dig + drig) * 100) / 100;
     bhavas.push({
-      house: i + 1,
+      house,
       rasi: RASI_NAMES_EN[rasiIdx],
       score,
       rupas: (score / 60).toFixed(2),
-      pct: Math.min(100, Math.round(score / 551.86 * 100)),
-      desc: significations[i]
+      desc: significations[i],
+      parts: {
+        lord,
+        adhipati: Math.round(adhipati * 100) / 100,
+        dig,
+        drig
+      }
     });
   }
+  const maxScore = Math.max.apply(null, bhavas.map(b => b.score).concat([1]));
+  bhavas.forEach(b => {
+    b.pct = Math.min(100, Math.round(b.score / maxScore * 100));
+  });
   const sorted = [...bhavas].sort((a, b) => b.score - a.score);
   bhavas.forEach(b => {
     b.rank = sorted.findIndex(s => s.house === b.house) + 1;
@@ -2851,9 +2917,9 @@ function checkAllYogas(p) {
     });
   };
   const k = [1, 4, 7, 10];
-  if ([1, 4, 7, 10].includes(h('Jupiter')) && [3, 6, 8, 9, 11].includes(s('Jupiter'))) add('Hamsa Mahapurusha Yoga', 'Jupiter သည် ကိန်းအိမ်တွင် မိမိ/ဥစ္စရာသီ၌ရှိခြင်း', 'ပညာ၊ အကြံဉာဏ်၊ အကျင့်သီလနှင့် အာဏာဘက်တွင် ထင်ရှားနိုင်သည်။', 5, ['Jupiter']);
-  if (k.includes(h('Venus')) && [1, 2, 6, 7, 11].includes(s('Venus'))) add('Malavya Mahapurusha Yoga', 'Venus ကိန်း + မိမိ/ဥစ္စရာသီ', 'အနုပညာ၊ ဆွဲဆောင်မှု၊ သက်သောင့်သက်သာနှင့် ပစ္စည်းပိုင်းဆိုင်ရာ အကျိုးပေးတတ်သည်။', 5, ['Venus']);
-  if (k.includes(h('Mars')) && [0, 7, 10].includes(s('Mars'))) add('Ruchaka Mahapurusha Yoga', 'Mars ကိန်း + မိမိ/ဥစ္စရာသီ', 'ရဲရင့်မှု၊ ဆုံးဖြတ်ချက်၊ ဦးဆောင်မှုနှင့် လုပ်ဆောင်နိုင်စွမ်း တိုးစေသည်။', 5, ['Mars']);
+  if ([1, 4, 7, 10].includes(h('Jupiter')) && [3, 8, 11].includes(s('Jupiter'))) add('Hamsa Mahapurusha Yoga', 'Jupiter သည် ကိန်းအိမ်တွင် မိမိ/ဥစ္စရာသီ၌ရှိခြင်း', 'ပညာ၊ အကြံဉာဏ်၊ အကျင့်သီလနှင့် အာဏာဘက်တွင် ထင်ရှားနိုင်သည်။', 5, ['Jupiter']);
+  if (k.includes(h('Venus')) && [1, 6, 11].includes(s('Venus'))) add('Malavya Mahapurusha Yoga', 'Venus ကိန်း + မိမိ/ဥစ္စရာသီ', 'အနုပညာ၊ ဆွဲဆောင်မှု၊ သက်သောင့်သက်သာနှင့် ပစ္စည်းပိုင်းဆိုင်ရာ အကျိုးပေးတတ်သည်။', 5, ['Venus']);
+  if (k.includes(h('Mars')) && [0, 7, 9].includes(s('Mars'))) add('Ruchaka Mahapurusha Yoga', 'Mars ကိန်း + မိမိ/ဥစ္စရာသီ', 'ရဲရင့်မှု၊ ဆုံးဖြတ်ချက်၊ ဦးဆောင်မှုနှင့် လုပ်ဆောင်နိုင်စွမ်း တိုးစေသည်။', 5, ['Mars']);
   if (k.includes(h('Mercury')) && [2, 5].includes(s('Mercury'))) add('Bhadra Mahapurusha Yoga', 'Mercury ကိန်း + မိမိရာသီ', 'ဉာဏ်၊ စကား၊ စီးပွားရေးနှင့် နည်းပညာကျွမ်းကျင်မှုကို အားပေးသည်။', 5, ['Mercury']);
   if (k.includes(h('Saturn')) && [6, 9, 10].includes(s('Saturn'))) add('Sasa Mahapurusha Yoga', 'Saturn ကိန်း + မိမိ/ဥစ္စရာသီ', 'တာဝန်ယူမှု၊ အဖွဲ့အစည်းအာဏာနှင့် အသက်ကြီးလာလေ ခိုင်မာလာလေဖြစ်စေသည်။', 5, ['Saturn']);
   if (s('Sun') === s('Mercury')) add('Budha-Aditya Yoga', 'Sun + Mercury ပူးယှဉ်ခြင်း', 'ဉာဏ်၊ စီမံခန့်ခွဲမှု၊ ဆက်သွယ်ရေးနှင့် analytical thinking အားကောင်းစေသည်။', 3, ['Sun', 'Mercury']);
@@ -9328,7 +9394,7 @@ function MainApp() {
   const transitPlanets = calculateNASA_JPL_Planets(tJD, parseFloat(transitLat) || 16.84, parseFloat(transitLon) || 96.17, ayanamsa, nodeType);
   const tropTransitCusps = isTrop ? calculatePlacidusCusps(tJD, parseFloat(transitLat) || 16.84, parseFloat(transitLon) || 96.17, 'tropical') : null;
   const dashaTree = calculateDashaTree(birthPlanets.Moon, birthDateObj);
-  const bhavaBala = calculateBhavaBala(birthPlanets);
+  const bhavaBala = calculateBhavaBala(birthPlanets, birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
   const yogas = checkAllYogas(birthPlanets);
   const kpReading = ayanamsa === 'kp' && kpCusps ? generateKPReading(birthPlanets, kpCusps, dashaTree) : null;
   const kpData = kpReading ? kpReading.data : null;
@@ -10974,7 +11040,9 @@ function MainApp() {
     className: "p-3 space-y-2 text-xs"
   }, /*#__PURE__*/React.createElement("h2", {
     className: "font-bold text-emerald-900 text-sm"
-  }, ayanamsa === 'kp' && kpData ? 'ဘာဝ ၁၂ ပါး (KP Cusp မြင်ကွင်း)' : 'ဘာဝ ၁၂ ပါး အားဗလ (Bhava Bala)'), ayanamsa === 'kp' && kpData && /*#__PURE__*/React.createElement("div", {
+  }, ayanamsa === 'kp' && kpData ? 'ဘာဝ ၁၂ ပါး (KP Cusp မြင်ကွင်း)' : 'ဘာဝ ၁၂ ပါး အားဗလ (Bhava Bala)'), !(ayanamsa === 'kp' && kpData) && /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] text-slate-500 leading-relaxed"
+  }, "နည်းလမ်း (v6.37 မှစ၍ အစစ် တွက်သည်): Bhava Bala = အိမ်အရှင်၏ Shadbala + Dig Bala (ရာသီ သဘာဝ အလိုက် အိမ်အား) + Drig Bala (အိမ်ပေါ် ကျသော ဂြိုဟ်အမြင် — သုဘ +, အသုဘ −)။ whole-sign အိမ် စနစ် သုံးပြီး Drig ကို Shadbala နည်းတူ အကျဉ်းချုံး တွက်ထားသည်။"), ayanamsa === 'kp' && kpData && /*#__PURE__*/React.createElement("div", {
     className: "space-y-2"
   }, kpData.houseSig.map(hs => /*#__PURE__*/React.createElement("div", {
     key: hs.house,
