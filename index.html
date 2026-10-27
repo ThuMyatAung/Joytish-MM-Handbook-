@@ -50,6 +50,7 @@
   </div>
 
   <script type="text/javascript">
+// v6.38 (2026-10-27): Hard Season two-tier window gate (user's ruling, two-tier option). Tier 1 UNCHANGED: the two-level gate (antar lord in the shown families' lord set AND maha lord in that set or = Lagna lord; future-only; 2065 cap) stays the main list. Tier 2 NEW: antar-only windows (maha condition dropped; same future-only + 2065 caps), minus any window already in tier 1, shown under a visibly lighter "may encounter / should be aware" label — a card never sits dateless when either tier has windows; when neither has any, the dateless display stays as the honest fallback. Recovery line stays tied to tier-1 windows ONLY (tier-2 windows get no recovery line). Nothing else changed: golden output identical to the v6.33 baseline.
 // v6.37 (2026-10-22): Classical-correctness fixes from an external (ChatGPT) audit, verified against the code before fixing — (A) Mahapurusha sign lists corrected to own/exaltation signs only (Hamsa [3,8,11] — Libra/Capricorn removed; Malavya [1,6,11] — Gemini/Scorpio removed; Ruchaka [0,7,9] — Aquarius replaced by Capricorn; Bhadra/Sasa were already correct). (B) Vimshottari first mahadasha now uses the elapsed method: antardashas fully elapsed before birth are skipped and the running one is trimmed to birth; mahadasha boundaries and MD2-9 antardashas are byte-identical to before. (C) Bhava Bala is now a REAL per-chart calculation (house lord's Shadbala + Dig Bala by sign class + Drig Bala by whole-sign aspects, benefic +15/malefic -15 as in Shadbala's Drik) — until v6.36 it returned a static score array identical for every chart. Nothing else changed: golden output identical to the v6.33 baseline; test45 27/27.
 // v6.33 (2026-10-18): Jaimini Chara Karaka SURFACED — charaKarakas() helper (checkAllYogas Jaimini block refactored onto it, yogas unchanged); AK/AmK/BK/MK/PK/GK/DK badges beside planet names in the Nakshatra table; new KarakaPanel card in the sidereal Birth Chart (all 7 with sign/degree/house/role + AK and AmK house-theme lines). Display layer only.
 // v6.32 (2026-10-18): Art income source — the evidence line now lists the reasons that ACTUALLY fired for this chart (Venus strength / yogakaraka / star-lord channel / lordship / placement only when the placement itself scores). v6.31's bare Venus-placement caption could imply a non-scoring house (e.g. Venus in the 9th) was a reason; engine scores unchanged.
@@ -3708,6 +3709,25 @@ function hardSeasonAnalysis(p, yogas, dashaTree) {
       wins.sort((a, b) => a.start < b.start ? -1 : 1);
     }
     const windows = wins.slice(0, 3);
+    // v6.38: tier 2 — antar-only windows (maha condition dropped; same future-only + 2065 caps), minus any two-level window (displayed or beyond the tier-1 cap), so the two lists never double-print the same window.
+    const _t1keys = new Set(wins.map(w => w.lord + '|' + w.mLord + '|' + w.start + '|' + w.end));
+    const weakWins = [];
+    if (Array.isArray(dashaTree)) {
+      for (const m of dashaTree) for (const a of m.antars || []) {
+        if (a.end < today || a.start > '2065-01-01') continue;
+        if (lordSet.has(a.lord)) {
+          const w = {
+            lord: a.lord,
+            mLord: m.lord,
+            start: a.start,
+            end: a.end
+          };
+          if (!_t1keys.has(w.lord + '|' + w.mLord + '|' + w.start + '|' + w.end)) weakWins.push(w);
+        }
+      }
+      weakWins.sort((a, b) => a.start < b.start ? -1 : 1);
+    }
+    const weakWindows = weakWins.slice(0, 3);
     let recovery = false;
     if (windows.length && Array.isArray(dashaTree)) {
       const lastEnd = windows[windows.length - 1].end;
@@ -3717,6 +3737,7 @@ function hardSeasonAnalysis(p, yogas, dashaTree) {
     return {
       families: shown,
       windows,
+      weakWindows,
       recovery
     };
   } catch (e) {
@@ -10489,6 +10510,13 @@ function MainApp() {
   }, "သတိ ထား သင့် တဲ့ ပြတင်း ကာလ:"), lifeOverview.hardSeason.windows.map((w, i) => /*#__PURE__*/React.createElement("p", {
     key: i,
     className: "text-[11px] leading-relaxed"
+  }, "· ", PLANET_MY[w.lord] || w.lord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာ အတွင်း) — ", w.start, " → ", w.end))), lifeOverview.hardSeason.weakWindows && lifeOverview.hardSeason.weakWindows.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-0.5"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] font-bold text-slate-300"
+  }, "တွေ့ကြုံရတတ် / သတိရှိသင့် တဲ့ ပြတင်း (တစ်ဆင့်တည်း ကိုက် — အထက် ပြတင်း လောက် မသေချာ ပါ):"), lifeOverview.hardSeason.weakWindows.map((w, i) => /*#__PURE__*/React.createElement("p", {
+    key: i,
+    className: "text-[10px] leading-relaxed text-slate-300"
   }, "· ", PLANET_MY[w.lord] || w.lord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာ အတွင်း) — ", w.start, " → ", w.end))), /*#__PURE__*/React.createElement("div", {
     className: "bg-white/5 rounded p-2"
   }, /*#__PURE__*/React.createElement("p", {
