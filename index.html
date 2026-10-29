@@ -51,6 +51,13 @@
 
   <script type="text/javascript">
 // v6.38 (2026-10-27): Hard Season two-tier window gate (user's ruling, two-tier option). Tier 1 UNCHANGED: the two-level gate (antar lord in the shown families' lord set AND maha lord in that set or = Lagna lord; future-only; 2065 cap) stays the main list. Tier 2 NEW: antar-only windows (maha condition dropped; same future-only + 2065 caps), minus any window already in tier 1, shown under a visibly lighter "may encounter / should be aware" label — a card never sits dateless when either tier has windows; when neither has any, the dateless display stays as the honest fallback. Recovery line stays tied to tier-1 windows ONLY (tier-2 windows get no recovery line). Nothing else changed: golden output identical to the v6.33 baseline.
+// v6.39 (2026-10-28): Disclaimer consent modal now shows on EVERY fresh page load (agreed state initializes to false; tapping agree dismisses it for that session only — the stored 'jyotish_agreed_v1' key is no longer read to suppress it). SelfCheckPanel results are now dismissible: the Self-check button toggles them and a "ပိတ်" button inside the results block closes them. Nothing else changed.
+// v6.40 (2026-10-28): Saved-profile Export/Import (backup against browser storage wipes). Export downloads ONE JSON file with all saved profiles (wrapper {app:'jyotish', format:1, exported:<ISO date>, profiles:[...]}). Import accepts MULTIPLE .json files at once; each file may be the wrapper, a bare array, or a single profile object; merge dedupes by id AND by exact (name+year+month+day+hour+minute+place) key, reports imported/skipped/failed counts in Burmese, and never wipes the list on a bad file. Nothing else changed.
+// v6.41 (2026-10-28): Saved-chart name search (substring filter in the saved list); rectification: new job-change/start event type, new separate appearance-detail picks (display-only, original lagna-appearance untouched and primary), and approximate event entry (around-year, looser year-window matching at 0.7 weight). Nothing else changed.
+// v6.42 (2026-10-28): Rectification personality picks (new separate display-only block, no scoring change); approximate-event window widened from 1 year to 3 years [Y-1, Y+2) at unchanged x0.7 discount. Dress skipped entirely. Nothing else changed.
+// v6.45 (2026-10-29): (1) Luminary section: instruction line ("ရွေးချယ်မှု ... ဖတ်ပါ") removed — values, computation note and per-varga breakdown kept; no Moon-lagna reading built. (2) Added-dasha menu label shortened to "ထပ်တိုး ဒဿာ" (grouping unchanged); all six headers (five dashas + Sudarshana) tightened to shorter text with identical facts, effects-present wording replacing the "later phase" sentence. (3) Per-period EFFECT lines for all five added dashas, app-generated from chart factors (lord's sign/house from Lagna, dignity, Shadbala, lordship houses, conjunctions) and labeled as such, never text quotes; Moola: order + effects only, no dates (Ch.41 has no year table); Saravali Ch.42 note: Ch.42 governs Moola SUB-periods (bhuktis), not these major periods, so no Ch.42 pair text is pasted onto major periods. Kala: effects with years only, no dates (birth balance uncomputed). Chara antars (sub-divisions) keep dates only. Display-only: nothing feeds any score. NO Sudarshana timing cycle, NO varga layer, NO Ashtakavarga cross-check, NO full Moon-lagna reading, NO Vimshottari/menu-structure/score change. Nothing else changed.
+// v6.44 (2026-10-29): (1) Added dasha tabs grouped under one parent menu "�ပ်တိုး ဒဿာ" (Vimshottari stays top-level, Sudarshana stays separate, UI only). (2) Explainer headers on all five added dasha tabs + a how-to-read header on the Sudarshana tab (display text only, no predictions, no invented rules). (3) Sudarshana verdicts now use occupancy AND aspects per BPHS File 1 Ch.74 vv.10-13 (existing _aspectHouses engine: all aspect 7th; Saturn 3/10; Jupiter 5/9; Mars 4/8 — BPHS Ch.26); both sides present -> majority wins, equal numbers -> stronger side wins by summed Shadbala totals (Rahu/Ketu have no Shadbala total -> 0), no strength difference -> mixed; distinctness gate + Lagna-only fallback unchanged. Display-only: nothing here feeds any score. NO timing cycle, NO varga layer, NO Ashtakavarga cross-check, NO dasha effects engine, NO luminary/Vimshottari/score/threshold/formula change. Nothing else changed.
+// v6.43 (2026-10-29): Lost Horoscopy section (Saravali Ch.48-52, own title, display/comparison only, moles/scars cross-check per Ch.4+50); per-candidate textual appearance boxes below each rectification candidate (display-only, Use-this-time unchanged); Navamsa line in Executive Overview (below life-path); Hora effects (Saravali Ch.49) in candidate profiles + Lost Horoscopy; special ascendants block (BPHS Ch.5); Sudarshana tab (BPHS Ch.74); Mahapurusha classical effect details alongside modern summaries (BPHS Ch.75 / Saravali Ch.37); guna/tatwa display alongside personality picks (Saravali Ch.38, mapping BPHS Ch.3 v22 only); Vimsopaka-based luminary section (user course selection rule, labeled as such); dasha tabs Moola/Yogini/Ashtottari/Chara/Kala (ayanamsa labeled per system). NO score, Bhava Bala, Shadbala, aspect, BAV, Lakshmi, combustion, or Ashtakoota change. Nothing else changed.
 // v6.37 (2026-10-22): Classical-correctness fixes from an external (ChatGPT) audit, verified against the code before fixing — (A) Mahapurusha sign lists corrected to own/exaltation signs only (Hamsa [3,8,11] — Libra/Capricorn removed; Malavya [1,6,11] — Gemini/Scorpio removed; Ruchaka [0,7,9] — Aquarius replaced by Capricorn; Bhadra/Sasa were already correct). (B) Vimshottari first mahadasha now uses the elapsed method: antardashas fully elapsed before birth are skipped and the running one is trimmed to birth; mahadasha boundaries and MD2-9 antardashas are byte-identical to before. (C) Bhava Bala is now a REAL per-chart calculation (house lord's Shadbala + Dig Bala by sign class + Drig Bala by whole-sign aspects, benefic +15/malefic -15 as in Shadbala's Drik) — until v6.36 it returned a static score array identical for every chart. Nothing else changed: golden output identical to the v6.33 baseline; test45 27/27.
 // v6.33 (2026-10-18): Jaimini Chara Karaka SURFACED — charaKarakas() helper (checkAllYogas Jaimini block refactored onto it, yogas unchanged); AK/AmK/BK/MK/PK/GK/DK badges beside planet names in the Nakshatra table; new KarakaPanel card in the sidereal Birth Chart (all 7 with sign/degree/house/role + AK and AmK house-theme lines). Display layer only.
 // v6.32 (2026-10-18): Art income source — the evidence line now lists the reasons that ACTUALLY fired for this chart (Venus strength / yogakaraka / star-lord channel / lordship / placement only when the placement itself scores). v6.31's bare Venus-placement caption could imply a non-scoring house (e.g. Venus in the 9th) was a reason; engine scores unchanged.
@@ -1530,6 +1537,11 @@ const RECT_EVENT_DEFS = {
     houses: [6, 10, 11],
     primary: 10
   },
+  jobchange: {
+    label: '🔄 အလုပ် ပြောင်း / အလုပ် သစ် စခဲ့',
+    houses: [6, 10, 11],
+    primary: 10
+  },
   business: {
     label: '🏢 ကိုယ်ပိုင် လုပ်ငန်း စထောင်ခဲ့သည်',
     houses: [7, 10, 11],
@@ -1592,6 +1604,44 @@ const RECT_EVENT_DEFS = {
   }
 };
 const APPEARANCE_BY_SIGN = ['မိဿ: အရပ် အလတ်, ကိုယ် သွယ်လျ, မျက်နှာ ရှည်သွယ်, လှုပ်ရှား မြန်', 'ပြိဿ: အရပ် အလတ်/နိမ့်, ကိုယ် တောင့်တင်း, လည်ပင်း/ပခုံး ကြီး, ငြိမ်', 'မေထုန်: အရပ် ရှည်, ကိုယ် ပိန်, လက် ရှည်, နုပျို ရုပ်', 'ကရကဋ်: အရပ် အလတ်, ကိုယ် ပြည့်, မျက်နှာ လုံး/ပြည့်, အသား ဖြူစင်', 'သိဟ်: ကိုယ် တောင့်, ပခုံး ကျယ်, ဦးခေါင်း ကြီး, ဟန် ခန့်ညား', 'ကန်: အရပ် အလတ်, ကိုယ် သွယ်, မျက်နှာ သန့် ပြတ်, စနစ် ကျ', 'တူ: အရပ် အလတ်, ကိုယ် ချော လှ, မျက်နှာ ညီညာ, ပြုံး များ', 'ဗြိစ္ဆာ: အရပ် အလတ်, ကိုယ် တောင့်, မျက်လုံး နက် စူး, ကြည့် ထက်မြက်', 'ဓနု: အရပ် ရှည်, ကိုယ် တောင့်လျ, မျက်နှာ ရှည်, ပွင့်လင်း ဟန်', 'မကာရ: အရပ် အလတ်/ရှည်, ကိုယ် ပိန် တောင့်, ရင့်ကျက် ရုပ်', 'ကုံ: အရပ် ရှည်, ကိုယ် တောင့်, မျက်နှာ ကျယ်, ဆန်းသစ် ဟန်', 'မိန်: အရပ် အလတ်/နိမ့်, ကိုယ် ပြည့် နူး, မျက်လုံး အိပ်မက် ဆန်, နူးညံ့'];
+const RECT_APP_DETAIL_DEFS = [{
+  key: 'height',
+  label: 'အရပ်',
+  opts: ['ပု', 'လတ်', 'ရှည်']
+}, {
+  key: 'complexion',
+  label: 'အသားအရေ',
+  opts: ['ဝင်း', 'လတ်', 'ညို']
+}, {
+  key: 'build',
+  label: 'ကိုယ်လုံး',
+  opts: ['ပိန်', 'လတ်', 'ဝ']
+}, {
+  key: 'fingers',
+  label: 'လက်ချောင်း',
+  opts: ['ရှည်', 'လတ်', 'တို']
+}];
+const RECT_PERS_DEFS = [{
+  key: 'speech',
+  label: 'စကား',
+  opts: ['စကားများ', 'စကားနည်း']
+}, {
+  key: 'pace',
+  label: 'လုပ်ရပ်',
+  opts: ['လုပ်ရပ်မြန်', 'လုပ်ရပ်နှေး']
+}, {
+  key: 'openness',
+  label: 'ပွင့်လင်းမှု',
+  opts: ['ပွင့်လင်း', 'လျို့ဝှက်']
+}, {
+  key: 'honesty',
+  label: 'ရိုးသားမှု',
+  opts: ['ရိုးသား', 'နောက်ကွယ်က လုပ်တတ်']
+}, {
+  key: 'decision',
+  label: 'ဆုံးဖြတ်ပုံ',
+  opts: ['တစ်ဇွတ်ထိုး', 'အစီအစဉ် ဗျူဟာသမား']
+}];
 function _rectConnection(bp, kpData, def, planet) {
   if (!planet || bp[planet] == null) return 0;
   let sc = 0;
@@ -1610,17 +1660,48 @@ function _rectConnection(bp, kpData, def, planet) {
   }
   return sc;
 }
+function rectApproxActs(tree, year) {
+  // v6.42: three-year window [Y-1-01-01, Y+2-01-01) — years Y-1, Y, Y+1; every maha/antar pair overlapping the window counts
+  const wS = parseInt(year, 10) - 1 + '-01-01',
+    wE = parseInt(year, 10) + 2 + '-01-01';
+  const acts = [];
+  for (const m of tree || []) {
+    if (m.start < wE && m.end > wS) {
+      const ans = (m.antars || []).filter(a => a.start < wE && a.end > wS);
+      if (ans.length) ans.forEach(a => acts.push({
+        maha: m.lord,
+        antar: a.lord
+      }));else acts.push({
+        maha: m.lord,
+        antar: null
+      });
+    }
+  }
+  return acts;
+}
+function _rectEventScore(bp, kpData, def, act, tJup, tSat) {
+  const cM = _rectConnection(bp, kpData, def, act.maha),
+    cA = act.antar ? _rectConnection(bp, kpData, def, act.antar) : 0;
+  // antar is the trigger level: gate on it; maha is background
+  let sc = cA > 0 ? cA * 1.5 + cM * 0.5 : cM * 0.3;
+  const primSign = (calculateVarga(bp.Lagna, 1) + def.primary - 1) % 12;
+  if (cA > 0 && tJup != null && tJup === primSign) sc += 1.5;
+  if (cA > 0 && tSat != null && def.primary === 8 && tSat === primSign) sc += 1;
+  return Math.round(Math.min(12, sc) * 10) / 10;
+}
 function rectifyBirthTime(opts) {
-  // opts: {dateStr (YYYY-MM-DD of birth), fromMin, toMin (minutes of day), lat, lon, ayanamsa, nodeType, events:[{type,date}], appearanceSign}
+  // opts: {dateStr (YYYY-MM-DD of birth), fromMin, toMin (minutes of day), lat, lon, ayanamsa, nodeType, events:[{type,date} or {type,approx:true,year}], appearanceSign}
   const results = [];
   const evDefs = opts.events.map(e => ({
     ...e,
-    def: RECT_EVENT_DEFS[e.type]
-  })).filter(e => e.def && e.date);
+    def: RECT_EVENT_DEFS[e.type],
+    approx: !!e.approx
+  })).filter(e => e.def && (e.date || e.approx && /^\d{4}$/.test(String(e.year))));
   // event-date transits computed once per event
   evDefs.forEach(e => {
     try {
-      const tp = calculateNASA_JPL_Planets(_jdFromDate(new Date(e.date + 'T12:00:00'), opts.tz), opts.lat, opts.lon, opts.ayanamsa, opts.nodeType);
+      const effDate = e.approx ? e.year + '-07-01T12:00:00' : e.date + 'T12:00:00';
+      const tp = calculateNASA_JPL_Planets(_jdFromDate(new Date(effDate), opts.tz), opts.lat, opts.lon, opts.ayanamsa, opts.nodeType);
       e.tJup = calculateVarga(tp.Jupiter, 1);
       e.tSat = calculateVarga(tp.Saturn, 1);
     } catch (err) {}
@@ -1646,32 +1727,33 @@ function rectifyBirthTime(opts) {
       let total = 0;
       const per = [];
       evDefs.forEach(e => {
-        const act = (() => {
-          for (const m of tree) {
-            if (e.date >= m.start && e.date < m.end) {
-              const an = (m.antars || []).find(a => e.date >= a.start && e.date < a.end);
-              return {
-                maha: m.lord,
-                antar: an ? an.lord : null
-              };
-            }
-          }
-          return null;
-        })();
         let sc = 0;
-        if (act) {
-          const cM = _rectConnection(bp, kpData, e.def, act.maha),
-            cA = act.antar ? _rectConnection(bp, kpData, e.def, act.antar) : 0;
-          // antar is the trigger level: gate on it; maha is background
-          sc = cA > 0 ? cA * 1.5 + cM * 0.5 : cM * 0.3;
-          const primSign = (calculateVarga(bp.Lagna, 1) + e.def.primary - 1) % 12;
-          if (cA > 0 && e.tJup != null && e.tJup === primSign) sc += 1.5;
-          if (cA > 0 && e.tSat != null && e.def.primary === 8 && e.tSat === primSign) sc += 1;
+        if (e.approx) {
+          // v6.42: approximate year — any maha/antar overlapping the three-year window [Y-1, Y+2) counts; best wins, discounted for uncertainty
+          let best = 0;
+          rectApproxActs(tree, e.year).forEach(act => {
+            best = Math.max(best, _rectEventScore(bp, kpData, e.def, act, e.tJup, e.tSat));
+          });
+          sc = Math.round(Math.min(12, best * 0.7) * 10) / 10;
+        } else {
+          const act = (() => {
+            for (const m of tree) {
+              if (e.date >= m.start && e.date < m.end) {
+                const an = (m.antars || []).find(a => e.date >= a.start && e.date < a.end);
+                return {
+                  maha: m.lord,
+                  antar: an ? an.lord : null
+                };
+              }
+            }
+            return null;
+          })();
+          if (act) sc = _rectEventScore(bp, kpData, e.def, act, e.tJup, e.tSat);
         }
-        sc = Math.round(Math.min(12, sc) * 10) / 10;
         per.push({
           type: e.type,
-          score: sc
+          score: sc,
+          approx: !!e.approx
         });
         total += sc;
       });
@@ -1711,6 +1793,1546 @@ function rectifyBirthTime(opts) {
   }
   const picked = Object.values(byLagna).sort((a, b) => b.total - a.total).slice(0, 6);
   return picked;
+}
+
+// ===== v6.43: Special ascendants, Vimsopaka, extra dashas, Sudarshana (pure helpers) =====
+// Sources: BPHS File 1 (unidentified translation) Ch.5, Ch.7, Ch.46, Ch.74; standard published
+// Vimsopaka Dasa-varga scheme (weights match File 1 Ch.7 v.20; File 1 gives no dignity-points
+// table, so the 20/18/15/10/7/5/0 scale is the published standard, labeled as such);
+// standard Jaimini Chara rules (File 1 Ch.46 vv.147-157 are ellipsized, so the opening-sign
+// rule is the standard one, labeled). Display-only helpers: none of these feed any score.
+
+// --- Sunrise by bisection on Sun altitude, using the app's own ephemeris ---
+function v643GmstDeg(jd) {
+  return norm360(280.46061837 + 360.98564736629 * (jd - 2451545.0));
+}
+function v643SunAltDeg(jd, lat, lon) {
+  try {
+    const trop = calculateNASA_JPL_Planets(jd, lat, lon, 'tropical', 'mean');
+    const lam = trop.Sun * Math.PI / 180,
+      eps = 23.4392811 * Math.PI / 180;
+    const dec = Math.asin(Math.sin(lam) * Math.sin(eps));
+    const ra = norm360(Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam)) * 180 / Math.PI);
+    let H = norm360(v643GmstDeg(jd) + lon - ra);
+    if (H > 180) H -= 360;
+    const latR = lat * Math.PI / 180;
+    const s = Math.sin(latR) * Math.sin(dec) + Math.cos(latR) * Math.cos(dec) * Math.cos(H * Math.PI / 180);
+    return Math.asin(Math.max(-1, Math.min(1, s))) * 180 / Math.PI;
+  } catch (e) {
+    return -90;
+  }
+}
+function v643SunriseJD(y, mo, d, lat, lon, tz) {
+  // Bisection over local 00:00-12:00 for altitude -0.833 deg. Returns JD or null (polar day/night).
+  try {
+    const jd0 = getJulianDay(y, mo, d, 0, 0, tz);
+    const jd12 = getJulianDay(y, mo, d, 12, 0, tz);
+    const a0 = v643SunAltDeg(jd0, lat, lon),
+      a12 = v643SunAltDeg(jd12, lat, lon);
+    if (a0 >= -0.833 || a12 <= -0.833) return null;
+    let lo = jd0,
+      hi = jd12;
+    for (let i = 0; i < 30; i++) {
+      const mid = (lo + hi) / 2;
+      if (v643SunAltDeg(mid, lat, lon) < -0.833) lo = mid;else hi = mid;
+    }
+    return (lo + hi) / 2;
+  } catch (e) {
+    return null;
+  }
+}
+function v643PrevDate(y, mo, d) {
+  const dt = new Date(Date.UTC(y, mo - 1, d));
+  dt.setUTCDate(dt.getUTCDate() - 1);
+  return [dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate()];
+}
+function v643SpecialAscendants(birthJD, y, mo, d, lat, lon, tz, ayanamsa, nodeType, lagnaLong) {
+  // BPHS File 1 Ch.5 vv.2-8: Bhava (5 ghatis = 120 min per sign), Hora (2.5 ghatis = 60 min),
+  // Ghati (1 ghati = 24 min) — all from sunrise + Sun longitude at sunrise.
+  // Varnada vv.10-15: from natal Lagna + Hora Lagna signs (odd/even counting).
+  let sr = v643SunriseJD(y, mo, d, lat, lon, tz);
+  if (sr !== null && birthJD < sr) {
+    const pv = v643PrevDate(y, mo, d);
+    sr = v643SunriseJD(pv[0], pv[1], pv[2], lat, lon, tz);
+  }
+  if (sr === null) return null;
+  const ghatis = (birthJD - sr) * 1440 / 24;
+  const sunAtSr = calculateNASA_JPL_Planets(sr, lat, lon, ayanamsa, nodeType).Sun;
+  const bhava = norm360(sunAtSr + ghatis * 6);
+  const hora = norm360(sunAtSr + ghatis * 12);
+  const ghati = norm360(sunAtSr + ghatis * 30);
+  const lagnaSign = Math.floor(norm360(lagnaLong) / 30);
+  const horaSign = Math.floor(hora / 30);
+  const cnt = s => s % 2 === 0 ? s + 1 : 12 - s;
+  const a = cnt(lagnaSign),
+    b = cnt(horaSign);
+  const n0 = a % 2 === b % 2 ? a + b : Math.abs(a - b);
+  const n = (n0 - 1) % 12 + 1;
+  const varnada = n % 2 === 1 ? n - 1 : 12 - n;
+  return {
+    bhava,
+    hora,
+    ghati,
+    varnada,
+    ghatis
+  };
+}
+
+// --- Vimsopaka Bala, Dasa-varga (10 vargas), published standard scheme ---
+const VIMSOPAKA_WEIGHTS = {
+  1: 3,
+  2: 1.5,
+  3: 1.5,
+  7: 1.5,
+  9: 1.5,
+  10: 1.5,
+  12: 1.5,
+  16: 1.5,
+  30: 1.5,
+  60: 5
+};
+function v643Vishwa(planet, vargaSign, d1PlanetSign, d1LordSign) {
+  // Own/exalt 20, great friend 18, friend 15, neutral 10, enemy 7, great enemy 5, debil 0.
+  // Moola sign = own/exalt sign for all 7 grahas, so no separate moola branch is needed.
+  if (vargaSign === EXALT_SIGN[planet]) return 20;
+  if (RASI_LORDS[vargaSign] === planet) return 20;
+  if (vargaSign === (EXALT_SIGN[planet] + 6) % 12) return 0;
+  const lord = RASI_LORDS[vargaSign];
+  const nat = NATURAL_RELATIONS[planet] || {
+    friends: [],
+    enemies: []
+  };
+  const natF = nat.friends.includes(lord),
+    natE = nat.enemies.includes(lord);
+  const tmpD = (d1LordSign - d1PlanetSign + 12) % 12 + 1;
+  const tmpF = [2, 3, 4, 10, 11, 12].includes(tmpD);
+  if (natF && tmpF) return 18;
+  if (natE && tmpF) return 7;
+  if (natF || tmpF) return 15;
+  if (natE) return 5;
+  return 10;
+}
+function v643Vimsopaka(planetLong, planet, d1Longs) {
+  // Hora (D2) rule (published standard): Cancer -> Moon/Venus/Saturn 20, Sun/Mars/Jupiter 0;
+  // Leo -> reverse; Mercury 20 in both. Sign-level dignity per varga (simplified scheme).
+  let sum = 0;
+  const per = {};
+  const d1Sign = Math.floor(norm360(planetLong) / 30);
+  for (const v of [1, 2, 3, 7, 9, 10, 12, 16, 30, 60]) {
+    const vs = calculateVarga(planetLong, v);
+    let pts;
+    if (v === 2) {
+      if (planet === 'Mercury') pts = 20;else if (vs === 3) pts = ['Moon', 'Venus', 'Saturn'].includes(planet) ? 20 : 0;else pts = ['Sun', 'Mars', 'Jupiter'].includes(planet) ? 20 : 0;
+    } else {
+      const lord = RASI_LORDS[vs];
+      const lordD1 = Math.floor(norm360(d1Longs[lord]) / 30);
+      pts = v643Vishwa(planet, vs, d1Sign, lordD1);
+    }
+    per[v] = pts;
+    sum += VIMSOPAKA_WEIGHTS[v] * pts / 20;
+  }
+  return {
+    total: Math.round(sum * 10) / 10,
+    perVarga: per
+  };
+}
+
+// --- Shared dasha date builder (app's 365.25-day year convention, as in calculateDashaTree) ---
+function v643DashaDates(birthDate, periods) {
+  const fmt = d => {
+    try {
+      return d.toISOString().split('T')[0];
+    } catch (e) {
+      return '2026-01-01';
+    }
+  };
+  let cur = birthDate && !isNaN(birthDate.getTime()) ? new Date(birthDate.getTime()) : new Date();
+  return periods.map(p => {
+    const end = new Date(cur.getTime() + p.years * 365.25 * 86400000);
+    const row = {
+      label: p.label,
+      years: p.years,
+      start: fmt(cur),
+      end: fmt(end)
+    };
+    cur = end;
+    return row;
+  });
+}
+
+// --- Yogini Dasha (BPHS File 1 Ch.46 vv.195-199) ---
+const YOGINI_LORDS = [{
+  name: 'Mangal',
+  graha: 'Moon',
+  years: 1
+}, {
+  name: 'Pingal',
+  graha: 'Sun',
+  years: 2
+}, {
+  name: 'Dhanya',
+  graha: 'Jupiter',
+  years: 3
+}, {
+  name: 'Bhramari',
+  graha: 'Mars',
+  years: 4
+}, {
+  name: 'Bhadrika',
+  graha: 'Mercury',
+  years: 5
+}, {
+  name: 'Ulka',
+  graha: 'Saturn',
+  years: 6
+}, {
+  name: 'Siddha',
+  graha: 'Venus',
+  years: 7
+}, {
+  name: 'Sankat',
+  graha: 'Rahu',
+  years: 8
+}];
+function v643YoginiDasha(moonLong, birthDate) {
+  const nakTotal = norm360(moonLong) / (360 / 27);
+  const nakIndex = Math.floor(nakTotal);
+  const r = (nakIndex + 1 + 3) % 8;
+  const openIdx = r === 0 ? 7 : r - 1;
+  const elapsed = nakTotal - nakIndex;
+  const periods = [];
+  for (let cycle = 0; cycle < 5; cycle++) {
+    for (let i = 0; i < 8; i++) {
+      const idx = (openIdx + i) % 8;
+      const y = YOGINI_LORDS[idx];
+      periods.push({
+        label: y.name + ' (' + y.graha + ')',
+        years: cycle === 0 && i === 0 ? Math.max(0.01, (1 - elapsed) * y.years) : y.years
+      });
+    }
+  }
+  return v643DashaDates(birthDate, periods);
+}
+
+// --- Ashtottari Dasha (BPHS File 1 Ch.46 vv.17-22) ---
+const ASHTOTTARI_LORDS = [{
+  name: 'Sun',
+  years: 6
+}, {
+  name: 'Moon',
+  years: 15
+}, {
+  name: 'Mars',
+  years: 8
+}, {
+  name: 'Mercury',
+  years: 17
+}, {
+  name: 'Saturn',
+  years: 10
+}, {
+  name: 'Jupiter',
+  years: 19
+}, {
+  name: 'Rahu',
+  years: 12
+}, {
+  name: 'Venus',
+  years: 21
+}];
+// 0-based nakshatra index -> lord index (Ardra-group start; Abhijit counted in the Saturn group).
+const ASHTOTTARI_NAK_GROUP = [6, 6, 7, 7, 7, 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6];
+function v643AshtottariDasha(moonLong, birthDate) {
+  const nakTotal = norm360(moonLong) / (360 / 27);
+  const nakIndex = Math.floor(nakTotal);
+  const openIdx = ASHTOTTARI_NAK_GROUP[nakIndex];
+  const elapsed = nakTotal - nakIndex;
+  const periods = [];
+  for (let cycle = 0; cycle < 2; cycle++) {
+    for (let i = 0; i < 8; i++) {
+      const idx = (openIdx + i) % 8;
+      const y = ASHTOTTARI_LORDS[idx];
+      periods.push({
+        label: y.name,
+        years: cycle === 0 && i === 0 ? Math.max(0.01, (1 - elapsed) * y.years) : y.years
+      });
+    }
+  }
+  return v643DashaDates(birthDate, periods);
+}
+function v643AshtottariCondition(bp) {
+  // Recommended when Rahu, not in Lagna, is in kendra/trikona to the Lagna lord.
+  const lagnaSign = Math.floor(norm360(bp.Lagna) / 30);
+  const rahuSign = Math.floor(norm360(bp.Rahu) / 30);
+  const lordSign = Math.floor(norm360(bp[RASI_LORDS[lagnaSign]]) / 30);
+  if (rahuSign === lagnaSign) return {
+    applies: false,
+    reason: 'Rahu is in Lagna'
+  };
+  const h = (rahuSign - lordSign + 12) % 12 + 1;
+  const ok = [1, 4, 5, 7, 9, 10].includes(h);
+  return {
+    applies: ok,
+    reason: ok ? 'Rahu in ' + h + 'th from the Lagna lord' : 'Rahu in ' + h + 'th from the Lagna lord (not kendra/trikona)'
+  };
+}
+
+// --- Chara Dasha (standard Jaimini; File 1 Ch.46 v.167 for direction) ---
+const CHARA_SAMA_PADA = [3, 4, 5, 9, 10, 11]; // Cancer, Leo, Virgo, Capricorn, Aquarius, Pisces
+const CHARA_VISHAMA_PADA = [0, 1, 2, 6, 7, 8]; // Aries, Taurus, Gemini, Libra, Scorpio, Sagittarius
+function v643CharaDasha(bp, birthDate) {
+  // First period = Lagna sign (standard rule; File 1 vv.147-157 ellipsized). No balance at birth.
+  // Years: count from sign to lord's sign in the sign's pada direction, minus 1; lord in own
+  // sign -> 12; exalted lord +1; debilitated lord -1 (min 1). Dual-ruled signs: the lord in the
+  // sign itself is used when present, else the primary lord (occupation-only simplification).
+  const lagnaSign = Math.floor(norm360(bp.Lagna) / 30);
+  const ninthSign = (lagnaSign + 8) % 12;
+  const dir = CHARA_SAMA_PADA.includes(ninthSign) ? -1 : 1;
+  const lordOf = s => {
+    if (s === 7) return Math.floor(norm360(bp.Ketu) / 30) === 7 ? 'Ketu' : 'Mars';
+    if (s === 10) return Math.floor(norm360(bp.Rahu) / 30) === 10 ? 'Rahu' : 'Saturn';
+    return RASI_LORDS[s];
+  };
+  const periods = [];
+  for (let i = 0; i < 12; i++) {
+    const s = (lagnaSign + dir * i + 120) % 12;
+    const lord = lordOf(s);
+    const lordSign = Math.floor(norm360(bp[lord]) / 30);
+    const padaDir = CHARA_VISHAMA_PADA.includes(s) ? 1 : -1;
+    let count;
+    if (padaDir === 1) count = (lordSign - s + 12) % 12 + 1;else count = (s - lordSign + 12) % 12 + 1;
+    let years = count === 1 ? 12 : count - 1;
+    if (EXALT_SIGN[lord] !== undefined) {
+      if (lordSign === EXALT_SIGN[lord]) years += 1;else if (lordSign === (EXALT_SIGN[lord] + 6) % 12) years -= 1;
+    }
+    years = Math.max(1, years);
+    periods.push({
+      sign: s,
+      lord,
+      years,
+      count
+    });
+  }
+  const dated = v643DashaDates(birthDate, periods.map(p => ({
+    label: RASI_NAMES_MY[p.sign] + ' (' + p.lord + ')',
+    years: p.years
+  })));
+  return dated.map((d, i) => ({
+    label: d.label,
+    years: periods[i].years,
+    start: d.start,
+    end: d.end,
+    sign: periods[i].sign,
+    lord: periods[i].lord,
+    count: periods[i].count
+  }));
+}
+
+// --- Kala Chakra structure (BPHS File 1 Ch.46 vv.54-95) ---
+const KALA_SAVYA = [0, 1, 2, 6, 7, 8, 12, 13, 14, 18, 19, 20, 24, 25, 26];
+const KALA_S1 = [0, 6, 12, 18, 24, 2, 8, 14, 20, 26]; // Ashvini-pattern
+const KALA_S2 = [1, 7, 13, 19, 25]; // Bharani-pattern
+const KALA_A1 = [3, 9, 15, 21]; // Rohini-pattern
+const KALA_A2 = [4, 5, 10, 11, 16, 17, 22, 23]; // Mrigashira-pattern
+const KALA_DEHA_JIVA = {
+  S1: [[0, 8], [9, 2], [1, 2], [3, 11]],
+  S2: [[7, 11], [10, 5], [6, 5], [3, 10]],
+  A1: [[3, 8], [6, 5], [10, 5], [7, 11]],
+  A2: [[3, 11], [1, 2], [9, 2], [0, 8]]
+};
+// Lord sequences ONLY where the printed list is clean; other padas are left null (not tabulated
+// in this release — the translation's lists there contain skips/duplicates).
+const KALA_LORD_SEQ = {
+  'S1-0': [0, 1, 2, 3, 4, 5, 6, 7, 8],
+  'S1-3': [3, 4, 5, 6, 7, 8, 9, 10, 11],
+  'A1-3': [11, 0, 1, 2, 4, 3, 5, 6, 7],
+  'A2-0': [11, 10, 9, 8, 7, 6, 5, 4, 3],
+  'A2-3': [8, 7, 6, 5, 4, 3, 2, 1, 0]
+};
+const KALA_GRAHA_YEARS = {
+  Sun: 5,
+  Moon: 21,
+  Mars: 7,
+  Mercury: 9,
+  Jupiter: 10,
+  Venus: 16,
+  Saturn: 4
+};
+function v643KalaInfo(moonLong) {
+  const nakTotal = norm360(moonLong) / (360 / 27);
+  const nakIndex = Math.floor(nakTotal);
+  const pada = Math.min(3, Math.floor((nakTotal - nakIndex) * 4));
+  let group = null;
+  if (KALA_S1.includes(nakIndex)) group = 'S1';else if (KALA_S2.includes(nakIndex)) group = 'S2';else if (KALA_A1.includes(nakIndex)) group = 'A1';else if (KALA_A2.includes(nakIndex)) group = 'A2';
+  const chakra = KALA_SAVYA.includes(nakIndex) ? 'Savya' : 'Apsavya';
+  const dj = group ? KALA_DEHA_JIVA[group][pada] : null;
+  const seq = group ? KALA_LORD_SEQ[group + '-' + pada] || null : null;
+  const lords = seq ? seq.map(s => ({
+    sign: s,
+    lord: RASI_LORDS[s],
+    years: KALA_GRAHA_YEARS[RASI_LORDS[s]]
+  })) : null;
+  return {
+    nakIndex,
+    pada,
+    chakra,
+    group,
+    deha: dj ? dj[0] : null,
+    jiva: dj ? dj[1] : null,
+    lords
+  };
+}
+
+// ===== v6.45: added-dasha period effects — app-generated from chart factors ONLY =====
+// NEVER text quotes: each line derives from the period lord's/sign's chart factors —
+// sign + house from Lagna, dignity (getPlanetaryDignity), Shadbala total (sb),
+// houses ruled by the lord, conjunctions (same sign). Aspects are NOT used in these
+// one-line effects (kept compact); every effect block in the UI says so.
+const V645_HOUSE_MY = ['ကိုယ်/ဘဝ', 'ငွေ/မိသားစု', 'ကြိုးစားမှု/ညီအစ်ကို', 'အိမ်/မိခင်/စိတ်', 'ပညာ/သား/အချစ်', 'ရောဂါ/ရန်သူ/အကြွေး', 'အိမ်ထောင်ဖက်/လုပ်ဖော်ကိုင်ဖက်', 'အမွေ/အန္တရာယ်/ပြောင်းလဲ', 'ကံ/ဆရာ/ခရီး', 'အလုပ်/ဂုဏ်', 'အကျိုး/မိတ်ဆွေ/ဆန္ဒပြည့်', 'ဆုံးရှုံး/ပြည်ပ/လွတ်မြောက်'];
+const V645_GRAHA_MY = {
+  Sun: 'နေ',
+  Moon: 'တနင်္လာ',
+  Mars: 'အင်္ဂါ',
+  Mercury: 'ဗုဒ္ဓဟူး',
+  Jupiter: 'ကြာသပတေး',
+  Venus: 'သောကြာ',
+  Saturn: 'စနေ',
+  Rahu: 'ရာဟု',
+  Ketu: 'ကေတု'
+};
+const V645_BEN = ['Moon', 'Mercury', 'Jupiter', 'Venus'];
+function v645LordFactors(graha, bp, sb) {
+  const lagnaSign = Math.floor(norm360(bp.Lagna) / 30);
+  const signOf = pl => Math.floor(norm360(bp[pl]) / 30);
+  const s = signOf(graha);
+  const h = (s - lagnaSign + 12) % 12 + 1;
+  const dig = getPlanetaryDignity(graha, s).label;
+  const strong = dig.indexOf('ဥစ္စ') !== -1 || dig.indexOf('သယံ') !== -1 ? 'အားကောင်း' : dig.indexOf('နိစ္စ') !== -1 || dig.indexOf('ရန်') !== -1 ? 'အားနည်း' : 'အလယ်';
+  const ben = V645_BEN.indexOf(graha) !== -1;
+  const tone = ben ? 'သုဘ' : graha === 'Sun' ? 'ပြင်းထန်' : 'ပါပ';
+  const dir = ben ? strong === 'အားကောင်း' ? 'အကျိုးပေးတတ်' : 'အကျိုးပေး အားလျော့' : strong === 'အားကောင်း' ? 'ပြင်းထန်သော အကျိုး' : 'အကျိုး အားလျော့';
+  const ruled = RASI_LORDS.map((l, i) => l === graha ? (i - lagnaSign + 12) % 12 + 1 : 0).filter(x => x > 0);
+  const conj = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].filter(q => q !== graha && signOf(q) === s);
+  const sbTot = sb && sb[graha] && sb[graha].total;
+  let line = V645_GRAHA_MY[graha] + ' ' + RASI_NAMES_MY[s] + ' ' + h + 'အိမ် (' + V645_HOUSE_MY[h - 1] + ') — ' + dig + ' · ' + tone + ' · ' + strong + ' · ' + dir;
+  if (ruled.length) line += ' · ပိုင် ' + ruled.join('/') + 'အိမ်';
+  if (sbTot !== undefined && sbTot !== null) line += ' · Shadbala ' + sbTot.toFixed(1);
+  if (conj.length) line += ' · တွဲ: ' + conj.map(c => V645_GRAHA_MY[c]).join(', ');
+  return line;
+}
+function v645LordEffect(graha, bp, sb) {
+  return 'အကျိုး: ' + v645LordFactors(graha, bp, sb);
+}
+function v645SignEffect(sign, bp, sb) {
+  const lagnaSign = Math.floor(norm360(bp.Lagna) / 30);
+  const h = (sign - lagnaSign + 12) % 12 + 1;
+  const lord = RASI_LORDS[sign];
+  return 'အကျိုး: ' + RASI_NAMES_MY[sign] + ' ' + h + 'အိမ် (' + V645_HOUSE_MY[h - 1] + ') — အရှင် ' + V645_GRAHA_MY[lord] + ' · ' + v645LordFactors(lord, bp, sb);
+}
+
+// --- Sudarshana Chakra (BPHS File 1 Ch.74 vv.4-20; aspects per vv.10-13) ---
+// v6.44: verdicts use occupancy AND aspects via the existing _aspectHouses
+// engine (all aspect 7th; Saturn 3/10; Jupiter 5/9; Mars 4/8 — BPHS Ch.26).
+// Per house per reference: lord occupied/aspected -> favourable; benefic
+// occupied/aspected -> favourable; malefic occupied/aspected -> harm; Sun
+// auspicious in 1st house, malefic elsewhere; exalted malefic -> no evil.
+// Both sides present -> majority wins; equal numbers -> stronger side wins,
+// strength = sum of Shadbala totals of the influencing grahas (sb param =
+// computeShadbala output; Rahu/Ketu have no Shadbala total -> 0); no strength
+// difference (or no sb given) -> mixed. Neither occupied nor aspected ->
+// judge by lord; only exalted malefics influencing -> neutral (no evil).
+// Three readings from Lagna, Moon, Sun. Used only when all three signs
+// differ; otherwise judge from the ordinary kundali only. Display-only:
+// nothing here feeds any score.
+function v643Sudarshana(bp, sb) {
+  const lagnaSign = Math.floor(norm360(bp.Lagna) / 30);
+  const moonSign = Math.floor(norm360(bp.Moon) / 30);
+  const sunSign = Math.floor(norm360(bp.Sun) / 30);
+  const distinct = lagnaSign !== moonSign && moonSign !== sunSign && lagnaSign !== sunSign;
+  const BENEFICS = ['Moon', 'Mercury', 'Jupiter', 'Venus'];
+  const MALEFICS = ['Mars', 'Saturn', 'Rahu', 'Ketu'];
+  const ALL9 = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
+  const signOf = p => Math.floor(norm360(bp[p]) / 30);
+  const strOf = p => sb && sb[p] && typeof sb[p].total === 'number' ? sb[p].total : 0;
+  const refs = [{
+    key: 'Lagna',
+    sign: lagnaSign
+  }, {
+    key: 'Moon',
+    sign: moonSign
+  }, {
+    key: 'Sun',
+    sign: sunSign
+  }];
+  const houses = refs.map(r => {
+    const hs = [];
+    for (let h = 1; h <= 12; h++) {
+      const s = (r.sign + h - 1) % 12;
+      const occ = ALL9.filter(p => signOf(p) === s);
+      const hLag = (s - lagnaSign + 12) % 12 + 1;
+      const asp = ALL9.filter(p => signOf(p) !== s && _aspectHouses(bp, p).includes(hLag));
+      const lord = RASI_LORDS[s];
+      const ben = [],
+        mal = [];
+      occ.concat(asp).forEach(p => {
+        if (p === lord) ben.push(p);else if (BENEFICS.includes(p) || p === 'Sun' && h === 1) ben.push(p);else if (MALEFICS.includes(p) || p === 'Sun' && h !== 1) {
+          if (!(EXALT_SIGN[p] !== undefined && signOf(p) === EXALT_SIGN[p])) mal.push(p);
+        }
+      });
+      const benStr = ben.reduce((a, p) => a + strOf(p), 0);
+      const malStr = mal.reduce((a, p) => a + strOf(p), 0);
+      let verdict,
+        note = '';
+      if (ben.length > 0 && mal.length === 0) verdict = 'favourable';else if (mal.length > 0 && ben.length === 0) verdict = 'harm';else if (ben.length > mal.length) {
+        verdict = 'favourable';
+        note = 'သုဘ ' + ben.length + ' : ပါပ ' + mal.length + ' — အများစု';
+      } else if (mal.length > ben.length) {
+        verdict = 'harm';
+        note = 'သုဘ ' + ben.length + ' : ပါပ ' + mal.length + ' — အများစု';
+      } else if (ben.length > 0) {
+        if (benStr > malStr) {
+          verdict = 'favourable';
+          note = 'သုဘ ' + ben.length + ' : ပါပ ' + mal.length + ' — Shadbala အား (' + benStr.toFixed(0) + ' : ' + malStr.toFixed(0) + ') ဖြင့် ဆုံးဖြတ်';
+        } else if (malStr > benStr) {
+          verdict = 'harm';
+          note = 'သုဘ ' + ben.length + ' : ပါပ ' + mal.length + ' — Shadbala အား (' + benStr.toFixed(0) + ' : ' + malStr.toFixed(0) + ') ဖြင့် ဆုံးဖြတ်';
+        } else {
+          verdict = 'mixed';
+          note = 'သုဘ ' + ben.length + ' : ပါပ ' + mal.length + ' — အား တူ — ရောနှော';
+        }
+      } else if (occ.length > 0 || asp.length > 0) {
+        verdict = 'neutral';
+        note = 'ပါပ ဥစ္စ — မကောင်းကျိုး မပေး (Ch.74)';
+      } else {
+        verdict = 'lord';
+        note = '';
+      }
+      hs.push({
+        house: h,
+        sign: s,
+        occ,
+        asp,
+        lord,
+        verdict,
+        note,
+        ben: ben.length,
+        mal: mal.length,
+        benStr,
+        malStr
+      });
+    }
+    return {
+      ref: r.key,
+      sign: r.sign,
+      houses: hs
+    };
+  });
+  return {
+    distinct,
+    houses
+  };
+}
+
+// ===== v6.43: Saravali appearance tables + Ch.52 reconstruction + Mahapurusha text =====
+// Paraphrases only (short phrases). Sources labeled per table. Display-only: nothing here feeds any score.
+// Saravali Ch.48: per-Ascendant effects [sign] -> {en, my}
+const SARAVALI_ASC = [{
+  en: 'emaciated, fickle, fast walker',
+  my: 'ပိန်သည်၊ စိတ်မတည်၊ မြန်မြန်လျှောက်'
+}, {
+  en: 'brave, broad forehead/nose, short-tempered',
+  my: 'ရဲရင့်၊ နဖူးနှာခေါင်းကျယ်၊ စိတ်တို'
+}, {
+  en: 'gentle, musical, round eyes, crafty',
+  my: 'နူးညံ့၊ ဂီတဝါသနာ၊ မျက်လုံးဝိုင်း၊ လှည့်စား'
+}, {
+  en: 'timid, fickle, phlegmatic, learned',
+  my: 'ကြောက်၊ စိတ်မတည်၊ သလိပ်များ၊ ပညာတတ်'
+}, {
+  en: 'lion-like face, bold, miserly, majestic',
+  my: 'ခြင်္သေ့မျက်နှာ၊ ရဲရင့်၊ နှမြော၊ ဂုဏ်ရှိ'
+}, {
+  en: 'gentle, sweet speaker, musical, modest',
+  my: 'နူးညံ့၊ စကားချို၊ ဂီတဝါသနာ၊ ယဉ်ကျေး'
+}, {
+  en: 'crooked body, long face, black eyes, learned',
+  my: 'ကိုယ်ကောက်၊ မျက်နှာရှည်၊ မျက်လုံးမည်း၊ ပညာတတ်'
+}, {
+  en: 'fleshy broad limbs, tawny eyes, valorous',
+  my: 'အသားပြည့်၊ ခြေလက်ကျယ်၊ မျက်လုံးဝါ၊ ရဲရင့်'
+}, {
+  en: 'big teeth, prominent forehead, fat thighs',
+  my: 'သွားကြီး၊ နဖူးထွက်၊ ပေါင်ဆူ၊ ရဲရင့်'
+}, {
+  en: 'emaciated, deer-like face, hairy, wandering',
+  my: 'ပိန်သည်၊ သမင်မျက်နှာ၊ အမွေးများ၊ လှည့်လည်'
+}, {
+  en: 'sharp blown nose, irascible, indolent, crafty',
+  my: 'နှာခေါင်းချွန်၊ စိတ်တို၊ ပျင်းရိ၊ လှည့်စား'
+}, {
+  en: 'well-blown nose, famous, modest, musical',
+  my: 'နှာခေါင်းဖောင်း၊ ကျော်ကြား၊ ယဉ်ကျေး၊ ဂီတဝါသနာ'
+}];
+// Saravali Ch.49: Hora effects [sign][hora 1-2]. Hora rulership per Ch.3 v.14: odd sign -> 1st Sun, 2nd Moon; even sign -> 1st Moon, 2nd Sun.
+const SARAVALI_HORA = [[{
+  en: 'rolling eyes, cruel, tall, irascible',
+  my: 'မျက်လုံးလှိမ့်၊ ရက်စက်၊ အရပ်ရှည်၊ စိတ်တို'
+}, {
+  en: 'thief, careless, large eyes, tall',
+  my: 'သူခိုး၊ ဂရုမစိုက်၊ မျက်လုံးကြီး၊ အရပ်ရှည်'
+}], [{
+  en: 'dark, broad eyes/chest, strong body',
+  my: 'မည်း၊ မျက်လုံးရင်ကျယ်၊ ကိုယ်သန်မာ'
+}, {
+  en: 'long round limbs, thin waist, ox eyes',
+  my: 'ခြေလက်ရှည်ဝိုင်း၊ ခါးသိမ်၊ နွားမျက်လုံး'
+}], [{
+  en: 'long waist, skilful, moderate body, soft hair',
+  my: 'ခါးရှည်၊ ကျွမ်းကျင်၊ ကိုယ်အလယ်၊ ဆံပျော့'
+}, {
+  en: 'large beautiful eyes, sensuous, gifted speaker',
+  my: 'မျက်လုံးလှကြီး၊ ကာမဝါသနာ၊ စကားကျွမ်း'
+}], [{
+  en: 'prominent body, beautiful head, broken teeth',
+  my: 'ကိုယ်ထင်ရှား၊ ခေါင်းလှ၊ သွားကျိုး'
+}, {
+  en: 'fond of gambling/travel, broad chest, truthful',
+  my: 'လောင်းကစားခရီးဝါသနာ၊ ရင်ကျယ်၊ ရိုးသား'
+}], [{
+  en: 'blood-red eyes, bold, large long body, firm',
+  my: 'မျက်လုံးနီရဲ၊ ရဲရင့်၊ ကိုယ်ကြီးရှည်၊ ခိုင်မာ'
+}, {
+  en: 'fond of women/sweets, liberal, few sons',
+  my: 'မိန်းမအချိုဝါသနာ၊ ရက်ရော၊ သားနည်း'
+}], [{
+  en: 'soft beautiful body, sweet speaker, musical',
+  my: 'ကိုယ်ပျော့လှ၊ စကားချို၊ ဂီတဝါသနာ'
+}, {
+  en: 'short, big head, learned, checkered fortune',
+  my: 'ပုသည်၊ ခေါင်းကြီး၊ ပညာတတ်၊ ကံကြောင်း'
+}], [{
+  en: 'round face, elevated nose/back, strong body',
+  my: 'မျက်နှာဝိုင်း၊ နှာကျောထွက်၊ ကိုယ်သန်မာ'
+}, {
+  en: 'very wealthy, black curly hair, defective feet',
+  my: 'အလွန်ချမ်းသာ၊ ဆံကောက်မည်း၊ ခြေချို့ယွင်း'
+}], [{
+  en: 'blood-red eyes, valorous in battle, rich',
+  my: 'မျက်လုံးနီရဲ၊ စစ်ရဲရင့်၊ ချမ်းသာ'
+}, {
+  en: 'broad fleshy limbs, serves king, many debts',
+  my: 'ခြေလက်ကျယ်အသား၊ ဘုရင်အမှု၊ ကြွေးများ'
+}], [{
+  en: 'wide split face/chest, small eyes/neck, pious',
+  my: 'မျက်နှာရင်ကျယ်ကွဲ၊ မျက်လည်တို၊ ဘာသာကိုင်း'
+}, {
+  en: 'lotus-petal eyes, long arms, sweet speaker',
+  my: 'ကြာပွင့်မျက်လုံး၊ လက်ရှည်၊ စကားချို'
+}], [{
+  en: 'dark, deer eyes, fortunate, elevated nose',
+  my: 'မည်း၊ သမင်မျက်လုံး၊ ကံကောင်း၊ နှာထွက်'
+}, {
+  en: 'blood-red eyes, indolent, hairy, fierce',
+  my: 'မျက်လုံးနီရဲ၊ ပျင်းရိ၊ အမွေးများ၊ ပြင်းထန်'
+}], [{
+  en: 'soft, virtuous, copper complexion, radiant',
+  my: 'နူးညံ့၊ သီလကောင်း၊ ကြေးအရောင်၊ တောက်ပ'
+}, {
+  en: 'copper eyes, emaciated, dejected, miserly',
+  my: 'ကြေးမျက်လုံး၊ ပိန်သည်၊ စိတ်ဓာတ်ကျ၊ နှမြော'
+}], [{
+  en: 'short, broad beautiful body, large face/chest',
+  my: 'ပုသည်၊ ကိုယ်ကျယ်လှ၊ မျက်နှာရင်ကြီး'
+}, {
+  en: 'liberal, elevated nose, charming eyes, affable',
+  my: 'ရက်ရော၊ နှာထွက်၊ မျက်လုံးလှ၊ စကားယဉ်ကျေး'
+}]];
+// Saravali Ch.50: decanate effects [sign][decanate 1-3]. NOTE: Cancer-2 repeats Gemini-2 verbatim as printed; reported as printed, not corrected.
+const SARAVALI_DEC = [[{
+  en: 'charitable, thief, fierce in quarrels',
+  my: 'စေတနာကောင်း၊ သူခိုး၊ ရန်ပြင်းထန်'
+}, {
+  en: 'attached to women, wandering, musical',
+  my: 'မိန်းမစွဲ၊ လှည့်လည်၊ ဂီတဝါသနာ'
+}, {
+  en: 'virtuous, fickle, mighty, serves king',
+  my: 'သီလကောင်း၊ စိတ်မတည်၊ အားကြီး၊ ဘုရင်အမှု'
+}], [{
+  en: 'fond of food/drink, wife-ruled',
+  my: 'စားသောက်ဝါသနာ၊ ဇနီးစကားနားထောင်'
+}, {
+  en: 'beautiful, large lips, firmly wealthy',
+  my: 'လှပ၊ နှုတ်ခမ်းကြီး၊ စည်းစိမ်ခိုင်မာ'
+}, {
+  en: 'skilful, valorous, dirty, regretful spending',
+  my: 'ကျွမ်းကျင်၊ ရဲရင့်၊ ညစ်ပတ်၊ သုံးပြီးနောင်တ'
+}], [{
+  en: 'broad excellent limbs, wealthy, good speaker',
+  my: 'ခြေလက်ကျယ်ကောင်း၊ ချမ်းသာ၊ စကားကောင်း'
+}, {
+  en: 'miserly, dreaming, woman-conquered, diseased',
+  my: 'နှမြော၊ အိပ်မက်များ၊ မိန်းမနိုင်၊ ရောဂါများ'
+}, {
+  en: 'hates women, large head, rough nails',
+  my: 'မိန်းမမုန်း၊ ခေါင်းကြီး၊ လက်သည်းကြမ်း'
+}], [{
+  en: 'honours gods, fickle, fair, fortunate wife',
+  my: 'နတ်ကိုးကွယ်၊ စိတ်မတည်၊ ဖြူ၊ ဇနီးကံကောင်း'
+}, {
+  en: 'miserly, dreaming, woman-conquered, diseased (as printed)',
+  my: 'နှမြော၊ အိပ်မက်များ၊ မိန်းမနိုင်၊ ရောဂါများ (စာအတိုင်း)'
+}, {
+  en: 'woman-weakened, wealthy, foreign-living, wine-loving',
+  my: 'မိန်းမအားနည်း၊ ချမ်းသာ၊ နိုင်ငံခြားနေ၊ အရက်ဝါသနာ'
+}], [{
+  en: 'liberal, conqueror, abundant wealth, mighty',
+  my: 'ရက်ရော၊ အောင်နိုင်၊ စည်းစိမ်များ၊ အားကြီး'
+}, {
+  en: 'beneficent, liberal, firm, quarrelsome, Vedic',
+  my: 'ကောင်းမှုလုပ်၊ ရက်ရော၊ ခိုင်မာ၊ ရန်များ၊ ဝေဒကိုင်း'
+}, {
+  en: 'miser, thief, hard-hearted, narrow body',
+  my: 'နှမြော၊ သူခိုး၊ စိတ်မာ၊ ကိုယ်ကျဉ်း'
+}], [{
+  en: 'dark, affable, modest, long head, honey eyes',
+  my: 'မည်း၊ စကားယဉ်၊ ယဉ်ကျေး၊ ခေါင်းရှည်၊ ပျားမျက်လုံး'
+}, {
+  en: 'bold, foreign-living, artistic, garrulous',
+  my: 'ရဲရင့်၊ နိုင်ငံခြားနေ၊ အနုပညာ၊ စကားများ'
+}, {
+  en: 'musical, king-dear, short, large head/eyes',
+  my: 'ဂီတဝါသနာ၊ ဘုရင်ချစ်၊ ပု၊ ခေါင်းမျက်လုံးကြီး'
+}], [{
+  en: 'Cupid-like charm, skilful, dark, learned',
+  my: 'အချစ်နတ်လှ၊ ကျွမ်းကျင်၊ မည်း၊ ပညာတတ်'
+}, {
+  en: 'lotus eyes, charming, valorous, famous',
+  my: 'ကြာမျက်လုံး၊ ဆွဲဆောင်၊ ရဲရင့်၊ ကျော်ကြား'
+}, {
+  en: 'fickle, crafty, ungrateful, loses friends/wealth',
+  my: 'စိတ်မတည်၊ လှည့်စား၊ ကျေးဇူးကန်း၊ မိတ်ဆွေငွေဆုံး'
+}], [{
+  en: 'fair, firm, fierce, broad-eyed, quarrelsome',
+  my: 'ဖြူ၊ ခိုင်မာ၊ ပြင်းထန်၊ မျက်လုံးကျယ်၊ ရန်များ'
+}, {
+  en: 'pure food, rolling eyes, golden, artistic',
+  my: 'သန့်ရှင်းစား၊ မျက်လုံးလှိမ့်၊ ရွှေရောင်၊ အနုပညာ'
+}, {
+  en: 'beardless, tawny eyes, large belly, brave',
+  my: 'မုတ်ဆိတ်မရှိ၊ မျက်လုံးဝါ၊ ဝမ်းကြီး၊ ရဲရင့်'
+}], [{
+  en: 'round face/eyes, chief, self-advanced, soft',
+  my: 'မျက်နှာမျက်လုံးဝိုင်း၊ ခေါင်းဆောင်၊ ကိုယ့်အားကိုယ်ကိုး၊ နူးညံ့'
+}, {
+  en: 'Shastra expert, good speaker, shrine-visiting',
+  my: 'ကျမ်းကျွမ်း၊ စကားကောင်း၊ ဘုရားဖူးများ'
+}, {
+  en: 'chief of kin, virtuous, sensuous, famous',
+  my: 'ဆွေမျိုးခေါင်း၊ သီလကောင်း၊ ကာမဝါသနာ၊ ကျော်ကြား'
+}], [{
+  en: 'long hands, dark, charming, sparing speech',
+  my: 'လက်ရှည်၊ မည်း၊ ဆွဲဆောင်၊ စကားနည်း'
+}, {
+  en: 'small face, fickle, fortune-teller, foot disease',
+  my: 'မျက်နှာသေး၊ စိတ်မတည်၊ ဗေဒင်၊ ခြေရောဂါ'
+}, {
+  en: 'garrulous, dirty, emaciated, fatherless, foreign evils',
+  my: 'စကားများ၊ ညစ်ပတ်၊ ပိန်သည်၊ အဖမရှိ၊ နိုင်ငံခြားဒုက္ခ'
+}], [{
+  en: 'wived, honoured, lofty, serves king',
+  my: 'ဇနီးရှိ၊ ဂုဏ်ရှိ၊ မြင့်မား၊ ဘုရင်အမှု'
+}, {
+  en: 'miser, sweet, fair, tawny broad eyes, many friends',
+  my: 'နှမြော၊ စကားချို၊ ဖြူ၊ မျက်လုံးဝါကျယ်၊ မိတ်ဆွေများ'
+}, {
+  en: 'tall, crafty, emaciated, short-armed, lying',
+  my: 'အရပ်ရှည်၊ လှည့်စား၊ ပိန်သည်၊ လက်တို၊ လိမ်ပြော'
+}], [{
+  en: 'honey-tawny eyes, fair, learned, sea trips',
+  my: 'ပျားဝါမျက်လုံး၊ ဖြူ၊ ပညာတတ်၊ ပင်လယ်ခရီး'
+}, {
+  en: 'serves women skilfully, sensuous, excellent',
+  my: 'မိန်းမအမှုကျွမ်း၊ ကာမဝါသနာ၊ ထူးချွန်'
+}, {
+  en: 'dark, artistic, wide feet, generous, pure food',
+  my: 'မည်း၊ အနုပညာ၊ ခြေကျယ်၊ ရက်ရော၊ သန့်ရှင်းစား'
+}]];
+// Saravali Ch.51: navamsa effects [lagna sign][navamsa 1-9]
+const SARAVALI_NAV = [[{
+  en: 'goat face, fierce voice, narrow eyes, thin body',
+  my: 'ဆိတ်မျက်နှာ၊ အသံပြင်း၊ မျက်လုံးကျဉ်း၊ ကိုယ်ပိန်'
+}, {
+  en: 'dark, broad shoulders, long arms, weak legs',
+  my: 'မည်း၊ ပခုံးကျယ်၊ လက်ရှည်၊ ခြေအားနည်း'
+}, {
+  en: 'hair loss, fair, defective arms, weak thighs',
+  my: 'ဆံပျက်၊ ဖြူ၊ လက်ချို့ယွင်း၊ ပေါင်အားနည်း'
+}, {
+  en: 'erratic sight, irascible, short nose, emaciated',
+  my: 'မျက်လုံးမတည်၊ စိတ်တို၊ နှာတို၊ ပိန်သည်'
+}, {
+  en: 'fierce, elephant eyes, fat nose, thick brows',
+  my: 'ပြင်းထန်၊ ဆင်မျက်လုံး၊ နှာဆူ၊ မျက်ခုံးထူ'
+}, {
+  en: 'dark, deer eyes, tall, timid, garrulous',
+  my: 'မည်း၊ သမင်မျက်လုံး၊ အရပ်ရှည်၊ ကြောက်၊ စကားများ'
+}, {
+  en: 'green-sprout complexion, white eyes, broad body',
+  my: 'အစိမ်းရောင်၊ မျက်လုံးဖြူ၊ ကိုယ်ကျယ်'
+}, {
+  en: 'monkey face, tawny body, liar, fierce',
+  my: 'မျောက်မျက်နှာ၊ ကိုယ်ဝါ၊ လိမ်ပြော၊ ပြင်းထန်'
+}, {
+  en: 'tall, emaciated, horse face, crooked',
+  my: 'အရပ်ရှည်၊ ပိန်သည်၊ မြင်းမျက်နှာ၊ ကောက်'
+}], [{
+  en: 'even dark body, hard-hearted, crooked sight',
+  my: 'ကိုယ်မည်းညီ၊ စိတ်မာ၊ မျက်လုံးကောက်'
+}, {
+  en: 'majestic, indolent, bent body, great liar',
+  my: 'ဂုဏ်ရှိ၊ ပျင်းရိ၊ ကိုယ်ကွေး၊ လိမ်ပြောကြီး'
+}, {
+  en: 'erratic sight, fierce, short nose, broad eyes',
+  my: 'မျက်လုံးမတည်၊ ပြင်းထန်၊ နှာတို၊ မျက်လုံးကျယ်'
+}, {
+  en: 'short, wandering, goat eyes, tawny, poor',
+  my: 'ပု၊ လှည့်လည်၊ ဆိတ်မျက်လုံး၊ ဝါ၊ ဆင်းရဲ'
+}, {
+  en: 'vicious, elevated nose, ox-like, large shoulders',
+  my: 'ဆိုးသွမ်း၊ နှာထွက်၊ နွားကဲ့သို့၊ ပခုံးကြီး'
+}, {
+  en: 'beautiful eyes/hair, fair, sweet speaker, emaciated',
+  my: 'မျက်လုံးဆံလှ၊ ဖြူ၊ စကားချို၊ ပိန်သည်'
+}, {
+  en: 'elevated nose, strong body, stout feet, fine hair',
+  my: 'နှာထွက်၊ ကိုယ်သန်မာ၊ ခြေတုတ်၊ ဆံကောင်း'
+}, {
+  en: 'tiger eyes, charming teeth, curly bluish hair',
+  my: 'ကျားမျက်လုံး၊ သွားလှ၊ ဆံကောက်ပြာ'
+}, {
+  en: 'honourable, timid, even charming body, rogue',
+  my: 'ဂုဏ်ရှိ၊ ကြောက်၊ ကိုယ်ညီလှ၊ လှည့်စား'
+}], [{
+  en: 'shoulder hair, dark charming eyes, thin limbs',
+  my: 'ပခုံးအမွေး၊ မျက်လုံးမည်း လှ၊ ခြေလက်သိမ်'
+}, {
+  en: 'pot head, dirty acts, depressed nose, quarrelsome',
+  my: 'ခေါင်းအိုးကဲ့သို့၊ ညစ်ပတ်လုပ်၊ နှာချိုင့်၊ ရန်များ'
+}, {
+  en: 'fair, blood-red eyes, long face, skilful speaker',
+  my: 'ဖြူ၊ မျက်လုံးနီရဲ၊ မျက်နှာရှည်၊ စကားကျွမ်း'
+}, {
+  en: 'charming brows/forehead, blue-lotus splendour, broad chest',
+  my: 'မျက်ခုံးနဖူးလှ၊ ကြာပြာရောင်၊ ရင်ကျယ်'
+}, {
+  en: 'broad face, strong chest, big head, cunning',
+  my: 'မျက်နှာကျယ်၊ ရင်သန်မာ၊ ခေါင်းကြီး၊ ကောက်ကျစ်'
+}, {
+  en: 'honey eyes, broad forehead, even body, rogue',
+  my: 'ပျားမျက်လုံး၊ နဖူးကျယ်၊ ကိုယ်ညီ၊ လှည့်စား'
+}, {
+  en: 'copper body, copper-red eyes, broad chest, jocular',
+  my: 'ကြေးကိုယ်၊ ကြေးနီမျက်လုံး၊ ရင်ကျယ်၊ နောက်ပြောင်'
+}, {
+  en: 'dark, great, soft, broad tall body, large black eyes',
+  my: 'မည်း၊ ကြီးမြတ်၊ နူးညံ့၊ ကိုယ်ကျယ်ရှည်၊ မျက်လုံးမည်း'
+}, {
+  en: 'round dark eyes, charming body, very intelligent',
+  my: 'မျက်လုံးဝိုင်းမည်း၊ ကိုယ်လှ၊ အလွန်ဉာဏ်ကောင်း'
+}], [{
+  en: 'clean fair body, beautiful hair, broad belly, thin shoulders',
+  my: 'ကိုယ်သန့်ဖြူ၊ ဆံလှ၊ ဝမ်းကျယ်၊ ပခုံးသိမ်'
+}, {
+  en: 'blood-red, fierce quarrels, cat face/eyes, weak knees',
+  my: 'နီရဲ၊ ရန်ပြင်းထန်၊ ကြောင်မျက်နှာ၊ ဒူးအားနည်း'
+}, {
+  en: 'fair, beautiful eyes, soft female-like body, indolent',
+  my: 'ဖြူ၊ မျက်လုံးလှ၊ ကိုယ်ပျော့မိန်းမကဲ့သို့၊ ပျင်းရိ'
+}, {
+  en: 'black, pressed brows, charming eyes/nose, crafty',
+  my: 'မည်း၊ မျက်ခုံးဖိ၊ မျက်လုံးနှာလှ၊ လှည့်စား'
+}, {
+  en: 'bell voice, stooping face, long arms, injurious',
+  my: 'ခေါင်းလောင်းအသံ၊ မျက်နှာငုံ့၊ လက်ရှည်၊ ထိခိုက်'
+}, {
+  en: 'long broad body, fair, good speaker, big teeth',
+  my: 'ကိုယ်ရှည်ကျယ်၊ ဖြူ၊ စကားကောင်း၊ သွားကြီး'
+}, {
+  en: 'scattered hair, big body, sinewy knees, crow-like',
+  my: 'ဆံဖွာ၊ ကိုယ်ကြီး၊ ဒူးကြွက်၊ ကျီးကဲ့သို့'
+}, {
+  en: 'bell head, charming face/limbs, tortoise gait, dark',
+  my: 'ခေါင်းလောင်းခေါင်း၊ မျက်နှာခြေလက်လှ၊ လိပ်လျှောက်၊ မည်း'
+}, {
+  en: 'fair, fish eyes, soft belly, broad chest, weak knees',
+  my: 'ဖြူ၊ ငါးမျက်လုံး၊ ဝမ်းပျော့၊ ရင်ကျယ်၊ ဒူးအားနည်း'
+}], [{
+  en: 'even lion belly, fierce, blood-red nose, big head',
+  my: 'ခြင်္သေ့ဝမ်းညီ၊ ပြင်းထန်၊ နှာနီရဲ၊ ခေါင်းကြီး'
+}, {
+  en: 'broad forehead, square body, broad eyes/chest',
+  my: 'နဖူးကျယ်၊ ကိုယ်လေးထောင့်၊ မျက်လုံးရင်ကျယ်'
+}, {
+  en: 'hairy broad arms, partridge eyes, white body, round neck',
+  my: 'လက်အမွေးကျယ်၊ ငှက်မျက်လုံး၊ ကိုယ်ဖြူ၊ လည်ဝိုင်း'
+}, {
+  en: 'ghee-coloured body, large black eyes, frog stomach',
+  my: 'ထောပတ်ရောင်၊ မျက်လုံးမည်း ကြီး၊ ဖားဝမ်း'
+}, {
+  en: 'bell head, little hair, hairy body, long belly, fierce',
+  my: 'ခေါင်းလောင်းခေါင်း၊ ဆံနည်း၊ ကိုယ်အမွေး၊ ဝမ်းရှည်၊ ပြင်းထန်'
+}, {
+  en: 'little soft hair, white large eyes, tall, dark, learned',
+  my: 'ဆံပျော့နည်း၊ မျက်လုံးဖြူ ကြီး၊ အရပ်ရှည်၊ မည်း၊ ပညာတတ်'
+}, {
+  en: 'long face, sinewy, dark, hairy, harsh speech',
+  my: 'မျက်နှာရှည်၊ ကြွက်သားများ၊ မည်း၊ အမွေး၊ စကားကြမ်း'
+}, {
+  en: 'excellent speech, firm limbs, majestic, poor, crafty',
+  my: 'စကားကောင်း၊ ခြေလက်ခိုင်မာ၊ ဂုဏ်ရှိ၊ ဆင်းရဲ၊ လှည့်စား'
+}, {
+  en: 'donkey face, dark eyes, long arms, breathing trouble',
+  my: 'မြည်းမျက်နှာ၊ မျက်လုံးမည်း၊ လက်ရှည်၊ အသက်ရှူခက်'
+}], [{
+  en: 'antelope eyes, good speaker, rich, dark, large-hearted',
+  my: 'သမင်မျက်လုံး၊ စကားကောင်း၊ ချမ်းသာ၊ မည်း၊ စိတ်ကြီး'
+}, {
+  en: 'charming face/eyes, fair, soft, long belly',
+  my: 'မျက်နှာမျက်လုံးလှ၊ ဖြူ၊ နူးညံ့၊ ဝမ်းရှည်'
+}, {
+  en: 'blown nose, prominent feet, long arms, fair, friendly',
+  my: 'နှာဖောင်း၊ ခြေထွက်၊ လက်ရှည်၊ ဖြူ၊ မိတ်ဆွေ'
+}, {
+  en: 'learned, beautiful, blood-red, emaciated, charming eyes',
+  my: 'ပညာတတ်၊ လှပ၊ နီရဲ၊ ပိန်သည်၊ မျက်လုံးလှ'
+}, {
+  en: 'large lips/hands, big body, broad chest, dependent',
+  my: 'နှုတ်ခမ်းလက်ကြီး၊ ကိုယ်ကြီး၊ ရင်ကျယ်၊ သူများမှီခို'
+}, {
+  en: 'charming, impressive speech, splendourous, writer-skilled',
+  my: 'ဆွဲဆောင်၊ စကားထင်ရှား၊ တောက်ပ၊ စာရေးကျွမ်း'
+}, {
+  en: 'small face, elevated nose, compact arms, very fair',
+  my: 'မျက်နှာသေး၊ နှာထွက်၊ လက်ကျစ်၊ အလွန်ဖြူ'
+}, {
+  en: 'very beautiful, fair, tall, long stout arms, brown hair',
+  my: 'အလွန်လှ၊ ဖြူ၊ အရပ်ရှည်၊ လက်ရှည်တုတ်၊ ဆံနီ'
+}, {
+  en: 'famous, broad eyes, vigour, stooping shoulders, writer',
+  my: 'ကျော်ကြား၊ မျက်လုံးကျယ်၊ အားကောင်း၊ ပခုံးငုံ့၊ စာရေး'
+}], [{
+  en: 'fair, broad eyes, long face, business-skilled, famous',
+  my: 'ဖြူ၊ မျက်လုံးကျယ်၊ မျက်နှာရှည်၊ ကုန်ကျွမ်း၊ ကျော်ကြား'
+}, {
+  en: 'squint round eyes, ill-formed teeth, ugly body',
+  my: 'မျက်လုံးစောင်း ဝိုင်း၊ သွားမညီ၊ ကိုယ်မလှ'
+}, {
+  en: 'fair, horse face, thin body, long hair/nose',
+  my: 'ဖြူ၊ မြင်းမျက်နှာ၊ ကိုယ်သိမ်၊ ဆံနှာရှည်'
+}, {
+  en: 'weak hands, timid, overlapping teeth, dark, miserable',
+  my: 'လက်အားနည်း၊ ကြောက်၊ သွားထပ်၊ မည်း၊ ဆင်းရဲ'
+}, {
+  en: 'majestic, firm, rough hair, even eyes, beautiful nose',
+  my: 'ဂုဏ်ရှိ၊ ခိုင်မာ၊ ဆံကြမ်း၊ မျက်လုံးညီ၊ နှာလှ'
+}, {
+  en: 'fleshy limbs, fair, broad eyes, white nails, diplomatic',
+  my: 'အသားပြည့်၊ ဖြူ၊ မျက်လုံးကျယ်၊ လက်သည်းဖြူ၊ သံတမန်'
+}, {
+  en: 'blood-red, long body/arms, big head, miserly, fierce',
+  my: 'နီရဲ၊ ကိုယ်လက်ရှည်၊ ခေါင်းကြီး၊ နှမြော၊ ပြင်းထန်'
+}, {
+  en: 'elevated shoulders, coarse body, long dark brows, bruised head',
+  my: 'ပခုံးထွက်၊ ကိုယ်ကြမ်း၊ မျက်ခုံးရှည်မည်း၊ ခေါင်းဒဏ်'
+}, {
+  en: 'charming eyes, pleased mind, fair, even beautiful body',
+  my: 'မျက်လုံးလှ၊ စိတ်ကြည်လင်၊ ဖြူ၊ ကိုယ်ညီလှ'
+}], [{
+  en: 'short, prominent lips/nose, frog belly, marriage broker',
+  my: 'ပု၊ နှုတ်ခမ်းနှာထွက်၊ ဖားဝမ်း၊ အိမ်ထောင်ပွဲစား'
+}, {
+  en: 'fair, strong broad chest/shoulders, reddish eyes, hairy',
+  my: 'ဖြူ၊ ရင်ပခုံးသန်ကျယ်၊ မျက်လုံးနီ၊ အမွေးများ'
+}, {
+  en: 'learned, strong shoulders/arms, clear speech, fair',
+  my: 'ပညာတတ်၊ ပခုံးလက်သန်မာ၊ စကားရှင်း၊ ဖြူ'
+}, {
+  en: 'wife-seeking, valorous, tall, dark, dark-eyed',
+  my: 'မိန်းမလိုက်၊ ရဲရင့်၊ အရပ်ရှည်၊ မည်း၊ မျက်လုံးမည်း'
+}, {
+  en: 'majestic, copper-red eyes, depressed nose, strong',
+  my: 'ဂုဏ်ရှိ၊ ကြေးနီမျက်လုံး၊ နှာချိုင့်၊ သန်မာ'
+}, {
+  en: 'impudent, highly intelligent, elevated nose, less hair',
+  my: 'ရဲတင်း၊ ဉာဏ်မြင့်၊ နှာထွက်၊ ဆံနည်း'
+}, {
+  en: 'split face, strong body, uneven teeth, squint, splendourous',
+  my: 'မျက်နှာကွဲ၊ ကိုယ်သန်မာ၊ သွားမညီ၊ မျက်စောင်း၊ တောက်ပ'
+}, {
+  en: 'blown nose, dark, dirty-looking, stiff hair, foolhardy',
+  my: 'နှာဖောင်း၊ မည်း၊ ညစ်ပတ်ပုံ၊ ဆံမာ၊ ရဲမိုက်'
+}, {
+  en: 'fair, deer-like beauty, calm tawny eyes/hair, strong',
+  my: 'ဖြူ၊ သမင်လှ၊ မျက်လုံးဆံဝါငြိမ်၊ သန်မာ'
+}], [{
+  en: 'big charming nose, goat sight, gifted speaker, fair',
+  my: 'နှာကြီးလှ၊ ဆိတ်အမြင်၊ စကားကျွမ်း၊ ဖြူ'
+}, {
+  en: 'prominent head, firm, large eyes, tall, firm cheeks',
+  my: 'ခေါင်းထွက်၊ ခိုင်မာ၊ မျက်လုံးကြီး၊ အရပ်ရှည်၊ ပါးခိုင်'
+}, {
+  en: 'teaching/art skill, majestic, just, jocular',
+  my: 'သင်ပြအနုပညာကျွမ်း၊ ဂုဏ်ရှိ၊ တရားမျှ၊ နောက်ပြောင်'
+}, {
+  en: 'tawny, round eyes, tortoise belly, wandering, charming',
+  my: 'ဝါ၊ မျက်လုံးဝိုင်း၊ လိပ်ဝမ်း၊ လှည့်လည်၊ ဆွဲဆောင်'
+}, {
+  en: 'large ears/eyes/face, lion body, spread brows, hairless',
+  my: 'နားမျက်လုံးမျက်နှာကြီး၊ ခြင်္သေ့ကိုယ်၊ မျက်ခုံးပြန့်၊ အမွေးမရှိ'
+}, {
+  en: 'beautiful large eyes, broad forehead/face, poet, mean',
+  my: 'မျက်လုံးလှ ကြီး၊ နဖူးမျက်နှာကျယ်၊ ကဗျာဆရာ၊ ယုတ်'
+}, {
+  en: 'dark, soft, promise-keeping, prominent head, tall',
+  my: 'မည်း၊ နူးညံ့၊ ကတိတည်၊ ခေါင်းထွက်၊ အရပ်ရှည်'
+}, {
+  en: 'flat nose, broad head, erratic sight, garrulous',
+  my: 'နှာပြား၊ ခေါင်းကျယ်၊ မျက်လုံးမတည်၊ စကားများ'
+}, {
+  en: 'fair, horse face, broad dark eyes, sparing speech',
+  my: 'ဖြူ၊ မြင်းမျက်နှာ၊ မျက်လုံးကျယ်မည်း၊ စကားနည်း'
+}], [{
+  en: 'gapped visible teeth, dark, stammering, coarse hair',
+  my: 'သွားကွာထင်၊ မည်း၊ စကားထစ်၊ ဆံကြမ်း'
+}, {
+  en: 'indolent, crafty, crooked nose, broad body, prattling',
+  my: 'ပျင်းရိ၊ လှည့်စား၊ နှာကောက်၊ ကိုယ်ကျယ်၊ စကားများ'
+}, {
+  en: 'music-loving, famous, fair, superior looks, charming nose',
+  my: 'ဂီတဝါသနာ၊ ကျော်ကြား၊ ဖြူ၊ ရုပ်ထူး၊ နှာလှ'
+}, {
+  en: 'red-black round eyes, large forehead, thin arms, broken speech',
+  my: 'မျက်လုံးနီမည်း ဝိုင်း၊ နဖူးကြီး၊ လက်သိမ်၊ စကားကျိုး'
+}, {
+  en: 'prominent neck/nose/belly, dark, round knees/arms',
+  my: 'လည်နှာဝမ်းထွက်၊ မည်း၊ ဒူးလက်ဝိုင်း'
+}, {
+  en: 'splendourous, charming dress, small even teeth, big cheeks',
+  my: 'တောက်ပ၊ ဝတ်လှ၊ သွားသေးညီ၊ ပါးကြီး'
+}, {
+  en: 'dark, indolent, eloquent, short hair, big body, soft limbs',
+  my: 'မည်း၊ ပျင်းရိ၊ စကားကျွမ်း၊ ဆံတို၊ ကိုယ်ကြီး၊ ခြေလက်ပျော့'
+}, {
+  en: 'majestic sight, charming nose, reddish face, pot forehead',
+  my: 'အမြင်ဂုဏ်ရှိ၊ နှာလှ၊ မျက်နှာနီ၊ နဖူးအိုးကဲ့သို့'
+}, {
+  en: 'broad chest, large eyes, high intelligence, gentle',
+  my: 'ရင်ကျယ်၊ မျက်လုံးကြီး၊ ဉာဏ်မြင့်၊ နူးညံ့'
+}], [{
+  en: 'dark, soft, emaciated, prominent cheeks, poetic',
+  my: 'မည်း၊ နူးညံ့၊ ပိန်သည်၊ ပါးထွက်၊ ကဗျာတတ်'
+}, {
+  en: 'coarse skin/nails/hair, gentle, tall, foolish, distinct head',
+  my: 'အရေလက်သည်းဆံကြမ်း၊ နူးညံ့၊ အရပ်ရှည်၊ မိုက်၊ ခေါင်းထင်'
+}, {
+  en: 'compact body, lapis splendour, Shastra-learned',
+  my: 'ကိုယ်ကျစ်၊ လာပစ်ရောင်၊ ကျမ်းတတ်'
+}, {
+  en: 'fair, split face, enemy-destroying, majestic, pleasure-loving',
+  my: 'ဖြူ၊ မျက်နှာကွဲ၊ ရန်ဖျက်၊ ဂုဏ်ရှိ၊ သုခဝါသနာ'
+}, {
+  en: 'Shastra/art learned, coarse leg hair, hidden neck/ears, dark',
+  my: 'ကျမ်းအနုပညာတတ်၊ ခြေအမွေးကြမ်း၊ လည်နားပုန်း၊ မည်း'
+}, {
+  en: 'tiger face, bold, short hair, kills beasts, king-dear',
+  my: 'ကျားမျက်နှာ၊ ရဲရင့်၊ ဆံတို၊ သားကောင်သတ်၊ ဘုရင်ချစ်'
+}, {
+  en: 'goat eyes/face, fierce, village-delighting, bilious',
+  my: 'ဆိတ်မျက်လုံးမျက်နှာ၊ ပြင်းထန်၊ ရွာဝါသနာ၊ သည်းခြေများ'
+}, {
+  en: 'undiminishing strength, firm, warrior/king, strong teeth',
+  my: 'အားမလျော့၊ ခိုင်မာ၊ စစ်သူ/ဘုရင်၊ သွားသန်မာ'
+}, {
+  en: 'dark, unclean elevated teeth, separated from family, affable',
+  my: 'မည်း၊ သွားမသန့်ထွက်၊ မိသားစုကွဲ၊ စကားယဉ်ကျေး'
+}], [{
+  en: 'white yet blood-red splendour, soft, female-like mind, short neck',
+  my: 'ဖြူ�ော်လည်း နီရောင်၊ နူးညံ့၊ မိန်းမစိတ်၊ လည်တို'
+}, {
+  en: 'big nose, skilful, meat-eating, forest-wandering, big head',
+  my: 'နှာကြီး၊ ကျွမ်းကျင်၊ အသားစား၊ တောလှည့်၊ ခေါင်းကြီး'
+}, {
+  en: 'white, crafty, beautiful eyes, righteous, modest, charming',
+  my: 'ဖြူ၊ လှည့်စား၊ မျက်လုံးလှ၊ သီလကောင်း၊ ယဉ်ကျေး၊ ဆွဲဆောင်'
+}, {
+  en: 'praiseworthy, adversity-falling, serves elders, strong, just',
+  my: 'ချီးမွမ်း၊ ဒုက္ခကြ၊ လူကြီးအမှု၊ သန်မာ၊ တရားမျှ'
+}, {
+  en: 'tall, dark, valorous, snail nose, torturing, prattling',
+  my: 'အရပ်ရှည်၊ မည်း၊ ရဲရင့်၊ ခရုနှာ၊ ညှဉ်းဆဲ၊ စကားများ'
+}, {
+  en: 'self-respected, righteous, strong, miserable, crafty, minister',
+  my: 'ကိုယ့်သိက္ခာရှိ၊ သီလကောင်း၊ သန်မာ၊ ဆင်းရဲ၊ လှည့်စား၊ ဝန်ကြီး'
+}, {
+  en: 'self-respected, other-religion interest, minister, cruel, unsteady',
+  my: 'ကိုယ့်သိက္ခာရှိ၊ အခြားဘာသာစိတ်၊ ဝန်ကြီး၊ ရက်စက်၊ မတည်'
+}, {
+  en: 'tall, big head, emaciated, indolent, uneven eyes/hair, war-skilled',
+  my: 'အရပ်ရှည်၊ ခေါင်းကြီး၊ ပိန်သည်၊ ပျင်းရိ၊ မျက်လုံးဆံမညီ၊ စစ်ကျွမ်း'
+}, {
+  en: 'short, soft, courageous, broad chest/eyes, big nose, famous',
+  my: 'ပု၊ နူးညံ့၊ ရဲရင့်၊ ရင်မျက်လုံးကျယ်၊ နှာကြီး၊ ကျော်ကြား'
+}]];
+// Saravali Ch.4+50: Drekkana limb lists by decanate + side rule. (7th-sign face pair garbled as printed; omitted.)
+const DREK_LIMBS = [{
+  en: 'Head — already-risen part = left, yet-to-rise part = right; pairs: eyes (2nd/12th signs), ears (3rd/11th), nose (4th/10th), cheeks (5th/9th), chins (6th/8th)',
+  my: 'ခေါင်း — တက်ပြီးသား အပိုင်း = ဘယ်၊ မတက်သေးသော အပိုင်း = ညာ; အတွဲ: မျက်လုံး (၂/၁၂), နား (၃/၁၁), နှာ (၄/၁၀), ပါး (၅/၉), မေးစေ့ (၆/၈)'
+}, {
+  en: 'Neck, shoulder, arms, side, heart, stomach, navel',
+  my: 'လည်၊ ပခုံး၊ လက်၊ နံဘေး၊ နှလုံး၊ အစာအိမ်၊ ချက်'
+}, {
+  en: 'Pelvis, anus, penis, testicle, thigh, knee, calf, feet',
+  my: 'တင်ပါးဆုံ၊ စအို၊ လိင်အင်္ဂါ၊ ဝှေး၊ ပေါင်၊ ဒူး၊ ခြေသလုံး၊ ခြေ'
+}];
+// Saravali Ch.38: guna effects
+const SARAVALI_GUNA = {
+  Sattva: {
+    en: 'highly merciful, firm, sweet truthful speaker, forgiving',
+    my: 'အလွန်သနား၊ ခိုင်မာ၊ စကားချို မှန်၊ ခွင့်လွှတ်'
+  },
+  Rajas: {
+    en: 'valorous, fine-arts/literature skill, showy, musical, gambling',
+    my: 'ရဲရင့်၊ အနုပညာစာပေ၊ ကြွားဝါ၊ ဂီတ၊ လောင်းကစား'
+  },
+  Tamas: {
+    en: 'foolish, indolent, cheating, irascible, miserable, miserly',
+    my: 'မိုက်၊ ပျင်းရိ၊ လှည့်စား၊ စိတ်တို၊ ဆင်းရဲ၊ နှမြော'
+  }
+};
+// Saravali Ch.38 v.5: tatwa by planet (Jupiter Ether, Venus Water, Saturn Air, Mars Fire, Mercury Earth).
+// Tatwa -> temperament is the standard Ayurvedic correspondence (Ch.38 does not pair them individually).
+const TATWA_MAP = {
+  Jupiter: 'Ether',
+  Venus: 'Water',
+  Saturn: 'Air',
+  Mars: 'Fire',
+  Mercury: 'Earth'
+};
+const TATWA_DOSHA = {
+  Ether: 'windy',
+  Air: 'windy',
+  Fire: 'bilious',
+  Water: 'phlegmatic',
+  Earth: 'phlegmatic'
+};
+const TATWA_MY = {
+  Ether: 'ကောင်းကင်',
+  Water: 'ရေ',
+  Air: 'လေ',
+  Fire: 'မီး',
+  Earth: 'မြေ'
+};
+const DOSHA_MY = {
+  windy: 'လေဓာတ်',
+  bilious: 'သည်းခြေဓာတ်',
+  phlegmatic: 'သလိပ်ဓာတ်'
+};
+// Planet -> guna mapping, BPHS File 1 Ch.3 v.22 ONLY (Saravali Ch.38 gives guna effects, not this mapping).
+const GUNA_MAP_BPHS = {
+  Sun: 'Sattva',
+  Moon: 'Sattva',
+  Jupiter: 'Sattva',
+  Venus: 'Rajas',
+  Mercury: 'Rajas',
+  Mars: 'Tamas',
+  Saturn: 'Tamas'
+};
+// Planet complexions (method: Phaladeepika Ch.16; words: BPHS Ch.3 sl.16-17 / Saravali Ch.4).
+const PLANET_COMPLEXIONS = {
+  Sun: {
+    en: 'blood-red',
+    my: 'နီရဲ'
+  },
+  Moon: {
+    en: 'tawny',
+    my: 'ဝါညို'
+  },
+  Mars: {
+    en: 'blood-red',
+    my: 'နီရဲ'
+  },
+  Mercury: {
+    en: 'green-grass',
+    my: 'စိမ်းမြက်'
+  },
+  Jupiter: {
+    en: 'tawny',
+    my: 'ဝါ'
+  },
+  Venus: {
+    en: 'variegated',
+    my: 'ရောင်စုံ'
+  },
+  Saturn: {
+    en: 'dark',
+    my: 'မည်း'
+  }
+};
+// Mahapurusha classical effect details. Face: Saravali Ch.37 short phrase. Other fields: both books
+// where they differ (null = not given in that book). BPHS File 1 Ch.75 / Saravali Ch.37.
+const MAHAPURUSHA_TEXT = {
+  Ruchaka: {
+    face: {
+      en: 'long face, conch neck, blood-red, thin shanks',
+      my: 'မျက်နှာရှည်၊ ခရုလည်ပင်း၊ နီရဲ၊ ခြေသလုံးသိမ်'
+    },
+    height: {
+      en: '100 angul',
+      my: '၁၀၀ အင်္ဂုလ'
+    },
+    weightSv: {
+      en: '100 tulas',
+      my: '၁၀၀ တူလာ'
+    },
+    weightBp: {
+      en: '1000 karshas',
+      my: '၁၀၀၀ ကာရှ'
+    },
+    life: {
+      en: '70, death by weapons/fire',
+      my: '၇၀၊ လက်နက်မီးဖြင့် သေ'
+    },
+    region: {
+      en: 'Vindhya and Sahya',
+      my: 'ဝိန္ဓျနှင့် သဟျ'
+    }
+  },
+  Bhadra: {
+    face: {
+      en: 'tiger-like face, elephant gait, broad chest, square body',
+      my: 'ကျားမျက်နှာ၊ ဆင်လျှောက်၊ ရင်ကျယ်၊ ကိုယ်လေးထောင့်'
+    },
+    height: null,
+    weightSv: {
+      en: '2000 palas (= 20 tulas)',
+      my: '၂၀၀၀ ပလာ (= ၂၀ တူလာ)'
+    },
+    weightBp: {
+      en: '20 tulas',
+      my: '၂၀ တူလာ'
+    },
+    lifeSv: {
+      en: '80, always happy',
+      my: '၈၀၊ အမြဲပျော်'
+    },
+    lifeBp: {
+      en: '100',
+      my: '၁၀၀'
+    },
+    region: {
+      en: 'mid portion of the country (Madhya Desha)',
+      my: 'နိုင်ငံအလယ် (မဓျဒေသ)'
+    }
+  },
+  Hamsa: {
+    face: {
+      en: 'reddish face, elevated nose, broad cheeks, swan voice',
+      my: 'မျက်နှာနီ၊ နှာမြင့်၊ ပါးကျယ်၊ ငန်းအသံ'
+    },
+    height: {
+      en: '96 angul',
+      my: '၉၆ အင်္ဂုလ'
+    },
+    weightSv: {
+      en: '1600 tulas (as printed)',
+      my: '၁၆၀၀ တူလာ (စာအတိုင်း)'
+    },
+    weightBp: null,
+    life: {
+      en: '100, end in a forest',
+      my: '၁၀၀၊ တော၌ဆုံး'
+    },
+    region: {
+      en: 'Surasena, Gandharva, between Ganges and Yamuna',
+      my: 'သူရသေန၊ ဂန္ဓာရ၊ ဂင်္ဂါယမုနာကြား'
+    }
+  },
+  Malavya: {
+    face: {
+      en: 'thin lips, even physique, grey complexion, thin waist, moon-like splendour, hands to knees',
+      my: 'နှုတ်ခမ်းပါး၊ ကိုယ်ညီ၊ မီးခိုးရောင်၊ ခါးသိမ်၊ လရောင်၊ လက်ဒူးထိရောက်'
+    },
+    height: {
+      en: 'face 13x10 angul (no full stature)',
+      my: 'မျက်နှာ ၁၃×၁၀ အင်္ဂုလ (အရပ်အပြည့် မဖော်ပြ)'
+    },
+    weightSv: null,
+    weightBp: null,
+    life: {
+      en: '70',
+      my: '၇၀'
+    },
+    regionSv: {
+      en: 'Laata, Malawa, Sindhu',
+      my: 'လာတ၊ မာလဝ၊ သိန္ဓု'
+    },
+    regionBp: {
+      en: 'Sindhu and Malwa',
+      my: 'သိန္ဓုနှင့် မာလဝ'
+    }
+  },
+  Sasa: {
+    face: {
+      en: 'small face/teeth, somewhat protruding teeth, lotus eyes, long body',
+      my: 'မျက်နှာသွားသေး၊ သွားအနည်းငယ်ထွက်၊ ကြာမျက်လုံး၊ ကိုယ်ရှည်'
+    },
+    height: null,
+    weightSv: null,
+    weightBp: null,
+    life: {
+      en: '70, ruler of some place',
+      my: '၇၀၊ ဒေသတစ်ခုအုပ်'
+    },
+    regionSv: null,
+    regionBp: {
+      en: 'several parts of the earth',
+      my: 'ကမ္ဘာအနှံ့'
+    }
+  }
+};
+// --- Textual composite appearance profile for one lagna time (display-only) ---
+// Method: lagna sign (Saravali Ch.48) + complexion per Moon-house lord (Phaladeepika Ch.16) +
+// Navamsa Lagna + lord + Ch.51 entry + decanate (Saravali Ch.50) + Hora (Saravali Ch.49).
+// Mole cross-check (Saravali Ch.4+50): planets in the lagna decanate; benefic = mole, malefic = wound;
+// own Rasi/Amsa at birth = from birth, else later. bp may be null (then moleCheck is null).
+function v643AppearanceProfile(lagnaLong, moonLong, bp) {
+  const lagnaSign = Math.floor(norm360(lagnaLong) / 30);
+  const degInSign = norm360(lagnaLong) % 30;
+  const moonSign = Math.floor(norm360(moonLong) / 30);
+  const complexionLord = RASI_LORDS[moonSign];
+  const navamsaLagna = calculateVarga(lagnaLong, 9);
+  const navamsaNum = Math.floor(degInSign / (30 / 9)) + 1;
+  const decanate = Math.floor(degInSign / 10);
+  const half = degInSign < 15 ? 1 : 2;
+  const horaLord = lagnaSign % 2 === 0 ? half === 1 ? 'Sun' : 'Moon' : half === 1 ? 'Moon' : 'Sun';
+  let moleCheck = null;
+  if (bp) {
+    const lo = lagnaSign * 30 + decanate * 10,
+      hi = lo + 10;
+    const BEN = ['Moon', 'Mercury', 'Jupiter', 'Venus'];
+    moleCheck = [];
+    ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach(pl => {
+      const L = norm360(bp[pl]);
+      if (L >= lo && L < hi) {
+        const ps = Math.floor(L / 30);
+        const fromBirth = RASI_LORDS[ps] === pl || RASI_LORDS[calculateVarga(bp[pl], 9)] === pl;
+        moleCheck.push({
+          planet: pl,
+          type: BEN.includes(pl) ? 'mole' : 'wound',
+          fromBirth
+        });
+      }
+    });
+  }
+  return {
+    lagnaSign,
+    lagnaText: SARAVALI_ASC[lagnaSign],
+    complexionLord,
+    complexion: PLANET_COMPLEXIONS[complexionLord],
+    navamsaLagna,
+    navamsaLord: RASI_LORDS[navamsaLagna],
+    navamsaNum,
+    navamsaEntry: SARAVALI_NAV[lagnaSign][navamsaNum - 1],
+    decanate,
+    decanateText: SARAVALI_DEC[lagnaSign][decanate],
+    drekLimbs: DREK_LIMBS[decanate],
+    horaNum: half,
+    horaLord,
+    horaText: SARAVALI_HORA[lagnaSign][half - 1],
+    moleCheck
+  };
+}
+// --- Moola Dasha order (Saravali Ch.41) ---
+// First: strongest of Lagna/Sun/Moon (Lagna strength proxied by its lord's Shadbala — labeled).
+// Then remaining planets by class: Kendra, Panaphara, Apoklima; within class by Shadbala desc,
+// ties by zodiacal (rising) order. Rahu/Ketu excluded (not in the triad or strength scheme).
+// Ch.41 gives NO year table, so this returns order only — no dates, no Pindayu substitution.
+function v643MoolaOrder(bp, sb) {
+  const lagnaSign = Math.floor(norm360(bp.Lagna) / 30);
+  const signOf = pl => Math.floor(norm360(bp[pl]) / 30);
+  const tot = pl => sb[pl] && sb[pl].total || 0;
+  const triad = [{
+    key: 'Lagna',
+    strength: tot(RASI_LORDS[lagnaSign]),
+    proxy: true
+  }, {
+    key: 'Sun',
+    strength: tot('Sun')
+  }, {
+    key: 'Moon',
+    strength: tot('Moon')
+  }];
+  triad.sort((a, b) => b.strength - a.strength);
+  const first = triad[0];
+  const rest = GRAHAS7.filter(pl => pl !== first.key);
+  const cls = h => [1, 4, 7, 10].includes(h) ? 0 : [2, 5, 8, 11].includes(h) ? 1 : 2;
+  const clsName = ['Kendra', 'Panaphara', 'Apoklima'];
+  rest.sort((a, b) => {
+    const ha = (signOf(a) - lagnaSign + 12) % 12 + 1,
+      hb = (signOf(b) - lagnaSign + 12) % 12 + 1;
+    if (cls(ha) !== cls(hb)) return cls(ha) - cls(hb);
+    if (tot(b) !== tot(a)) return tot(b) - tot(a);
+    return signOf(a) - signOf(b);
+  });
+  const out = [{
+    key: first.key,
+    cls: 'Triad-first',
+    strength: first.strength,
+    proxy: !!first.proxy
+  }];
+  rest.forEach(pl => {
+    const h = (signOf(pl) - lagnaSign + 12) % 12 + 1;
+    out.push({
+      key: pl,
+      cls: clsName[cls(h)],
+      house: h,
+      sign: signOf(pl),
+      strength: tot(pl)
+    });
+  });
+  return out;
+}
+// --- Saravali Ch.52 reconstruction (display-only) ---
+// Ritu-lord mapping per BPHS Ch.78 (Saravali Ch.52 states the rule without the table — labeled).
+// Ritu months are the standard Vedic calendar (verse says month follows the decanate half — labeled).
+// Decanate lords per standard lordship (1st = sign lord, 2nd = 5th-from, 3rd = 9th-from — labeled).
+const RITU_OF_PLANET = {
+  Sun: 'Grishma',
+  Mars: 'Grishma',
+  Moon: 'Varsha',
+  Mercury: 'Sharad',
+  Jupiter: 'Hemanta',
+  Venus: 'Vasanta',
+  Saturn: 'Shishir'
+};
+const RITU_MONTHS = {
+  Shishir: ['Magha', 'Phalguna'],
+  Vasanta: ['Chaitra', 'Vaishakha'],
+  Grishma: ['Jyeshtha', 'Ashadha'],
+  Varsha: ['Shravana', 'Bhadrapada'],
+  Sharad: ['Ashvina', 'Kartika'],
+  Hemanta: ['Margashirsha', 'Pausha']
+};
+const RITU_MY = {
+  Shishir: 'ဆိသိရ',
+  Vasanta: 'ဝသန္တ',
+  Grishma: 'ဂိမှ',
+  Varsha: 'ဝဿန်',
+  Sharad: 'သရဒ်',
+  Hemanta: 'ဟေမန္တ'
+};
+const RITU_INTERCHANGE = {
+  Moon: 'Venus',
+  Venus: 'Moon',
+  Mercury: 'Mars',
+  Mars: 'Mercury',
+  Jupiter: 'Saturn',
+  Saturn: 'Jupiter'
+};
+function v643Ch52(bp, sb, bodySign, queristPos, nameInputs) {
+  const lagnaSign = Math.floor(norm360(bp.Lagna) / 30);
+  const degInSign = norm360(bp.Lagna) % 30;
+  const moonSign = Math.floor(norm360(bp.Moon) / 30);
+  const sunSign = Math.floor(norm360(bp.Sun) / 30);
+  const signOf = pl => Math.floor(norm360(bp[pl]) / 30);
+  const tot = pl => sb[pl] && sb[pl].total || 0;
+  const ayana = degInSign < 15 ? 'Uttarayana' : 'Dakshinayana';
+  let rituLord = null,
+    rituLordSrc = '';
+  const inLagna = GRAHAS7.filter(pl => signOf(pl) === lagnaSign);
+  if (inLagna.length > 0) {
+    inLagna.sort((a, b) => tot(b) - tot(a));
+    rituLord = inLagna[0];
+    rituLordSrc = 'strongest planet in Prashna Lagna';
+  } else {
+    const dec = Math.floor(degInSign / 10);
+    rituLord = RASI_LORDS[(lagnaSign + (dec === 0 ? 0 : dec === 1 ? 4 : 8)) % 12];
+    rituLordSrc = 'lord of the ascendant decanate (no planet in Lagna)';
+  }
+  let ritu = RITU_OF_PLANET[rituLord] || null;
+  const uttRitus = ['Shishir', 'Vasanta', 'Grishma'];
+  const clash = ritu ? ayana === 'Uttarayana' && uttRitus.indexOf(ritu) < 0 || ayana === 'Dakshinayana' && uttRitus.indexOf(ritu) >= 0 : false;
+  let rituFinal = ritu,
+    rituFinalLord = rituLord,
+    interchanged = false;
+  if (clash && RITU_INTERCHANGE[rituLord]) {
+    rituFinalLord = RITU_INTERCHANGE[rituLord];
+    rituFinal = RITU_OF_PLANET[rituFinalLord];
+    interchanged = true;
+  }
+  const decHalf = degInSign % 10 < 5 ? 0 : 1;
+  const month = rituFinal ? RITU_MONTHS[rituFinal][decHalf] : null;
+  const daySign = lagnaSign % 2 === 0;
+  const dayNight = daySign ? 'birth during night' : 'birth during day';
+  const triadSigns = [lagnaSign, (lagnaSign + 4) % 12, (lagnaSign + 8) % 12];
+  let moonStrongest3 = triadSigns[0];
+  triadSigns.forEach(sg => {
+    if (tot(RASI_LORDS[sg]) > tot(RASI_LORDS[moonStrongest3])) moonStrongest3 = sg;
+  });
+  let moonDistance = null;
+  if (moonSign !== 11) {
+    const dist = (moonSign - lagnaSign + 12) % 12;
+    moonDistance = (moonSign + dist) % 12;
+  } else {
+    moonDistance = 11;
+  }
+  const navamsaAsc = calculateVarga(bp.Lagna, 9);
+  const lagnaDecIdx = lagnaSign * 3 + Math.floor(degInSign / 10);
+  const sunDecIdx = sunSign * 3 + Math.floor(norm360(bp.Sun) % 30 / 10);
+  const between = (sunDecIdx - lagnaDecIdx + 36) % 36;
+  const natalDecIdx = (sunDecIdx + between) % 36;
+  const sunDecAsc = Math.floor(natalDecIdx / 3);
+  const posOff = {
+    standing: 0,
+    lying: 3,
+    sitting: 6,
+    rising: 9
+  }[queristPos];
+  const queristAsc = posOff === undefined ? null : (lagnaSign + posOff) % 12;
+  const jupiterLiteral = Math.floor(norm360(bp.Lagna) * 2 / 5 % 360 / 30);
+  let nameStar = null;
+  if (nameInputs && isFinite(nameInputs.matras) && isFinite(nameInputs.chaya)) {
+    const prod = nameInputs.matras * 2 + nameInputs.chaya;
+    const r = prod % 27;
+    const p = r === 0 ? 27 : r;
+    nameStar = NAKSHATRAS[(22 + p - 1) % 27];
+  }
+  const moonNight = moonSign % 2 === 1;
+  return {
+    ayana,
+    rituLord,
+    rituLordSrc,
+    ritu,
+    clash,
+    interchanged,
+    rituFinal,
+    rituFinalLord,
+    month,
+    decHalf,
+    dayNight,
+    elapsedFrac: degInSign / 30,
+    tithiHint: degInSign % 10,
+    moonStrongest3,
+    moonDistance,
+    moonDistanceNote: moonSign === 11 ? 'query Moon in Pisces — natal Moon in Pisces itself' : null,
+    bodyMoon: bodySign,
+    navamsaAsc,
+    sunDecAsc,
+    queristAsc,
+    jupiterLiteral,
+    nameStar,
+    moonInversion: moonNight ? 'query Moon in a night sign — natal Moon in a day sign' : 'query Moon in a day sign — natal Moon in a night sign'
+  };
 }
 
 // ===== v6.3: Placement readings (prototype — Moon) =====
@@ -5860,6 +7482,54 @@ function buildWesternVocational(p, cusps) {
   };
 }
 
+// ===== v6.40: saved-profile export/import helpers (pure — tested by test47) =====
+function normalizeImportProfiles(parsed) {
+  if (Array.isArray(parsed)) return parsed;
+  if (parsed && typeof parsed === 'object') {
+    if (Array.isArray(parsed.profiles)) return parsed.profiles;
+    if ('profiles' in parsed) return [];
+    return [parsed];
+  }
+  return [];
+}
+function filterProfilesByName(profiles, query) {
+  // v6.41: plain substring match on name (Burmese-safe — String.includes on the raw string)
+  const q = (query || '').trim();
+  if (!q) return (profiles || []).slice();
+  return (profiles || []).filter(p => (p && p.name ? String(p.name) : '').includes(q));
+}
+function mergeSavedProfiles(existing, incoming) {
+  const ids = new Set();
+  const keys = new Set();
+  for (const p of existing || []) {
+    if (p && p.id !== undefined && p.id !== null) ids.add(p.id);
+    if (p) keys.add([p.name, p.year, p.month, p.day, p.hour, p.minute, p.place].join('|'));
+  }
+  const merged = (existing || []).slice();
+  let added = 0,
+    skipped = 0;
+  for (const p of incoming || []) {
+    if (!p || typeof p !== 'object') {
+      skipped++;
+      continue;
+    }
+    const key = [p.name, p.year, p.month, p.day, p.hour, p.minute, p.place].join('|');
+    if (p.id !== undefined && p.id !== null && ids.has(p.id) || keys.has(key)) {
+      skipped++;
+      continue;
+    }
+    if (p.id !== undefined && p.id !== null) ids.add(p.id);
+    keys.add(key);
+    merged.push(p);
+    added++;
+  }
+  return {
+    merged,
+    added,
+    skipped
+  };
+}
+
 // ==========================================
 // 3. CHART & MODAL COMPONENTS
 // ==========================================
@@ -8063,7 +9733,7 @@ function SelfCheckPanel() {
   return /*#__PURE__*/React.createElement("div", {
     className: "mt-2"
   }, /*#__PURE__*/React.createElement("button", {
-    onClick: () => setRes(astroSelfCheck()),
+    onClick: () => setRes(res ? null : astroSelfCheck()),
     className: "text-[11px] bg-white/10 hover:bg-white/20 text-emerald-50 px-2 py-1 rounded font-semibold"
   }, "🔍 စစ်ဆေးမှု (Self-check)"), res && /*#__PURE__*/React.createElement("div", {
     className: "mt-1.5 bg-white/10 rounded p-2 space-y-1"
@@ -8074,7 +9744,10 @@ function SelfCheckPanel() {
     className: "text-emerald-200/70"
   }, "— ", r.detail))), /*#__PURE__*/React.createElement("p", {
     className: "text-[9px] text-emerald-200/60"
-  }, "ဒီ စစ်ဆေး မှု က engine ရဲ့ အခြေခံ ကိန်းဂဏန်း တွေ မပျက် ကြောင်း ပဲ စစ် တာ ပါ — ဟောချက် မှန်/မမှန် ကို အာမ ခံ တာ မဟုတ် ပါ။")));
+  }, "ဒီ စစ်ဆေး မှု က engine ရဲ့ အခြေခံ ကိန်းဂဏန်း တွေ မပျက် ကြောင်း ပဲ စစ် တာ ပါ — ဟောချက် မှန်/မမှန် ကို အာမ ခံ တာ မဟုတ် ပါ။"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setRes(null),
+    className: "text-[11px] bg-white/20 hover:bg-white/30 text-emerald-50 px-2 py-1 rounded font-semibold"
+  }, "ပိတ်")));
 }
 function MindPanel({
   planets
@@ -8964,13 +10637,8 @@ class ErrorBoundary extends Component {
 // ==========================================
 function MainApp() {
   const [activeTab, setActiveTab] = useState('transit');
-  const [agreed, setAgreed] = useState(() => {
-    try {
-      return localStorage.getItem('jyotish_agreed_v1') === '1';
-    } catch (e) {
-      return false;
-    }
-  });
+  const [extraDashasOpen, setExtraDashasOpen] = useState(false); // v6.44: added-dasha submenu toggle
+  const [agreed, setAgreed] = useState(false);
   const agreeDisclaimer = () => {
     try {
       localStorage.setItem('jyotish_agreed_v1', '1');
@@ -9024,8 +10692,32 @@ function MainApp() {
     date: ''
   }]);
   const [rectAppSign, setRectAppSign] = useState('');
+  const [rectAppDetail, setRectAppDetail] = useState({
+    height: '',
+    complexion: '',
+    build: '',
+    fingers: ''
+  });
+  const [rectPers, setRectPers] = useState({
+    speech: '',
+    pace: '',
+    openness: '',
+    honesty: '',
+    decision: ''
+  });
   const [rectResults, setRectResults] = useState(null);
   const [rectBusy, setRectBusy] = useState(false);
+  const [prashnaDate, setPrashnaDate] = useState('');
+  const [prashnaTime, setPrashnaTime] = useState('');
+  const [prashnaTz, setPrashnaTz] = useState('6.5');
+  const [prashnaLat, setPrashnaLat] = useState('');
+  const [prashnaLon, setPrashnaLon] = useState('');
+  const [prashnaPos, setPrashnaPos] = useState('');
+  const [prashnaBody, setPrashnaBody] = useState('');
+  const [prashnaName, setPrashnaName] = useState('');
+  const [prashnaMatras, setPrashnaMatras] = useState('');
+  const [prashnaChaya, setPrashnaChaya] = useState('');
+  const [prashnaMoles, setPrashnaMoles] = useState('');
   const runRectification = () => {
     const baseH24 = to24(safeHour(birthHour, 12), birthAmPm) * 60 + (parseInt(birthMinute, 10) || 0);
     const parseT = (v, fb) => {
@@ -9036,7 +10728,7 @@ function MainApp() {
     const fromMin = Math.max(0, parseT(rectFrom, baseH24 - 180));
     const toMin = Math.min(1439, parseT(rectTo, baseH24 + 180));
     const dateStr = sY + '-' + String(sM).padStart(2, '0') + '-' + String(sD).padStart(2, '0');
-    const evs = rectEvents.filter(e => e.date);
+    const evs = rectEvents.filter(e => e.date || e.approx && e.year);
     if (evs.length === 0) {
       setRectResults([]);
       return;
@@ -9122,6 +10814,8 @@ function MainApp() {
   const [searchTarget, setSearchTarget] = useState(null);
   const [savedProfiles, setSavedProfiles] = useState([]);
   const [showSavedModal, setShowSavedModal] = useState(false);
+  const [savedSearch, setSavedSearch] = useState('');
+  const [importMsg, setImportMsg] = useState('');
   const [expMaha, setExpMaha] = useState(null);
   useEffect(() => {
     if (navigator.geolocation) {
@@ -9247,6 +10941,55 @@ function MainApp() {
     try {
       localStorage.setItem('saved_jyotish_pwa', JSON.stringify(updated));
     } catch (e) {}
+  };
+  const exportProfiles = () => {
+    const data = {
+      app: 'jyotish',
+      format: 1,
+      exported: new Date().toISOString(),
+      profiles: savedProfiles
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: 'application/json'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    a.href = url;
+    a.download = 'jyotish-saved-' + d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  const handleImportFiles = async fileList => {
+    const files = Array.prototype.slice.call(fileList || []);
+    if (!files.length) return;
+    let merged = savedProfiles.slice();
+    let imported = 0,
+      skipped = 0;
+    const failed = [];
+    for (const f of files) {
+      try {
+        const parsed = JSON.parse(await f.text());
+        const r = mergeSavedProfiles(merged, normalizeImportProfiles(parsed));
+        merged = r.merged;
+        imported += r.added;
+        skipped += r.skipped;
+      } catch (e) {
+        failed.push(f.name);
+      }
+    }
+    if (imported > 0) {
+      setSavedProfiles(merged);
+      try {
+        localStorage.setItem('saved_jyotish_pwa', JSON.stringify(merged));
+      } catch (e) {}
+    }
+    let msg = 'သွင်းပြီးပါပြီ: အသစ် ' + imported + ' ခု, ထပ်နေလို့ ကျော် ' + skipped + ' ခု။';
+    if (failed.length) msg += ' ဖတ်လို့မရတဲ့ ဖိုင်: ' + failed.join(', ') + ' (ရှိပြီးသား စာရင်း မထိပါ)။';
+    setImportMsg(msg);
   };
   const clearBirthInputs = () => {
     setBirthName('');
@@ -9659,7 +11402,7 @@ function MainApp() {
   }, "မှတ်ချက်: ဒီ App ဟာ အဟော ထုတ် ပေး တဲ့ ဆရာ တစ်ယောက် ရဲ့ စကား မဟုတ် ပါ — လေ့လာသူ တစ်ယောက် က အတူတူ ဝိုင်းဝန်း စဉ်းစား ဆွေးနွေး နိုင် အောင် စုစည်း ထား တဲ့ ကိရိယာ သာ ဖြစ် ပါတယ်။"))), /*#__PURE__*/React.createElement(SelfCheckPanel, null)), /*#__PURE__*/React.createElement("div", {
     className: "bg-white border-b border-slate-200 p-1.5 shadow-sm"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "grid grid-cols-5 gap-1 text-[11px] font-semibold text-center"
+    className: "grid grid-cols-4 gap-1 text-[11px] font-semibold text-center"
   }, [{
     id: 'transit',
     l: '🪐 ကောဇာ'
@@ -9676,6 +11419,9 @@ function MainApp() {
     id: 'dasha',
     l: '⏳ ဒသာ'
   }, {
+    id: 'sudarshana',
+    l: '☸️ တြိစက္က'
+  }, {
     id: 'bhava',
     l: '🏛️ ဘာဝ'
   }, {
@@ -9690,6 +11436,30 @@ function MainApp() {
   }, {
     id: 'relate',
     l: '🤝 ပေါင်းသင်း'
+  }].map(t => /*#__PURE__*/React.createElement("button", {
+    key: t.id,
+    onClick: () => setActiveTab(t.id),
+    className: `py-1.5 px-1 rounded-md transition-all ${activeTab === t.id ? 'bg-emerald-800 text-white font-bold shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`
+  }, t.l)), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setExtraDashasOpen(!extraDashasOpen),
+    className: `py-1.5 px-1 rounded-md transition-all ${['dasha-moola', 'dasha-yogini', 'dasha-ashtottari', 'dasha-chara', 'dasha-kala'].includes(activeTab) ? 'bg-emerald-800 text-white font-bold shadow-sm' : extraDashasOpen ? 'bg-emerald-100 text-emerald-900 font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`
+  }, "ထပ်တိုး ဒဿာ ", extraDashasOpen ? '▾' : '▸')), (extraDashasOpen || ['dasha-moola', 'dasha-yogini', 'dasha-ashtottari', 'dasha-chara', 'dasha-kala'].includes(activeTab)) && /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-5 gap-1 text-[11px] font-semibold text-center mt-1"
+  }, [{
+    id: 'dasha-moola',
+    l: '🌱 မူလ ဒသာ'
+  }, {
+    id: 'dasha-yogini',
+    l: '🧘 ယောဂိနီ ဒသာ'
+  }, {
+    id: 'dasha-ashtottari',
+    l: '🔢 အဋ္ဌောတ္တရီ'
+  }, {
+    id: 'dasha-chara',
+    l: '♟️ စရ ဒသာ'
+  }, {
+    id: 'dasha-kala',
+    l: '🌀 ကာလ စက္က'
   }].map(t => /*#__PURE__*/React.createElement("button", {
     key: t.id,
     onClick: () => setActiveTab(t.id),
@@ -10180,7 +11950,21 @@ function MainApp() {
   }, Object.entries(RECT_EVENT_DEFS).map(([k, v]) => /*#__PURE__*/React.createElement("option", {
     key: k,
     value: k
-  }, v.label))), /*#__PURE__*/React.createElement("input", {
+  }, v.label))), e.approx ? /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    inputMode: "numeric",
+    placeholder: "နှစ်",
+    value: e.year || '',
+    onChange: ev => {
+      const c = [...rectEvents];
+      c[i] = {
+        ...c[i],
+        year: ev.target.value
+      };
+      setRectEvents(c);
+    },
+    className: "w-20 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  }) : /*#__PURE__*/React.createElement("input", {
     type: "date",
     value: e.date,
     onChange: ev => {
@@ -10192,7 +11976,25 @@ function MainApp() {
       setRectEvents(c);
     },
     className: "bg-white border border-slate-300 rounded p-1.5 text-[11px]"
-  }), /*#__PURE__*/React.createElement("button", {
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "flex items-center gap-0.5 text-[10px] text-slate-500 whitespace-nowrap cursor-pointer"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: !!e.approx,
+    onChange: ev => {
+      const c = [...rectEvents];
+      const on = ev.target.checked;
+      c[i] = on ? {
+        ...c[i],
+        approx: true,
+        year: c[i].date ? c[i].date.slice(0, 4) : c[i].year || ''
+      } : {
+        ...c[i],
+        approx: false
+      };
+      setRectEvents(c);
+    }
+  }), "≈ ခန့်မှန်း"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setRectEvents(rectEvents.filter((_, j) => j !== i)),
     className: "px-2 text-slate-400"
   }, "✕"))), rectEvents.length < 8 && /*#__PURE__*/React.createElement("button", {
@@ -10212,7 +12014,75 @@ function MainApp() {
   }, "— မရွေးပါ —"), APPEARANCE_BY_SIGN.map((t, i) => /*#__PURE__*/React.createElement("option", {
     key: i,
     value: i
-  }, t)))), /*#__PURE__*/React.createElement("button", {
+  }, t)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "👀 ရုပ်ရည် အသေးစိတ် — ကိုယ်တိုင် နှိုင်းယှဉ်ရန် သက်သက် (အမှတ်ထဲ မပါ, မူလ လဂ် ရုပ်ရည် နှင့် သီးခြား)"), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 gap-1.5 mt-0.5"
+  }, RECT_APP_DETAIL_DEFS.map(d => /*#__PURE__*/React.createElement("label", {
+    key: d.key,
+    className: "text-[10px] text-slate-500"
+  }, d.label, /*#__PURE__*/React.createElement("select", {
+    value: rectAppDetail[d.key] || '',
+    onChange: ev => setRectAppDetail({
+      ...rectAppDetail,
+      [d.key]: ev.target.value
+    }),
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "— မရွေးပါ —"), d.opts.map(o => /*#__PURE__*/React.createElement("option", {
+    key: o,
+    value: o
+  }, o))))))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "🧠 စရိုက် — ကိုယ်တိုင် နှိုင်းယှဉ်ရန် သက်သက် (အမှတ်ထဲ မပါ)"), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 gap-1.5 mt-0.5"
+  }, RECT_PERS_DEFS.map(d => /*#__PURE__*/React.createElement("label", {
+    key: d.key,
+    className: "text-[10px] text-slate-500"
+  }, d.label, /*#__PURE__*/React.createElement("select", {
+    value: rectPers[d.key] || '',
+    onChange: ev => setRectPers({
+      ...rectPers,
+      [d.key]: ev.target.value
+    }),
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "— မရွေးပါ —"), d.opts.map(o => /*#__PURE__*/React.createElement("option", {
+    key: o,
+    value: o
+  }, o))))))), (() => {
+    try {
+      const sb = computeShadbala(birthPlanets, birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
+      let best = null,
+        bestTot = -Infinity;
+      GRAHAS7.forEach(pl => {
+        if (sb[pl] && sb[pl].total > bestTot) {
+          bestTot = sb[pl].total;
+          best = pl;
+        }
+      });
+      const tps = ['Jupiter', 'Venus', 'Saturn', 'Mars', 'Mercury'];
+      let bestT = null,
+        bestTTot = -Infinity;
+      tps.forEach(pl => {
+        if (sb[pl] && sb[pl].total > bestTTot) {
+          bestTTot = sb[pl].total;
+          bestT = pl;
+        }
+      });
+      const tat = TATWA_MAP[bestT];
+      const g = GUNA_MAP_BPHS[best];
+      return /*#__PURE__*/React.createElement("div", {
+        className: "bg-amber-50/70 border border-amber-100 rounded p-2 text-[10px] text-slate-600 leading-relaxed"
+      }, "🪔 ဂုဏ်/ဓာတ် (ကျမ်းလာ ပြကွက် — စရိုက် ရွေးချယ်မှုများနှင့် တွဲ၍ နှိုင်းယှဉ်ရန်၊ အမှတ်ထဲ မပါ၊ dropdown များကို အစားမထိုးပါ): အားအကောင်းဆုံး ဂြိုဟ် ", best, " (Shadbala ", (bestTot / 60).toFixed(1), " ရူပါ) — ဂုဏ် ", g, " (BPHS File 1 Ch.3 v22) · ", SARAVALI_GUNA[g].my, " ", /*#__PURE__*/React.createElement("span", {
+        className: "text-slate-400"
+      }, "(", SARAVALI_GUNA[g].en, ")"), "; ဓာတ် ငါးပါး အနက် အားအကောင်းဆုံး ", bestT, " → ", TATWA_MY[tat], " ဓာတ် → ", DOSHA_MY[TATWA_DOSHA[tat]], " (Saravali Ch.38 v.5; ဓာတ်→ခန္ဓာဓာတ် အဆက်မှာ စံ Ayurvedic အဆက် ဖြစ်ပြီး Ch.38 က တစ်ပါးချင်း မတွဲပြပါ)", best !== bestT && (best === 'Sun' || best === 'Moon') ? ' — မှတ်ချက်: နေ/တနင်္လာသည် Ch.38 v.5 ၏ ငါးပါးတွင် မပါသဖြင့် ဓာတ်ကို ထို ငါးပါး အနက် အားအကောင်းဆုံးမှ ပြထားသည်။' : '');
+    } catch (e) {
+      return null;
+    }
+  })(), /*#__PURE__*/React.createElement("button", {
     onClick: runRectification,
     disabled: rectBusy,
     className: "w-full bg-violet-700 hover:bg-violet-800 disabled:opacity-50 text-white font-bold py-2 rounded-lg text-xs"
@@ -10231,6 +12101,19 @@ function MainApp() {
         date: ''
       }]);
       setRectAppSign('');
+      setRectAppDetail({
+        height: '',
+        complexion: '',
+        build: '',
+        fingers: ''
+      });
+      setRectPers({
+        speech: '',
+        pace: '',
+        openness: '',
+        honesty: '',
+        decision: ''
+      });
       setRectResults(null);
     },
     className: "w-full bg-white border border-slate-300 text-slate-600 font-bold py-1.5 rounded-lg text-[11px]"
@@ -10238,13 +12121,24 @@ function MainApp() {
     className: "text-[10px] text-rose-500"
   }, "ဖြစ်စဉ် ရက်စွဲ အနည်းဆုံး တစ်ခု ထည့်ပါ (သို့) ရလဒ် မတွေ့ပါ။") : /*#__PURE__*/React.createElement("div", {
     className: "space-y-1.5"
-  }, rectResults.map((r, i) => {
+  }, RECT_APP_DETAIL_DEFS.some(d => rectAppDetail[d.key]) && /*#__PURE__*/React.createElement("div", {
+    className: "bg-slate-50 border border-slate-200 rounded p-2 text-[10px] text-slate-600"
+  }, "👀 ရွေးထားသော ရုပ်ရည် အသေးစိတ် (အမှတ်ထဲ မပါ — မူလ လဂ် ရုပ်ရည် နှင့် ကိုယ်တိုင် နှိုင်းယှဉ်ရန်): ", RECT_APP_DETAIL_DEFS.filter(d => rectAppDetail[d.key]).map(d => /*#__PURE__*/React.createElement("span", {
+    key: d.key,
+    className: "mr-2"
+  }, d.label, " ", rectAppDetail[d.key]))), RECT_PERS_DEFS.some(d => rectPers[d.key]) && /*#__PURE__*/React.createElement("div", {
+    className: "bg-slate-50 border border-slate-200 rounded p-2 text-[10px] text-slate-600"
+  }, "🧠 ရွေးထားသော စရိုက် (အမှတ်ထဲ မပါ — ကိုယ်တိုင် နှိုင်းယှဉ်ရန်): ", RECT_PERS_DEFS.filter(d => rectPers[d.key]).map(d => /*#__PURE__*/React.createElement("span", {
+    key: d.key,
+    className: "mr-2"
+  }, d.label, " ", rectPers[d.key]))), rectResults.map((r, i) => {
     const h24 = Math.floor(r.mins / 60),
       mm = r.mins % 60,
       h12 = (h24 + 11) % 12 + 1,
       ap = h24 >= 12 ? 'PM' : 'AM';
     return /*#__PURE__*/React.createElement("div", {
-      key: i,
+      key: i
+    }, /*#__PURE__*/React.createElement("div", {
       className: "flex items-start gap-2 bg-violet-50/60 border border-violet-100 rounded p-2"
     }, /*#__PURE__*/React.createElement("div", {
       className: "flex-1 min-w-0"
@@ -10255,13 +12149,212 @@ function MainApp() {
     }, r.per.map((pp, j) => /*#__PURE__*/React.createElement("span", {
       key: j,
       className: "mr-2"
-    }, RECT_EVENT_DEFS[pp.type].label, " ", pp.score > 0 ? '✓' : '—', " ", pp.score)))), /*#__PURE__*/React.createElement("button", {
+    }, RECT_EVENT_DEFS[pp.type].label, pp.approx ? ' ≈' : '', " ", pp.score > 0 ? '✓' : '—', " ", pp.score)))), /*#__PURE__*/React.createElement("button", {
       onClick: () => applyRectTime(r.mins),
       className: "shrink-0 bg-violet-700 text-white text-[10px] font-bold px-2 py-1 rounded"
-    }, "ဒီအချိန် သုံးမယ်"));
+    }, "ဒီအချိန် သုံးမယ်")), /*#__PURE__*/React.createElement("details", {
+      className: "mt-1 bg-amber-50/60 border border-amber-100 rounded p-2 text-[10px] leading-relaxed"
+    }, /*#__PURE__*/React.createElement("summary", {
+      className: "cursor-pointer font-bold text-slate-700"
+    }, "📖 ကျမ်းလာ ရုပ်ရည် (Saravali Ch.48/49/50/51) — ကိုယ်တိုင် နှိုင်းယှဉ်ရန် (အမှတ်ထဲ မပါ)"), (() => {
+      try {
+        const candJD = getJulianDay(sY, sM, sD, Math.floor(r.mins / 60), r.mins % 60, birthTzEffForRect);
+        const bpC = calculateNASA_JPL_Planets(candJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
+        const prof = v643AppearanceProfile(bpC.Lagna, bpC.Moon, bpC);
+        return /*#__PURE__*/React.createElement("div", {
+          className: "space-y-1 mt-1 text-slate-600"
+        }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "လဂ် ရာသီ (Saravali Ch.48):"), " ", RASI_NAMES_MY[prof.lagnaSign], " — ", prof.lagnaText.my, " ", /*#__PURE__*/React.createElement("span", {
+          className: "text-slate-400"
+        }, "(", prof.lagnaText.en, ")")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "အသားအရေ (Phaladeepika Ch.16 နည်း — တနင်္လာ၏ အိမ် အရှင် ", prof.complexionLord, "):"), " ", prof.complexion.my, " ", /*#__PURE__*/React.createElement("span", {
+          className: "text-slate-400"
+        }, "(", prof.complexion.en, "; စကားလုံး: BPHS Ch.3 sl.16-17)")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "နဝံသ လဂ် (Phaladeepika Ch.16):"), " ", RASI_NAMES_MY[prof.navamsaLagna], " (အရှင် ", prof.navamsaLord, ")၊ နဝံသ ", prof.navamsaNum), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "နဝံသ အကျိုး (Saravali Ch.51):"), " ", prof.navamsaEntry.my, " ", /*#__PURE__*/React.createElement("span", {
+          className: "text-slate-400"
+        }, "(", prof.navamsaEntry.en, ")")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "ဒရက္ကာဏ (Saravali Ch.50):"), " ", prof.decanate + 1, " — ", prof.decanateText.my, " ", /*#__PURE__*/React.createElement("span", {
+          className: "text-slate-400"
+        }, "(", prof.decanateText.en, ")")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "ဟိုရာ (Saravali Ch.49):"), " ", prof.horaLord, " ဟိုရာ (", prof.horaNum, ") — ", prof.horaText.my, " ", /*#__PURE__*/React.createElement("span", {
+          className: "text-slate-400"
+        }, "(", prof.horaText.en, ")")), /*#__PURE__*/React.createElement("div", {
+          className: "text-slate-400"
+        }, "ဤအချက်များသည် ပြသမှု/နှိုင်းယှဉ်မှုသာ — အမှတ်ထဲ မပါ။ အမှတ် % စုပေါင်း မရှိပါ။"));
+      } catch (e) {
+        return /*#__PURE__*/React.createElement("div", {
+          className: "text-rose-500"
+        }, "တွက်မရပါ။");
+      }
+    })()));
   }), /*#__PURE__*/React.createElement("div", {
     className: "text-[9px] text-slate-400"
-  }, "လဂ် တစ်မျိုးစီအတွက် အကိုက် ဆုံး အချိန် တစ်ခုစီ ပြထားသည်။ အမှတ် နီးစပ်လျှင် ဖြစ်စဉ် ထပ်ထည့်၍ ဖြစ်စေ၊ လဂ် ရုပ်ရည် နှင့် တိုက်၍ ဖြစ်စေ ထပ်စစ် ရွေးပါ။")))))), activeTab === 'readings' && isTrop && western && /*#__PURE__*/React.createElement("div", {
+  }, "လဂ် တစ်မျိုးစီအတွက် အကိုက် ဆုံး အချိန် တစ်ခုစီ ပြထားသည်။ အမှတ် နီးစပ်လျှင် ဖြစ်စဉ် ထပ်ထည့်၍ ဖြစ်စေ၊ လဂ် ရုပ်ရည် နှင့် တိုက်၍ ဖြစ်စေ ထပ်စစ် ရွေးပါ။"))))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-xl shadow-sm border border-amber-200 overflow-hidden mt-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-amber-50 px-3 py-2 border-b border-amber-200"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "font-bold text-slate-800 text-xs"
+  }, "🔍 Lost Horoscopy (Nashta Jataka) — Saravali Ch.48-52"), /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] text-slate-500 mt-0.5 leading-relaxed"
+  }, "မွေးအချိန် လုံးဝ မသိသူများအတွက် မေးသည့် အချိန် (Prashna) မှ မွေးအချက်အလက်ကို ပြန်ရှာသော ကျမ်းနည်း။ ဤကဏ္ဍသည် ပြသမှု/နှိုင်းယှဉ်မှုသာ — ဖြစ်စဉ်-ကိုက် အမှတ် သို့မဟုတ် အချိန်များနှင့် ရောနှော မထားပါ။ အမှတ်မပေးပါ။")), /*#__PURE__*/React.createElement("div", {
+    className: "p-3 space-y-2 text-[11px]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 gap-2"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500"
+  }, "မေးသည့် ရက်", /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: prashnaDate,
+    onChange: e => setPrashnaDate(e.target.value),
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500"
+  }, "မေးသည့် အချိန်", /*#__PURE__*/React.createElement("input", {
+    type: "time",
+    value: prashnaTime,
+    onChange: e => setPrashnaTime(e.target.value),
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500"
+  }, "အချိန် ဇုန် (နာရီ)", /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.5",
+    value: prashnaTz,
+    onChange: e => setPrashnaTz(e.target.value),
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500"
+  }, "မေးသည့် နေရာ — လတ္တီကျု", /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.0001",
+    value: prashnaLat,
+    onChange: e => setPrashnaLat(e.target.value),
+    placeholder: "မထည့်လျှင် မွေးနေရာ",
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500"
+  }, "မေးသည့် နေရာ — လောင်ဂျီကျု", /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.0001",
+    value: prashnaLon,
+    onChange: e => setPrashnaLon(e.target.value),
+    placeholder: "မထည့်လျှင် မွေးနေရာ",
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500"
+  }, "မေးသူ၏ အနေအထား (Ch.52 v.10-11)", /*#__PURE__*/React.createElement("select", {
+    value: prashnaPos,
+    onChange: e => setPrashnaPos(e.target.value),
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "— မရွေးပါ —"), /*#__PURE__*/React.createElement("option", {
+    value: "standing"
+  }, "မတ်တပ်ရပ်"), /*#__PURE__*/React.createElement("option", {
+    value: "lying"
+  }, "အိပ်ယာပေါ် လှဲနေ"), /*#__PURE__*/React.createElement("option", {
+    value: "sitting"
+  }, "ထိုင်"), /*#__PURE__*/React.createElement("option", {
+    value: "rising"
+  }, "ထ"))), /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500"
+  }, "မေးသူ ထိခဲ့သော ကိုယ်အစိတ်အပိုင်း (Ch.52 v.4 — Kalapurusha)", /*#__PURE__*/React.createElement("select", {
+    value: prashnaBody,
+    onChange: e => setPrashnaBody(e.target.value),
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "— မရွေးပါ —"), ['ခေါင်း (မိဿ)', 'လည် (ပြိဿ)', 'ပခုံး/လက် (မေထုန်)', 'ရင် (ကရကဋ်)', 'ကျော/နှလုံး (သိဟ်)', 'ဝမ်း (ကန်)', 'ခါး (တူ)', 'လျှို့ဝှက် (ဗြိစ္ဆာ)', 'ပေါင် (ဓနု)', 'ဒူး (မကာရ)', 'ခြေသလုံး (ကုံ)', 'ခြေ (မိန်)'].map((b, i) => /*#__PURE__*/React.createElement("option", {
+    key: i,
+    value: i
+  }, b))))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-3 gap-2"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500"
+  }, "အမည် (မဖြစ်မနေ မဟုတ်)", /*#__PURE__*/React.createElement("input", {
+    value: prashnaName,
+    onChange: e => setPrashnaName(e.target.value),
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500"
+  }, "အမည်၏ မာတ္တရာ အရေအတွက် (Ch.52 v.12)", /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: prashnaMatras,
+    onChange: e => setPrashnaMatras(e.target.value),
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "text-[10px] text-slate-500"
+  }, "Chayangula (အရိပ် အရှည်)", /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.1",
+    value: prashnaChaya,
+    onChange: e => setPrashnaChaya(e.target.value),
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "မှဲ့/အမာရွတ် စာရင်း (ကိုယ်အစိတ်အပိုင်းအလိုက် — Cross-check အတွက် ကိုယ်တိုင် နှိုင်းယှဉ်ရန်)"), /*#__PURE__*/React.createElement("textarea", {
+    value: prashnaMoles,
+    onChange: e => setPrashnaMoles(e.target.value),
+    rows: 2,
+    placeholder: "ဥပမာ — ဘယ်လက် အမာရွတ်၊ ညာပါး မှဲ့",
+    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  })), (() => {
+    try {
+      if (!prashnaDate || !prashnaTime) return /*#__PURE__*/React.createElement("div", {
+        className: "text-[11px] text-slate-500"
+      }, "မေးသည့် ရက်/အချိန် ထည့်လျှင် Prashna ဇာတာ တွက်ပြမည်။");
+      const pp = prashnaDate.split('-').map(x => parseInt(x, 10));
+      const tp = prashnaTime.split(':').map(x => parseInt(x, 10));
+      const ptz = parseFloat(prashnaTz) || 6.5;
+      const plat = parseFloat(prashnaLat) || parseFloat(birthLat) || 16.84;
+      const plon = parseFloat(prashnaLon) || parseFloat(birthLon) || 96.17;
+      const pjd = getJulianDay(pp[0], pp[1], pp[2], tp[0], tp[1] || 0, ptz);
+      const pbp = calculateNASA_JPL_Planets(pjd, plat, plon, ayanamsa, nodeType);
+      const prof = v643AppearanceProfile(pbp.Lagna, pbp.Moon, pbp);
+      const psb = computeShadbala(pbp, pjd, plat, plon, ayanamsa, nodeType);
+      const c52 = v643Ch52(pbp, psb, prashnaBody === '' ? null : parseInt(prashnaBody, 10), prashnaPos, prashnaMatras !== '' && prashnaChaya !== '' ? {
+        matras: parseFloat(prashnaMatras),
+        chaya: parseFloat(prashnaChaya)
+      } : null);
+      const plSign = Math.floor(norm360(pbp.Lagna) / 30);
+      return /*#__PURE__*/React.createElement("div", {
+        className: "space-y-1.5 text-[11px] leading-relaxed"
+      }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "Prashna လဂ်:"), " ", RASI_NAMES_MY[plSign], " ", (norm360(pbp.Lagna) % 30).toFixed(1), "° · တနင်္လာ ", RASI_NAMES_MY[Math.floor(norm360(pbp.Moon) / 30)], " · နေ ", RASI_NAMES_MY[Math.floor(norm360(pbp.Sun) / 30)]), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "လဂ် အကျိုး (Saravali Ch.48):"), " ", prof.lagnaText.my, " ", /*#__PURE__*/React.createElement("span", {
+        className: "text-slate-500"
+      }, "(", prof.lagnaText.en, ")")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "ဟိုရာ (Ch.49):"), " ", prof.horaLord, " ဟိုရာ (", prof.horaNum, ") — ", prof.horaText.my, " ", /*#__PURE__*/React.createElement("span", {
+        className: "text-slate-500"
+      }, "(", prof.horaText.en, ")")), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "Ch.49 v.25: နေ/တနင်္လာ အားကောင်းပြီး လဂ်ရှင်ကို မြင်လျှင် (သို့) လဂ်ရှင် ကိန်းတွင် ရှိလျှင် ဟိုရာ အကျိုး အပြည့်ထင်ရှားသည်။"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "ဒရက္ကာဏ (Ch.50):"), " ", prof.decanate + 1, " — ", prof.decanateText.my, " ", /*#__PURE__*/React.createElement("span", {
+        className: "text-slate-500"
+      }, "(", prof.decanateText.en, ")")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "ဒရက္ကာဏ အင်္ဂါ (Ch.4):"), " ", prof.drekLimbs.my, " ", /*#__PURE__*/React.createElement("span", {
+        className: "text-slate-500"
+      }, "(", prof.drekLimbs.en, ")")), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "ဘေး စည်းမျဉ်း (Ch.4): လဂ်မှ နောက်ပြန် ၆ ရာသီ = ဘယ်ဘက်၊ ရှေ့သို့ ၆ ရာသီ = ညာဘက်။"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, "နဝံသ (Ch.51):"), " နဝံသ လဂ် ", RASI_NAMES_MY[prof.navamsaLagna], " (အရှင် ", prof.navamsaLord, ")၊ နဝံသ ", prof.navamsaNum, " — ", prof.navamsaEntry.my, " ", /*#__PURE__*/React.createElement("span", {
+        className: "text-slate-500"
+      }, "(", prof.navamsaEntry.en, ")")), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "Ch.51 v.1: ရုပ်ရည်သည် တနင်္လာ၏ နဝံသ အရှင်နှင့် နဝံသ-လဂ် အရှင် တို့ အနက် အားသာသူကို လိုက်၍ ထင်ရှားသည်။"), /*#__PURE__*/React.createElement("div", {
+        className: "border-t border-amber-100 pt-1.5"
+      }, /*#__PURE__*/React.createElement("strong", null, "မွေးအချက် ပြန်ရှာမှု (Ch.52):")), /*#__PURE__*/React.createElement("div", null, "အယန: ", c52.ayana === 'Uttarayana' ? 'ဥတ္တရာယန (မြောက်သို့ လှည့်)' : 'ဒက္ခိဏာယန (တောင်သို့ လှည့်)', " (လဂ် ", c52.ayana === 'Uttarayana' ? 'ပထမ ၁၅° အတွင်း' : '၁၅° ကျော်', ")"), /*#__PURE__*/React.createElement("div", null, "ရာသီ (Ritu): ", RITU_MY[c52.rituFinal] || c52.rituFinal, " (", c52.rituFinal, ") — အရှင် ", c52.rituFinalLord, c52.interchanged ? ' (Ch.52 v.3 အရ ' + c52.rituLord + ' နှင့် လဲလှယ်ပြီး)' : '', " · လ ", c52.month, " (", c52.decHalf === 0 ? 'ဒရက္ကာဏ ပထမဝက်' : 'ဒရက္ကာဏ ဒုတိယဝက်', ") · ရင်းမြစ်: ", c52.rituLordSrc), /*#__PURE__*/React.createElement("div", null, "မွေးချိန် နေ့/ည: ", c52.dayNight === 'birth during night' ? 'ညအချိန် မွေး' : 'နေ့အချိန် မွေး', " (လဂ် ဒီဂရီ ", (c52.elapsedFrac * 100).toFixed(0), "% ကုန်ပြီး)"), /*#__PURE__*/React.createElement("div", null, "မွေး တနင်္လာ ရာသီ (ခန့်မှန်း ၃ မျိုး): (၁) လဂ်/၅/၉ အနက် အားသာဆုံး အရှင်၏ ရာသီ — ", RASI_NAMES_MY[c52.moonStrongest3], "; (၂) လဂ်-တနင်္လာ အကွာအဝေး နည်း — ", RASI_NAMES_MY[c52.moonDistance], c52.moonDistanceNote ? ' (' + c52.moonDistanceNote + ')' : '', "; ", c52.bodyMoon !== null ? '(၃) ထိခဲ့သော ကိုယ်အစိတ်အပိုင်း (Kalapurusha) — ' + RASI_NAMES_MY[c52.bodyMoon] : '(၃) ကိုယ်အစိတ်အပိုင်း မရွေးရသေး'), /*#__PURE__*/React.createElement("div", null, "မွေး လဂ် ရာသီ (ခန့်မှန်း ၄ မျိုး): (၁) Prashna နဝံသ လဂ် — ", RASI_NAMES_MY[c52.navamsaAsc], "; (၂) လဂ်-နေ ဒရက္ကာဏ အကွာအဝေး နည်း — ", RASI_NAMES_MY[c52.sunDecAsc], "; ", c52.queristAsc !== null ? '(၃) မေးသူ အနေအထား နည်း — ' + RASI_NAMES_MY[c52.queristAsc] + '; ' : '(၃) မေးသူ အနေအထား မရွေးရသေး; ', "(၄) လဂ် × ၂ ÷ ၅ နည်း (စာအတိုင်း တိုက်ရိုက် တွက်) — ", RASI_NAMES_MY[c52.jupiterLiteral], " (Jupiter တည်ရာ အဖြစ် ဖော်ပြ၊ အသက် ခန့်မှန်းဖြင့် ၁၂ နှစ် အကွာများ ညှိပါ)"), c52.nameStar ? /*#__PURE__*/React.createElement("div", null, "မွေး နက္ခတ် (အမည် နည်း, Ch.52 v.12): ", c52.nameStar, " — (မာတ္တရာ × ၂ + Chayangula) ÷ ၂၇ အကြွင်း၊ ဓနိဋ္ဌမှ စ၍ ရေတွက်") : /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "မွေး နက္ခတ် (အမည် နည်း): မာတ္တရာ + Chayangula ထည့်လျှင် တွက်ပြမည်။"), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "တနင်္လာ အခြေခံ နည်း (Ch.52 vv.17-21): ", c52.moonInversion, "။ တီထိ အရိပ်အမြွက်: ဒရက္ကာဏ အတွင်း ", c52.tithiHint.toFixed(1), "° ကုန်ပြီး (Ch.52: ဤဒီဂရီမှ မွေး တီထိကို သိနိုင်သည် — ပိုင်းခြား ကိန်းဂဏန်း စာတွင် မဖော်ပြ)။"), /*#__PURE__*/React.createElement("div", {
+        className: "border-t border-amber-100 pt-1.5"
+      }, /*#__PURE__*/React.createElement("strong", null, "မှဲ့/အမာရွတ် Cross-check (Saravali Ch.4+50):"), " ", prof.moleCheck && prof.moleCheck.length > 0 ? prof.moleCheck.map((m, j) => /*#__PURE__*/React.createElement("span", {
+        key: j,
+        className: "mr-2"
+      }, m.planet, ": ", m.type === 'mole' ? 'မှဲ့' : 'အမာရွတ်/ဒဏ်ရာ', " (", m.fromBirth ? 'မွေးကတည်း' : 'နောက်မှ ဖြစ်', ")")) : 'ဤဒရက္ကာဏတွင် ဂြိုဟ် မရှိ — မှဲ့/အမာရွတ် ခန့်မှန်းချက် မရှိ'), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "စည်းမျဉ်း: ဤဒရက္ကာဏရှိ ပါပ ဂြိုဟ် (နေ၊ အင်္ဂါ၊ စနေ၊ ရာဟု၊ ကေတု) = အမာရွတ်/ဒဏ်ရာ၊ သုဘ ဂြိုဟ် (တနင်္လာ၊ ဗုဒ္ဓဟူး၊ ကြာသပတေး၊ သောကြာ) = မှဲ့။ ကိုယ်ပိုင် ရာသီ/အံသာ တွင် ရှိလျှင် မွေးကတည်း၊ မဟုတ်လျှင် နောက်မှ ဖြစ်။ အထက်ပါ စာရင်းကို ကိုယ်တိုင် နှိုင်းယှဉ်ပါ — အမှတ်ထဲ မပါ။"), prashnaMoles ? /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px]"
+      }, "ထည့်ထားသော စာရင်း: ", prashnaMoles) : null, /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "မတွက်ပြသေးသော နည်းများ: အရိပ် အရှည် (Chayangula) သုံး နည်းများ (v.4 အဆုံး) နှင့် v.13-15 မြှောက်နည်း — လိုအပ်သော တိုင်းတာမှု/ဥပမာ မပါသဖြင့် ဤဗားရှင်းတွင် မပါပါ။ Ch.52 v.16: ဤနည်းအချို့သည် မရေမရာဖြစ်သဖြင့် ကိုယ်ပိုင် အဆုံးအဖြတ်ဖြင့် သုံးပါ။"));
+    } catch (e) {
+      return /*#__PURE__*/React.createElement("div", {
+        className: "text-[11px] text-rose-500"
+      }, "တွက်မရပါ — ရက်/အချိန်/ကိုဩဒိနိတ် စစ်ပါ။");
+    }
+  })()))), activeTab === 'readings' && isTrop && western && /*#__PURE__*/React.createElement("div", {
     className: "p-3 space-y-3 text-xs"
   }, /*#__PURE__*/React.createElement("h2", {
     className: "font-bold text-emerald-900 text-sm"
@@ -10387,7 +12480,85 @@ function MainApp() {
     className: "text-[10px]"
   }, "Promise → Dasha → Transit အစဉ်ဖြင့် အကျိုးပေးချိန်ကို ခွဲဖတ်ပါ။")))), /*#__PURE__*/React.createElement("div", {
     className: "border-t border-emerald-700/60 pt-1.5 text-emerald-100 text-[11px] leading-relaxed"
-  }, /*#__PURE__*/React.createElement("strong", null, "ဘဝခရီးလမ်း:"), " ", lifeOverview.pillars ? lifeOverview.pillars.lifePath : '')), (lifeOverview.incomeSources?.length > 0 || lifeOverview.assetProfile?.length > 0) && /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("strong", null, "ဘဝခရီးလမ်း:"), " ", lifeOverview.pillars ? lifeOverview.pillars.lifePath : ''), /*#__PURE__*/React.createElement("div", {
+    className: "border-t border-emerald-700/60 pt-1.5 text-emerald-100 text-[11px] leading-relaxed"
+  }, /*#__PURE__*/React.createElement("strong", null, "နဝံသ လဂ်:"), " ", (() => {
+    try {
+      const nl = calculateVarga(birthPlanets.Lagna, 9);
+      const nnum = Math.floor(norm360(birthPlanets.Lagna) % 30 / (30 / 9)) + 1;
+      const lsign = Math.floor(norm360(birthPlanets.Lagna) / 30);
+      const ent = SARAVALI_NAV[lsign][nnum - 1];
+      return /*#__PURE__*/React.createElement("span", null, RASI_NAMES_MY[nl], " (အရှင် ", RASI_LORDS[nl], ") — နဝံသ ", nnum, " · ", ent.my, " ", /*#__PURE__*/React.createElement("span", {
+        className: "text-emerald-200/70"
+      }, "(", ent.en, ")"), " ", /*#__PURE__*/React.createElement("span", {
+        className: "text-[9px] text-emerald-200/60"
+      }, "[Saravali Ch.51]"));
+    } catch (e) {
+      return '—';
+    }
+  })())), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-baseline border-b pb-1"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "font-bold text-slate-800 text-xs"
+  }, "🧭 အထူး လဂ်များ (Special Ascendants)"), /*#__PURE__*/React.createElement("span", {
+    className: "text-[9px] text-slate-400"
+  }, "BPHS File 1 · Ch.5")), (() => {
+    try {
+      const sp = v643SpecialAscendants(birthJD, sY, sM, sD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, birthTzEff, ayanamsa, nodeType, birthPlanets.Lagna);
+      if (!sp) return /*#__PURE__*/React.createElement("div", {
+        className: "text-[11px] text-slate-500"
+      }, "နေထွက် တွက်မရပါ (polar day/night) — အထူး လဂ် မပြနိုင်ပါ။");
+      const lagnaSign = Math.floor(norm360(birthPlanets.Lagna) / 30);
+      const houseOf = sg => (sg - lagnaSign + 12) % 12 + 1;
+      const rows = [['Bhava Lagna (5 ghati = 120 min/sign, vv.2-3)', Math.floor(sp.bhava / 30), (sp.bhava % 30).toFixed(1)], ['Hora Lagna (2.5 ghati = 60 min/sign, vv.4-5)', Math.floor(sp.hora / 30), (sp.hora % 30).toFixed(1)], ['Ghati Lagna (1 ghati = 24 min/sign, vv.6-8)', Math.floor(sp.ghati / 30), (sp.ghati % 30).toFixed(1)], ['Varnada Lagna (vv.10-15, sign only)', sp.varnada, null]];
+      return /*#__PURE__*/React.createElement("div", {
+        className: "text-[11px] leading-relaxed space-y-1"
+      }, rows.map((rw, j) => /*#__PURE__*/React.createElement("div", {
+        key: j
+      }, /*#__PURE__*/React.createElement("strong", null, rw[0], ":"), " ", RASI_NAMES_MY[rw[1]], rw[2] !== null ? ' ' + rw[2] + '°' : '', " · ", houseOf(rw[1]), " အိမ်")), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "နေထွက်မှ မွေးချိန် အထိ ", sp.ghatis.toFixed(1), " ghati ကြာသည်။ Varnada သည် နေထွက်မှ တိုက်ရိုက် မတွက်ပါ — မွေး လဂ်နှင့် Hora လဂ် ရာသီ နှစ်ခုမှ တွက်သည်။ ဤလဂ်များသည် မူလ ဇာတာနှင့် သီးခြား ပြကွက်သာ ဖြစ်သည်။"));
+    } catch (e) {
+      return null;
+    }
+  })()), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-baseline border-b pb-1"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "font-bold text-slate-800 text-xs"
+  }, "☀️🌙 အလင်း နှစ်ပါး အား (Luminary Strength)"), /*#__PURE__*/React.createElement("span", {
+    className: "text-[9px] text-slate-400"
+  }, "Vimsopaka Bala · Dasa-varga")), (() => {
+    try {
+      const d1 = {
+        Sun: birthPlanets.Sun,
+        Moon: birthPlanets.Moon,
+        Mars: birthPlanets.Mars,
+        Mercury: birthPlanets.Mercury,
+        Jupiter: birthPlanets.Jupiter,
+        Venus: birthPlanets.Venus,
+        Saturn: birthPlanets.Saturn
+      };
+      const vs = v643Vimsopaka(birthPlanets.Sun, 'Sun', d1);
+      const vm = v643Vimsopaka(birthPlanets.Moon, 'Moon', d1);
+      return /*#__PURE__*/React.createElement("div", {
+        className: "text-[11px] leading-relaxed space-y-1"
+      }, /*#__PURE__*/React.createElement("div", null, "နေ Vimsopaka: ", /*#__PURE__*/React.createElement("strong", null, vs.total, " / 20"), " · တနင်္လာ Vimsopaka: ", /*#__PURE__*/React.createElement("strong", null, vm.total, " / 20")), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "စည်းမျဉ်း: တနင်္လာ၏ Vimsopaka သည် နေ၏ Vimsopaka ထက် ကြီးမှသာ တနင်္လာကို သုံးသည်။ ပကတိ သတ်မှတ်ချက် (absolute threshold) မရှိပါ။ ဤပြကွက်သည် မည်သည့် ဖတ်စာကိုမျှ မပြောင်းပါ။"), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "တွက်နည်း: Dasa-varga (10 varga) — အလေးချိန် BPHS File 1 Ch.7 v.20 အတိုင်း (D1 3, D60 5, ကျန် 1.5 စီ); dignity အမှတ် 20/18/15/10/7/5/0 သည် ထုတ်ဝေထားသော စံနည်း (File 1 တွင် ဇယား မပါ)။"), /*#__PURE__*/React.createElement("details", {
+        className: "text-[10px]"
+      }, /*#__PURE__*/React.createElement("summary", {
+        className: "cursor-pointer text-slate-500"
+      }, "တစ်ဘဏ္ဍာ ခွဲခြမ်း (per-varga)"), /*#__PURE__*/React.createElement("div", null, "နေ: ", Object.keys(vs.perVarga).map(v => 'D' + v + ' ' + vs.perVarga[v]).join(' · ')), /*#__PURE__*/React.createElement("div", null, "တနင်္လာ: ", Object.keys(vm.perVarga).map(v => 'D' + v + ' ' + vm.perVarga[v]).join(' · '))));
+    } catch (e) {
+      return null;
+    }
+  })()), (lifeOverview.incomeSources?.length > 0 || lifeOverview.assetProfile?.length > 0) && /*#__PURE__*/React.createElement("div", {
     className: "bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex justify-between items-baseline border-b pb-1"
@@ -11026,7 +13197,254 @@ function MainApp() {
     className: "font-medium text-emerald-800"
   }, "↳ ", m.lord, " - ", a.lord), /*#__PURE__*/React.createElement("span", {
     className: "text-emerald-700"
-  }, a.start, " မှ ", a.end))))))), activeTab === 'bhava' && isTrop && /*#__PURE__*/React.createElement("div", {
+  }, a.start, " မှ ", a.end))))))), activeTab === 'sudarshana' && !isTrop && /*#__PURE__*/React.createElement("div", {
+    className: "p-3 space-y-2 text-xs"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-bold text-emerald-900 text-sm mb-1"
+  }, "တြိစက္က — Sudarshana Chakra (BPHS File 1 · Ch.74)"), /*#__PURE__*/React.createElement("div", {
+    className: "bg-emerald-50/70 border border-emerald-100 rounded p-2 text-[11px] leading-relaxed space-y-1"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "font-bold"
+  }, "ဖတ်နည်း:"), " ဂြိုဟ် အတူတူကို လဂ်/တနင်္လာ/နေ သုံးခုကနေ ရေတွက်၍ သုံးမျိုး ဖတ်သည်။ တူလျှင် ခိုင်မာ, ကွဲလျှင် ရောနှော (ဆရာ အဆုံးအဖြတ် လို)။"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "font-bold"
+  }, "စည်းမျဉ်း (vv.7-17, vv.10-13):"), " ရှိ/အမြင်ရှိ — အရှင်/သုဘ (တနင်္လာ၊ ဗုဒ္ဓဟူး၊ ကြာသပတေး၊ သောကြာ) → အကျိုးပေး; ပါပ (အင်္ဂါ၊ စနေ၊ ရာဟု၊ ကေတု) → အနာ; နေ ၁ အိမ်မှာ သုဘ, ကျန်အိမ် ပါပ; ပါပ ဥစ္စ အနာ မပေး။ နှစ်ဖက် ရှိလျှင် အများစု နိုင်; တူလျှင် Shadbala အားသာသူ နိုင် (ရာဟု/ကေတု ၀); အား တူလျှင် ရောနှော။ ရှိ/အမြင် မရှိလျှင် အိမ်ရှင်။"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "font-bold"
+  }, "အမြင်:"), " အားလုံး ၇ အိမ်; စနေ ၃/၁၀, ကြာသပတေး ၅/၉, အင်္ဂါ ၄/၈ (BPHS Ch.26) — ရှိ + အမြင် နှစ်မျိုး ထည့်တွက်။"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "font-bold"
+  }, "ကွဲခြင်း (vv.18-20):"), " သုံးခု မကွဲလျှင် မသုံး — သာမန် လဂ် ဇာတာသာ။"), /*#__PURE__*/React.createElement("div", {
+    className: "text-slate-500"
+  }, "အချိန် စက်ဝန်း နောက် အဆင့်။ ပြသမှုသာ, score မဝင်။")), (() => {
+    try {
+      const sdSb = computeShadbala(birthPlanets, birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
+      const sd = v643Sudarshana(birthPlanets, sdSb);
+      const vtxt = v => v === 'favourable' ? 'အကျိုးပေး' : v === 'harm' ? 'အနာ' : v === 'mixed' ? 'ရောနှော' : v === 'lord' ? 'အရှင်ကို ကြည့်' : 'သမ';
+      return /*#__PURE__*/React.createElement("div", {
+        className: "space-y-2"
+      }, !sd.distinct && /*#__PURE__*/React.createElement("div", {
+        className: "bg-amber-50 border border-amber-200 rounded p-2 text-[11px]"
+      }, "Ch.74 vv.18-20: နေ၊ တနင်္လာ၊ လဂ် ရာသီ သုံးခု မကွဲလျှင် Sudarshana ကို မသုံးပါ — သာမန် ရာသီ ဇာတာဖြင့်သာ ဆုံးဖြတ်ပါ။ အောက်တွင် လဂ် အခြေပြု ဖတ်စာသာ ပြထားသည်။"), (sd.distinct ? sd.houses : [sd.houses[0]]).map((rh, i) => /*#__PURE__*/React.createElement("div", {
+        key: i,
+        className: "bg-white border border-slate-200 rounded overflow-hidden"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "bg-slate-50 p-2 font-bold text-emerald-900"
+      }, rh.ref, " မှ ဖတ်စာ (", RASI_NAMES_MY[rh.sign], " ရာသီကို ၁ အိမ်)"), rh.houses.map(hh => /*#__PURE__*/React.createElement("div", {
+        key: hh.house,
+        className: "grid grid-cols-5 p-1.5 border-t border-slate-100 text-[11px]"
+      }, /*#__PURE__*/React.createElement("span", {
+        className: "font-bold"
+      }, hh.house, " အိမ် · ", RASI_NAMES_MY[hh.sign]), /*#__PURE__*/React.createElement("span", null, hh.occ.length > 0 ? hh.occ.join(', ') : '—'), /*#__PURE__*/React.createElement("span", {
+        className: "text-slate-500"
+      }, "အမြင်: ", hh.asp.length > 0 ? hh.asp.join(', ') : '—'), /*#__PURE__*/React.createElement("span", {
+        className: "text-slate-500"
+      }, "အရှင် ", hh.lord), /*#__PURE__*/React.createElement("span", {
+        className: "font-semibold"
+      }, vtxt(hh.verdict), hh.note ? ' (' + hh.note + ')' : ''))))));
+    } catch (e) {
+      return /*#__PURE__*/React.createElement("div", null, "တွက်မရပါ။");
+    }
+  })()), activeTab === 'dasha-moola' && !isTrop && /*#__PURE__*/React.createElement("div", {
+    className: "p-3 space-y-2 text-xs"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-bold text-emerald-900 text-sm mb-1"
+  }, "မူလ ဒသာ (Saravali · Ch.41)"), /*#__PURE__*/React.createElement("div", {
+    className: "bg-emerald-50/70 border border-emerald-100 rounded p-2 text-[11px] leading-relaxed"
+  }, "ထပ်တိုး ဒသာ — Saravali Ch.41။ ပြတာ: အစဉ် (လဂ်/နေ/တနင်္လာ အားဖြင့် စီ) + ကာလတိုင်း အကျိုးသက်ရောက်မှု။ ကာလ (နှစ်/ရက်) မပါ — Ch.41 တွင် နှစ်ဇယား မပါ။ ဖတ်နည်း: အပေါ်မှ အောက်သို့ ဖတ်ပါ။ ပြသမှုသာ။"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "Ayanamsa: Lahiri (ယူဆချက် — စာတွင် ayanamsa မဖော်ပြ)။ နည်းစနစ်: ပထမ လဂ်/နေ/တနင်္လာ အနက် အားအကောင်းဆုံး၊ ထို့နောက် ကိန်းရှိ ဂြိုဟ်များ၊ ထို့နောက် ပနဖရ၊ ထို့နောက် အပိုက္လိမ — အတန်းအတွင်း အားဖြင့် စီ၊ အားတူလျှင် တက်သည့် အစဉ်ဖြင့်။"), (() => {
+    try {
+      const bpL = calculateNASA_JPL_Planets(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'lahiri', nodeType);
+      const sbL = computeShadbala(bpL, birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'lahiri', nodeType);
+      const ord = v643MoolaOrder(bpL, sbL);
+      return /*#__PURE__*/React.createElement("div", {
+        className: "space-y-1"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "အကျိုးသက်ရောက်မှု: App-generated — ဇာတာ factor (နေရာ/ပိုင်/အား/တွဲ) မှ တွက်, ကျမ်း quote မဟုတ်။"), ord.map((o, j) => {
+        const effKey = o.key === 'Lagna' ? RASI_LORDS[Math.floor(norm360(bpL.Lagna) / 30)] : o.key;
+        const effLine = o.key === 'Lagna' ? 'အကျိုး: လဂ် အရှင် ' + V645_GRAHA_MY[effKey] + ' · ' + v645LordFactors(effKey, bpL, sbL) : v645LordEffect(o.key, bpL, sbL);
+        return /*#__PURE__*/React.createElement("div", {
+          key: j,
+          className: "bg-white border border-slate-200 rounded p-2 text-[11px]"
+        }, /*#__PURE__*/React.createElement("span", {
+          className: "font-bold"
+        }, j + 1, ". ", o.key), " · ", o.cls, o.house ? ' · ' + o.house + ' အိမ်' : '', o.sign !== undefined ? ' · ' + RASI_NAMES_MY[o.sign] : '', " · Shadbala ", (o.strength / 60).toFixed(1), " ရူပါ", o.proxy ? ' (လဂ် အား = လဂ်ရှင်၏ Shadbala ဖြင့် ကိုယ်စား)' : '', /*#__PURE__*/React.createElement("div", {
+          className: "text-[10px] text-slate-500 mt-0.5"
+        }, effLine));
+      }), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "မှတ်ချက်: Ch.41 တွင် တစ်လုံးချင်း နှစ်ကိန်းဂဏန်း ဇယား မပါသဖြင့် ကာလ (ရက်/နှစ်) ကို ဤဗားရှင်းတွင် မတွက်ပြပါ။ Pindayu (Ch.40) သို့မဟုတ် Naisargika နှစ်များကို မူလ နှစ်အဖြစ် အစားမထိုးပါ — ၎င်းတို့သည် သီးခြား စနစ်များ ဖြစ်သည်။ Manitha နည်း (နေ့မွေး နေ၊ ညမွေး သောကြာ မှ စ) ကို Ch.41 v.2 က လက်မခံဟု ဆိုသည်။ Rahu/Ketu ကို ဤအစဉ်တွင် မထည့်ပါ။"), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "Saravali Ch.42 မှတ်ချက်: Ch.42 သည် မူလ ဒဿာ၏ sub-period (ဘွက်) များအကြောင်းသာ ဖြစ်သည် — ဤ Tab ၏ major အစဉ်အတွက် မဟုတ်; sub-period များတွင် သုဘ → ကောင်း, ပါပ → ဆိုး (vv.2-3 အကျဉ်း)။ Sub-period များကို ဤဗားရှင်းတွင် ဇယားမသွင်းပါ (major ကာလ မရှိသဖြင့် ခွဲဝေ၍ မရ)။"));
+    } catch (e) {
+      return /*#__PURE__*/React.createElement("div", null, "တွက်မရပါ။");
+    }
+  })()), activeTab === 'dasha-yogini' && !isTrop && /*#__PURE__*/React.createElement("div", {
+    className: "p-3 space-y-2 text-xs"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-bold text-emerald-900 text-sm mb-1"
+  }, "ယောဂိနီ ဒသာ (BPHS File 1 · Ch.46 vv.195-199)"), /*#__PURE__*/React.createElement("div", {
+    className: "bg-emerald-50/70 border border-emerald-100 rounded p-2 text-[11px] leading-relaxed"
+  }, "ထပ်တိုး ဒသာ — BPHS File 1 Ch.46 vv.195-199။ ပြတာ: အစဉ် + နှစ် + ရက် (◀ အခု = လက်ရှိ) + ကာလတိုင်း အကျိုးသက်ရောက်မှု။ ဖတ်နည်း: ◀ အခု ကို အရင် ကြည့်ပြီး အစဉ်အတိုင်း ဖတ်ပါ။ အသုံးပြု သင့်မှု စည်းမျဉ်း စာတွင် မပါသဖြင့် မထည့်ပါ။ ပြသမှုသာ။"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "Ayanamsa: Lahiri (ယူဆချက်)။ အစဉ်: မင်္ဂလ (၁) → ပိင်္ဂလ (၂) → ဓနျ (၃) → ဗြမရီ (၄) → ဘဒြိကာ (၅) → ဥလကာ (၆) → သိဒ္ဓ (၇) → သင်္ကဋ (၈); စက်ဝန်း ၃၆ နှစ်။ အစ: မွေး နက္ခတ် + ၃ ကို ၈ ဖြင့် စား၍ အကြွင်း။ မွေးချိန်တွင် ကုန်ပြီး အပိုင်းကို Vimshottari နည်းအတိုင်း ချန်သည်။"), (() => {
+    try {
+      const bpL = calculateNASA_JPL_Planets(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'lahiri', nodeType);
+      const sbL = computeShadbala(bpL, birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'lahiri', nodeType);
+      const list = v643YoginiDasha(bpL.Moon, birthDateObj);
+      const now = new Date();
+      return /*#__PURE__*/React.createElement("div", {
+        className: "space-y-1"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "အကျိုးသက်ရောက်မှု: App-generated — ဇာတာ factor (နေရာ/ပိုင်/အား/တွဲ) မှ တွက်, ကျမ်း quote မဟုတ်။"), list.map((m, j) => {
+        const yg = (m.label.match(/\(([^)]+)\)/) || [])[1];
+        const effLine = yg ? v645LordEffect(yg, bpL, sbL) : '';
+        return /*#__PURE__*/React.createElement("div", {
+          key: j,
+          className: "bg-white border border-slate-200 rounded p-2 text-[11px]"
+        }, /*#__PURE__*/React.createElement("div", {
+          className: "flex justify-between"
+        }, /*#__PURE__*/React.createElement("span", {
+          className: "font-bold"
+        }, m.label, " (", m.years.toFixed(2), " နှစ်)"), /*#__PURE__*/React.createElement("span", null, m.start, " မှ ", m.end, now >= new Date(m.start) && now <= new Date(m.end) ? ' ◀ အခု' : '')), effLine ? /*#__PURE__*/React.createElement("div", {
+          className: "text-[10px] text-slate-500 mt-0.5"
+        }, effLine) : null);
+      }));
+    } catch (e) {
+      return /*#__PURE__*/React.createElement("div", null, "တွက်မရပါ။");
+    }
+  })()), activeTab === 'dasha-ashtottari' && !isTrop && /*#__PURE__*/React.createElement("div", {
+    className: "p-3 space-y-2 text-xs"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-bold text-emerald-900 text-sm mb-1"
+  }, "အဋ္ဌောတ္တရီ ဒသာ (BPHS File 1 · Ch.46 vv.17-22)"), /*#__PURE__*/React.createElement("div", {
+    className: "bg-emerald-50/70 border border-emerald-100 rounded p-2 text-[11px] leading-relaxed"
+  }, "ထပ်တိုး ဒသာ — BPHS File 1 Ch.46 vv.17-22။ ပြတာ: အစဉ် + နှစ် + ရက် + အသုံးပြု သင့်မှု (အောက် Ch.46 အတိုင်း) + ကာလတိုင်း အကျိုးသက်ရောက်မှု။ ဖတ်နည်း: သင့်မှု ကိုက်ညီမှ အဓိက သုံး၊ ထို့နောက် ရက်အစဉ်အတိုင်း ဖတ်ပါ။ ပြသမှုသာ။"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "Ayanamsa: Lahiri (ယူဆချက်)။ အစဉ်: နေ (၆) → တနင်္လာ (၁၅) → အင်္ဂါ (၈) → ဗုဒ္ဓဟူး (၁၇) → စနေ (၁၀) → ကြာသပတေး (၁၉) → ရာဟု (၁၂) → သောကြာ (၂၁); စက်ဝန်း ၁၀၈ နှစ်။ အစ: အာဒြာ မှ နက္ခတ် အစု (၄/၃/၄/၃/၄/၃/၄/၃) — Abhijit ကို စနေ အစုတွင် ရေသည်။"), (() => {
+    try {
+      const bpL = calculateNASA_JPL_Planets(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'lahiri', nodeType);
+      const sbL = computeShadbala(bpL, birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'lahiri', nodeType);
+      const cond = v643AshtottariCondition(bpL);
+      const list = v643AshtottariDasha(bpL.Moon, birthDateObj);
+      const now = new Date();
+      return /*#__PURE__*/React.createElement("div", {
+        className: "space-y-1"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "bg-amber-50 border border-amber-200 rounded p-2 text-[11px]"
+      }, "အသုံးပြု သင့်မှု (Ch.46): ", cond.applies ? 'ကိုက်ညီသည်' : 'မကိုက်ညီပါ', " — ", cond.reason, " (ရာဟု လဂ်တွင် မရှိ၍ လဂ်ရှင်၏ ကိန်း/တြိကိုဏ်တွင် ရှိမှသာ အကြံပြု)"), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "အကျိုးသက်ရောက်မှု: App-generated — ဇာတာ factor (နေရာ/ပိုင်/အား/တွဲ) မှ တွက်, ကျမ်း quote မဟုတ်။"), list.map((m, j) => {
+        const effLine = v645LordEffect(m.label, bpL, sbL);
+        return /*#__PURE__*/React.createElement("div", {
+          key: j,
+          className: "bg-white border border-slate-200 rounded p-2 text-[11px]"
+        }, /*#__PURE__*/React.createElement("div", {
+          className: "flex justify-between"
+        }, /*#__PURE__*/React.createElement("span", {
+          className: "font-bold"
+        }, m.label, " (", m.years.toFixed(2), " နှစ်)"), /*#__PURE__*/React.createElement("span", null, m.start, " မှ ", m.end, now >= new Date(m.start) && now <= new Date(m.end) ? ' ◀ အခု' : '')), /*#__PURE__*/React.createElement("div", {
+          className: "text-[10px] text-slate-500 mt-0.5"
+        }, effLine));
+      }));
+    } catch (e) {
+      return /*#__PURE__*/React.createElement("div", null, "တွက်မရပါ။");
+    }
+  })()), activeTab === 'dasha-chara' && !isTrop && /*#__PURE__*/React.createElement("div", {
+    className: "p-3 space-y-2 text-xs"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-bold text-emerald-900 text-sm mb-1"
+  }, "စရ ဒသာ (Jaimini)"), /*#__PURE__*/React.createElement("div", {
+    className: "bg-emerald-50/70 border border-emerald-100 rounded p-2 text-[11px] leading-relaxed"
+  }, "ထပ်တိုး ဒသာ — Jaimini (File 1 Ch.46 v.167 ဦးတည်ချက်)။ ပြတာ: ရာသီ အစဉ် + နှစ် + ရက် + အန္တရ ၁၂ ခု + အဓိက ကာလတိုင်း အကျိုးသက်ရောက်မှု။ ဖတ်နည်း: ဦးတည်ချက် + လဂ်/၉ အိမ် ကို အရင် ကြည့်ပြီး အစဉ်အတိုင်း ဖတ်ပါ။ အသုံးပြု သင့်မှု စည်းမျဉ်း စာတွင် မပါသဖြင့် မထည့်ပါ။ ပြသမှုသာ။"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "Ayanamsa: Lahiri (ယူဆချက်)။ အစ: လဂ် ရာသီ (စံနည်း — File 1 vv.147-157 တွင် စာသား ချန်လှပ်ထား)။ ဦးတည်ချက်: ၉ အိမ်မှ ရာသီ၏ ခြေ (sama-pada: ကရကဋ်၊ သိဟ်၊ ကန်၊ မကာရ၊ ကုံ၊ မိန်) ဖြစ်လျှင် ပြောင်းပြန်၊ မဟုတ်လျှင် ရှေ့သို့ (File 1 v.167)။ နှစ်: ရာသီမှ အရှင်ရှိရာ ရာသီသို့ ရေ၍ ၁ နှုတ် (အရှင် ကိုယ့်ရာသီ = ၁၂ နှစ်; ဥစ္စ အရှင် +၁၊ နိစ္စ အရှင် −၁)။ မွေးချိန်တွင် balance မရှိ — ပထမ ကာလ မွေးချိန်မှ စသည်။"), (() => {
+    try {
+      const bpL = calculateNASA_JPL_Planets(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'lahiri', nodeType);
+      const sbL = computeShadbala(bpL, birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'lahiri', nodeType);
+      const list = v643CharaDasha(bpL, birthDateObj);
+      const lagnaSign = Math.floor(norm360(bpL.Lagna) / 30);
+      const ninthSign = (lagnaSign + 8) % 12;
+      const dir = CHARA_SAMA_PADA.includes(ninthSign) ? -1 : 1;
+      const now = new Date();
+      return /*#__PURE__*/React.createElement("div", {
+        className: "space-y-1"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "text-[11px]"
+      }, "လဂ် ", RASI_NAMES_MY[lagnaSign], " · ၉ အိမ် ", RASI_NAMES_MY[ninthSign], " (", CHARA_SAMA_PADA.includes(ninthSign) ? 'sama-pada' : 'vishama-pada', ") → ", dir === 1 ? 'ရှေ့သို့' : 'ပြောင်းပြန်', " အစဉ်"), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "အကျိုးသက်ရောက်မှု: App-generated — ဇာတာ factor (နေရာ/ပိုင်/အား/တွဲ) မှ တွက်, ကျမ်း quote မဟုတ်။"), list.map((m, j) => /*#__PURE__*/React.createElement("div", {
+        key: j,
+        className: "bg-white border border-slate-200 rounded overflow-hidden"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "flex justify-between p-2 text-[11px]"
+      }, /*#__PURE__*/React.createElement("span", {
+        className: "font-bold"
+      }, m.label, " (", m.years, " နှစ်)"), /*#__PURE__*/React.createElement("span", null, m.start, " မှ ", m.end, now >= new Date(m.start) && now <= new Date(m.end) ? ' ◀ အခု' : '')), /*#__PURE__*/React.createElement("div", {
+        className: "px-2 pb-1 text-[10px] text-slate-500"
+      }, v645SignEffect(m.sign, bpL, sbL)), /*#__PURE__*/React.createElement("details", {
+        className: "px-2 pb-2 text-[10px] text-slate-500"
+      }, /*#__PURE__*/React.createElement("summary", {
+        className: "cursor-pointer"
+      }, "အန္တရ (၁၂ ခု — ကာလကို ၁၂ ပိုင်း၊ အစဉ်အတိုင်း)"), (() => {
+        const subs = v643DashaDates(new Date(m.start), Array.from({
+          length: 12
+        }, (_, k) => ({
+          label: RASI_NAMES_MY[(m.sign + dir * k + 120) % 12],
+          years: m.years / 12
+        })));
+        return /*#__PURE__*/React.createElement("div", null, subs.map((a, k) => /*#__PURE__*/React.createElement("div", {
+          key: k,
+          className: "flex justify-between py-0.5"
+        }, /*#__PURE__*/React.createElement("span", null, a.label), /*#__PURE__*/React.createElement("span", null, a.start, " မှ ", a.end))));
+      })()))), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "မှတ်ချက်: နှစ် ရေနည်းတွင် ရာသီ၏ ခြေ (pada) အလိုက် ရေသည် (စံနည်း — ထုတ်ဝေသော အကျဉ်းများတွင် အစဉ်-ဦးတည်ချက် ဖြင့် ရေသည်ဟုလည်း ဆိုသည်)။ နှစ်မျိုး အရှင်ရှိ ဗြိစ္ဆာ/ကုံ အတွက် ထို ရာသီတွင် ရှိသော အရှင်ကို သုံးသည် (မရှိလျှင် အဓိက အရှင်) — File 1 ၏ အားသာမှု စည်းမျဉ်း အပြည့်ကို ဤဗားရှင်းတွင် မထည့်ပါ။"));
+    } catch (e) {
+      return /*#__PURE__*/React.createElement("div", null, "တွက်မရပါ။");
+    }
+  })()), activeTab === 'dasha-kala' && !isTrop && /*#__PURE__*/React.createElement("div", {
+    className: "p-3 space-y-2 text-xs"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-bold text-emerald-900 text-sm mb-1"
+  }, "ကာလ စက္က ဒသာ (BPHS File 1 · Ch.46 vv.54-95)"), /*#__PURE__*/React.createElement("div", {
+    className: "bg-emerald-50/70 border border-emerald-100 rounded p-2 text-[11px] leading-relaxed"
+  }, "ထပ်တိုး ဒသာ — BPHS File 1 Ch.46 vv.54-95။ ပြတာ: Deha/Jiva + အရှင် အစဉ် (ဇယားသွင်းထားသော ပါဒများသာ) + အရှင်တိုင်း အကျိုးသက်ရောက်မှု။ ဖတ်နည်း: နက္ခတ်/ပါဒ/စက္က ကို အရင် ကြည့်ပြီး အစဉ်အတိုင်း ဖတ်ပါ။ မွေး balance မတွက်ပြ (အောက် ရှင်းချက် ကြည့်) — ရက်မပါ, နှစ်သာ။ ပြသမှုသာ။"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "Ayanamsa: Lahiri (ယူဆချက်)။ ဂရု နှစ် (v.84): နေ ၅၊ တနင်္လာ ၂၁၊ အင်္ဂါ ၇၊ ဗုဒ္ဓဟူး ၉၊ ကြာသပတေး ၁၀၊ သောကြာ ၁၆၊ စနေ ၄။"), (() => {
+    try {
+      const bpL = calculateNASA_JPL_Planets(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'lahiri', nodeType);
+      const sbL = computeShadbala(bpL, birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, 'lahiri', nodeType);
+      const ki = v643KalaInfo(bpL.Moon);
+      const patName = {
+        S1: 'Ashvini ပုံစံ',
+        S2: 'Bharani ပုံစံ',
+        A1: 'Rohini ပုံစံ',
+        A2: 'Mrigashira ပုံစံ'
+      }[ki.group] || '';
+      const total = ki.lords ? ki.lords.reduce((a, x) => a + x.years, 0) : null;
+      return /*#__PURE__*/React.createElement("div", {
+        className: "space-y-1 text-[11px]"
+      }, /*#__PURE__*/React.createElement("div", null, "မွေး နက္ခတ် ", NAKSHATRAS[ki.nakIndex], " · ပါဒ ", ki.pada + 1, " · စက္က ", ki.chakra, " · ပုံစံ ", patName), /*#__PURE__*/React.createElement("div", null, "Deha (ကိုယ်): ", RASI_NAMES_MY[ki.deha], " · Jiva (အသက်): ", RASI_NAMES_MY[ki.jiva], " ", ki.chakra === 'Savya' ? '(Savya: ပထမ အံသ = Deha, နောက်ဆုံး = Jiva)' : '(Apsavya: ပြောင်းပြန်)'), ki.lords ? /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+        className: "font-bold"
+      }, "ဒသာ အရှင် အစဉ် (၉ ခု):"), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "အကျိုးသက်ရောက်မှု: App-generated — ဇာတာ factor (နေရာ/ပိုင်/အား/တွဲ) မှ တွက်, ကျမ်း quote မဟုတ်။"), ki.lords.map((x, j) => /*#__PURE__*/React.createElement("div", {
+        key: j,
+        className: "bg-white border border-slate-200 rounded p-1.5"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "flex justify-between"
+      }, /*#__PURE__*/React.createElement("span", null, j + 1, ". ", RASI_NAMES_MY[x.sign], " (အရှင် ", x.lord, ")"), /*#__PURE__*/React.createElement("span", null, x.years, " နှစ်")), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500 mt-0.5"
+      }, v645SignEffect(x.sign, bpL, sbL)))), /*#__PURE__*/React.createElement("div", null, "စုစုပေါင်း ", total, " နှစ် (ဤအစဉ် တစ်ကြိမ်)")) : /*#__PURE__*/React.createElement("div", {
+        className: "bg-amber-50 border border-amber-200 rounded p-2"
+      }, "ဤပါဒ၏ အရှင် အစဉ်ကို ဤဗားရှင်းတွင် ဇယားမသွင်းပါ — File 1 vv.60-81 ၏ စာရင်းတွင် ကျော်/ထပ် ပါဝင်မှုများ ရှိသဖြင့် အမှားပါသော အစဉ်ကို စနစ်အဖြစ် မသွင်းလိုပါ။ Deha/Jiva နှင့် ဂရု နှစ်များကိုသာ ပြထားသည်။ Sharma စာအုပ်ဖြင့် တိုက်ဆိုင်ပြီးမှ ထပ်ထည့်နိုင်သည်။"), /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-500"
+      }, "မွေးချိန် balance (vv.90-91: ပါဒ အတွင်း ကုန်ပြီး အချိန် × နှစ် ÷ ၁၅) ကို ပါဒ-အချိန် ယူနစ် အတိအကျ မသေချာသဖြင့် ဤဗားရှင်းတွင် မတွက်ပြပါ — အစဉ်ကို မွေးချိန်မှ စသော အစဉ်အဖြစ် ပြထားသည်။"));
+    } catch (e) {
+      return /*#__PURE__*/React.createElement("div", null, "တွက်မရပါ။");
+    }
+  })()), activeTab === 'bhava' && isTrop && /*#__PURE__*/React.createElement("div", {
     className: "p-3 space-y-3 text-xs"
   }, /*#__PURE__*/React.createElement("h2", {
     className: "font-bold text-emerald-900 text-sm"
@@ -11181,7 +13599,30 @@ function MainApp() {
     className: "text-slate-600 mt-0.5"
   }, /*#__PURE__*/React.createElement("strong", null, "နက္ခတ်အကြောင်းရင်း:"), " ", y.cause), /*#__PURE__*/React.createElement("div", {
     className: "text-emerald-700 mt-0.5"
-  }, /*#__PURE__*/React.createElement("strong", null, "ပေးအပ်မည့် အကျိုး:"), " ", y.result)))), activeTab === 'place' && /*#__PURE__*/React.createElement(PlaceTab, {
+  }, /*#__PURE__*/React.createElement("strong", null, "ပေးအပ်မည့် အကျိုး:"), " ", y.result), y.name.indexOf('Mahapurusha') >= 0 && (() => {
+    const key = y.name.split(' ')[0];
+    const t = MAHAPURUSHA_TEXT[key];
+    if (!t) return null;
+    return /*#__PURE__*/React.createElement("div", {
+      className: "text-slate-500 mt-0.5"
+    }, "📜 ကျမ်းလာ အကျိုး (BPHS File 1 Ch.75 / Saravali Ch.37) — ခေတ်သစ် အကျဉ်းနှင့် တွဲဖက် ပြသသည်: မျက်နှာ ", t.face.my, " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-400"
+    }, "(", t.face.en, ")"), t.height ? /*#__PURE__*/React.createElement("span", null, " · အရပ် ", t.height.my, " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-400"
+    }, "(", t.height.en, ")")) : /*#__PURE__*/React.createElement("span", null, " · အရပ် မဖော်ပြ"), t.weightSv || t.weightBp ? /*#__PURE__*/React.createElement("span", null, " · အလေးချိန် ", t.weightSv ? t.weightSv.my : '', t.weightSv && t.weightBp && t.weightSv.my !== t.weightBp.my ? ' (BPHS: ' + t.weightBp.my + ')' : '', " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-400"
+    }, "(", t.weightSv ? t.weightSv.en : '', t.weightSv && t.weightBp && t.weightSv.en !== t.weightBp.en ? ' / BPHS: ' + t.weightBp.en : '', ")")) : /*#__PURE__*/React.createElement("span", null, " · အလေးချိန် မဖော်ပြ"), t.life ? /*#__PURE__*/React.createElement("span", null, " · အသက် ", t.life.my, " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-400"
+    }, "(", t.life.en, ")")) : t.lifeSv ? /*#__PURE__*/React.createElement("span", null, " · အသက် Saravali ", t.lifeSv.my, " / BPHS ", t.lifeBp.my, " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-400"
+    }, "(", t.lifeSv.en, " / ", t.lifeBp.en, ")")) : /*#__PURE__*/React.createElement("span", null, " · အသက် မဖော်ပြ"), t.region ? /*#__PURE__*/React.createElement("span", null, " · အုပ်စိုးဒေသ ", t.region.my, " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-400"
+    }, "(", t.region.en, ")")) : t.regionSv ? /*#__PURE__*/React.createElement("span", null, " · အုပ်စိုးဒေသ Saravali ", t.regionSv.my, " / BPHS ", t.regionBp ? t.regionBp.my : 'မဖော်ပြ', " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-400"
+    }, "(", t.regionSv.en, " / ", t.regionBp ? t.regionBp.en : 'not given', ")")) : t.regionBp ? /*#__PURE__*/React.createElement("span", null, " · အုပ်စိုးဒေသ ", t.regionBp.my, " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-400"
+    }, "(", t.regionBp.en, ")")) : /*#__PURE__*/React.createElement("span", null, " · အုပ်စိုးဒေသ အမည်မဖော်ပြ"));
+  })()))), activeTab === 'place' && /*#__PURE__*/React.createElement(PlaceTab, {
     ayanamsa: ayanamsa,
     p: birthPlanets,
     dashaTree: dashaTree,
@@ -11816,11 +14257,19 @@ function MainApp() {
     className: "bg-white rounded-lg p-4 w-full max-w-xs text-xs space-y-2"
   }, /*#__PURE__*/React.createElement("h3", {
     className: "font-bold text-sm text-slate-800"
-  }, "သိမ်းဆည်းထားသော ဇာတာရှင်များ"), /*#__PURE__*/React.createElement("div", {
+  }, "သိမ်းဆည်းထားသော ဇာတာရှင်များ"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    placeholder: "🔍 နာမည် ရိုက်ရှာရန်…",
+    value: savedSearch,
+    onChange: e => setSavedSearch(e.target.value),
+    className: "w-full bg-white border border-slate-300 rounded p-1.5 text-[11px]"
+  }), /*#__PURE__*/React.createElement("div", {
     className: "max-h-60 overflow-y-auto space-y-1"
   }, savedProfiles.length === 0 ? /*#__PURE__*/React.createElement("p", {
     className: "text-slate-500"
-  }, "မှတ်တမ်းမရှိသေးပါ။") : savedProfiles.map(p => /*#__PURE__*/React.createElement("div", {
+  }, "မှတ်တမ်းမရှိသေးပါ။") : filterProfilesByName(savedProfiles, savedSearch).length === 0 ? /*#__PURE__*/React.createElement("p", {
+    className: "text-slate-500"
+  }, "ရှာဖွေမှု နှင့် ကိုက်ညီတာ မရှိပါ။") : filterProfilesByName(savedProfiles, savedSearch).map(p => /*#__PURE__*/React.createElement("div", {
     key: p.id,
     className: "flex justify-between items-center border-b py-1.5"
   }, /*#__PURE__*/React.createElement("div", {
@@ -11833,8 +14282,29 @@ function MainApp() {
   }, p.day, "/", p.month, "/", p.year, " ", p.hour, ":", p.minute, " ", p.ampm, " (TZ: ", p.tz || '6.5', ")")), /*#__PURE__*/React.createElement("button", {
     onClick: () => deleteProfile(p.id),
     className: "bg-red-600 text-white px-2 py-1 rounded text-[10px]"
-  }, "ဖျက်")))), /*#__PURE__*/React.createElement("button", {
-    onClick: () => setShowSavedModal(false),
+  }, "ဖျက်")))), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: exportProfiles,
+    className: "flex-1 bg-emerald-700 text-white py-1.5 rounded font-bold"
+  }, "⬇️ ထုတ်မည် (Export)"), /*#__PURE__*/React.createElement("label", {
+    className: "flex-1 bg-sky-700 text-white py-1.5 rounded font-bold text-center cursor-pointer"
+  }, "⬆️ သွင်းမည် (Import)", /*#__PURE__*/React.createElement("input", {
+    type: "file",
+    accept: ".json",
+    multiple: true,
+    className: "hidden",
+    onChange: e => {
+      handleImportFiles(e.target.files);
+      e.target.value = '';
+    }
+  }))), importMsg ? /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-slate-600"
+  }, importMsg) : null, /*#__PURE__*/React.createElement("button", {
+    onClick: () => {
+      setShowSavedModal(false);
+      setSavedSearch('');
+    },
     className: "w-full bg-slate-700 text-white py-1.5 rounded font-bold mt-2"
   }, "ပိတ်မည်"))));
 }
