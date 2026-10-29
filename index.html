@@ -60,6 +60,12 @@
 // v6.44 (2026-10-29): (1) Added dasha tabs grouped under one parent menu "�ပ်တိုး ဒဿာ" (Vimshottari stays top-level, Sudarshana stays separate, UI only). (2) Explainer headers on all five added dasha tabs + a how-to-read header on the Sudarshana tab (display text only, no predictions, no invented rules). (3) Sudarshana verdicts now use occupancy AND aspects per BPHS File 1 Ch.74 vv.10-13 (existing _aspectHouses engine: all aspect 7th; Saturn 3/10; Jupiter 5/9; Mars 4/8 — BPHS Ch.26); both sides present -> majority wins, equal numbers -> stronger side wins by summed Shadbala totals (Rahu/Ketu have no Shadbala total -> 0), no strength difference -> mixed; distinctness gate + Lagna-only fallback unchanged. Display-only: nothing here feeds any score. NO timing cycle, NO varga layer, NO Ashtakavarga cross-check, NO dasha effects engine, NO luminary/Vimshottari/score/threshold/formula change. Nothing else changed.
 // v6.43 (2026-10-29): Lost Horoscopy section (Saravali Ch.48-52, own title, display/comparison only, moles/scars cross-check per Ch.4+50); per-candidate textual appearance boxes below each rectification candidate (display-only, Use-this-time unchanged); Navamsa line in Executive Overview (below life-path); Hora effects (Saravali Ch.49) in candidate profiles + Lost Horoscopy; special ascendants block (BPHS Ch.5); Sudarshana tab (BPHS Ch.74); Mahapurusha classical effect details alongside modern summaries (BPHS Ch.75 / Saravali Ch.37); guna/tatwa display alongside personality picks (Saravali Ch.38, mapping BPHS Ch.3 v22 only); Vimsopaka-based luminary section (user course selection rule, labeled as such); dasha tabs Moola/Yogini/Ashtottari/Chara/Kala (ayanamsa labeled per system). NO score, Bhava Bala, Shadbala, aspect, BAV, Lakshmi, combustion, or Ashtakoota change. Nothing else changed.
 // v6.47 (2026-10-29): rectification AUTO-FILL replaces the v6.46 step-2 panel (panel UI removed — user rejected big text tab): selecting a candidate now auto-fills the existing appearance/personality pick fields from that candidate's chart (appearance picks from lagna-sign classical content, personality picks from the Moon-sign book entry; single-driver conflicts leave the pick empty and show in display rows); aggregated display rows (same value once, different values additionally, no planet/house labels) from all 9 planets' book entries + classical lagna content; Rahu/Ketu display-only rule-borrowed with one block method note; only the Mars-Aries degree exception kept, all other degree lines excluded; modernized wordings M1–M21 + classical M1 per mapping §4.1 with M3 = user wording; 29 unclear phrases + unread blocks dropped; no scores; Executive Overview gains a light applied-time block (picks + time only) when a rectified time is applied. Display-only: no score, scoring, Vimshottari, Sudarshana or menu change. Nothing else changed.
+// v6.48 (2026-10-29): fix v6.47 regression — the panel removal left two dangling panel-state reset calls in runRectification; the first threw before the search timer was scheduled, so the search button stayed stuck on "searching" and no search ever ran. Removed both calls. Nothing else changed.
+// v6.49 (2026-10-29): user correction — the auto-fill display/conflict block under the selected candidate is REMOVED (it was the extra big text box; the user asked only for the pick fields themselves to auto-fill, no texts from under the lagna line). Selecting a candidate now only fills the existing appearance/personality pick fields above + marks the candidate header with the selected tick. Conflict picks still stay empty (no conflict text shown). The v647AutoFill pure function is unchanged (display data still computed, no longer rendered). Classical Saravali details, echo boxes and the Executive Overview light block are untouched. Nothing else changed.
+// v6.50 (2026-10-29): corrected design — Display details is a FIELD-BASED TAB (not a text section): selecting a candidate auto-fills its fields from both sources (classical + 12-house-9-planet book); full field inventory (skin, hair, eyes, face, body, veins, and every other detail attribute in the data) with blanks left blank, never invented; untitled/idiosyncratic rows (INTERESTS/WORKTYPE/BELIEF/HABITS) render only as a small untitled line under the selected candidate lagna line. Picks, EO block, Saravali details, echo boxes and search unchanged. Nothing else changed.
+// v6.51 (2026-10-29): user correction with screenshots — the Display details FIELD GROUP moves from the results-area Tab section into the UPPER pick-fields area, immediately after the personality pick fields and before the guna block (the blue-circled place the user originally asked for). Same 16 fields, same values, same rules (classical + 12-house-9-planet book from unchanged v647AutoFill display data; blanks literally blank; vein routing; Mars-Aries exception; footnotes move with the group). The separate Tab section below the echo boxes is removed. Picks, under-lagna small text, EO block, Saravali details, echo boxes and search unchanged. Nothing else changed.
+// v6.52 (2026-10-29): user decision — the whole pick-fields block is REMOVED (lagna dropdown + appearance/personality picks + echo boxes were redundant once Display details auto-fills); Display details returns UNDER THE SELECTED CANDIDATE'S LAGNA LINE ONLY (16 fields, same values/rules, blanks blank; small untitled INTERESTS/WORKTYPE/BELIEF/HABITS line directly below the field set). Consequences: the +3 lagna-match score goes with the dropdown (rectification outputs stay identical for all new-UI inputs; old +3-inclusive outputs superseded); EO light block now shows the selected time only (picks line dropped); v647AutoFill pick computation kept internally (dead computation, later cleanup). Search flow, events, guna, Saravali details, apply behavior unchanged. Nothing else changed.
+// v6.53 (2026-10-29): user ruling — the lagna dropdown is KEPT (original main thing, the texts' main appearance check): dropdown + +3 lagna-match score restored verbatim from v651 (options, state, call, Reset clearing, footnote clause); appearance/personality pick fields, echo boxes, upper group and Tab stay removed; Display details stays under the selected candidate's lagna line only; EO stays time-only. Calculation methods re-verified (see test59): no scoring drift beyond the +3 restoration. Nothing else changed.
 // v6.37 (2026-10-22): Classical-correctness fixes from an external (ChatGPT) audit, verified against the code before fixing — (A) Mahapurusha sign lists corrected to own/exaltation signs only (Hamsa [3,8,11] — Libra/Capricorn removed; Malavya [1,6,11] — Gemini/Scorpio removed; Ruchaka [0,7,9] — Aquarius replaced by Capricorn; Bhadra/Sasa were already correct). (B) Vimshottari first mahadasha now uses the elapsed method: antardashas fully elapsed before birth are skipped and the running one is trimmed to birth; mahadasha boundaries and MD2-9 antardashas are byte-identical to before. (C) Bhava Bala is now a REAL per-chart calculation (house lord's Shadbala + Dig Bala by sign class + Drig Bala by whole-sign aspects, benefic +15/malefic -15 as in Shadbala's Drik) — until v6.36 it returned a static score array identical for every chart. Nothing else changed: golden output identical to the v6.33 baseline; test45 27/27.
 // v6.33 (2026-10-18): Jaimini Chara Karaka SURFACED — charaKarakas() helper (checkAllYogas Jaimini block refactored onto it, yogas unchanged); AK/AmK/BK/MK/PK/GK/DK badges beside planet names in the Nakshatra table; new KarakaPanel card in the sidereal Birth Chart (all 7 with sign/degree/house/role + AK and AmK house-theme lines). Display layer only.
 // v6.32 (2026-10-18): Art income source — the evidence line now lists the reasons that ACTUALLY fired for this chart (Venus strength / yogakaraka / star-lord channel / lordship / placement only when the placement itself scores). v6.31's bare Venus-placement caption could imply a non-scoring house (e.g. Venus in the 9th) was a reason; engine scores unchanged.
@@ -1606,44 +1612,6 @@ const RECT_EVENT_DEFS = {
   }
 };
 const APPEARANCE_BY_SIGN = ['မိဿ: အရပ် အလတ်, ကိုယ် သွယ်လျ, မျက်နှာ ရှည်သွယ်, လှုပ်ရှား မြန်', 'ပြိဿ: အရပ် အလတ်/နိမ့်, ကိုယ် တောင့်တင်း, လည်ပင်း/ပခုံး ကြီး, ငြိမ်', 'မေထုန်: အရပ် ရှည်, ကိုယ် ပိန်, လက် ရှည်, နုပျို ရုပ်', 'ကရကဋ်: အရပ် အလတ်, ကိုယ် ပြည့်, မျက်နှာ လုံး/ပြည့်, အသား ဖြူစင်', 'သိဟ်: ကိုယ် တောင့်, ပခုံး ကျယ်, ဦးခေါင်း ကြီး, ဟန် ခန့်ညား', 'ကန်: အရပ် အလတ်, ကိုယ် သွယ်, မျက်နှာ သန့် ပြတ်, စနစ် ကျ', 'တူ: အရပ် အလတ်, ကိုယ် ချော လှ, မျက်နှာ ညီညာ, ပြုံး များ', 'ဗြိစ္ဆာ: အရပ် အလတ်, ကိုယ် တောင့်, မျက်လုံး နက် စူး, ကြည့် ထက်မြက်', 'ဓနု: အရပ် ရှည်, ကိုယ် တောင့်လျ, မျက်နှာ ရှည်, ပွင့်လင်း ဟန်', 'မကာရ: အရပ် အလတ်/ရှည်, ကိုယ် ပိန် တောင့်, ရင့်ကျက် ရုပ်', 'ကုံ: အရပ် ရှည်, ကိုယ် တောင့်, မျက်နှာ ကျယ်, ဆန်းသစ် ဟန်', 'မိန်: အရပ် အလတ်/နိမ့်, ကိုယ် ပြည့် နူး, မျက်လုံး အိပ်မက် ဆန်, နူးညံ့'];
-const RECT_APP_DETAIL_DEFS = [{
-  key: 'height',
-  label: 'အရပ်',
-  opts: ['ပု', 'လတ်', 'ရှည်']
-}, {
-  key: 'complexion',
-  label: 'အသားအရေ',
-  opts: ['ဝင်း', 'လတ်', 'ညို']
-}, {
-  key: 'build',
-  label: 'ကိုယ်လုံး',
-  opts: ['ပိန်', 'လတ်', 'ဝ']
-}, {
-  key: 'fingers',
-  label: 'လက်ချောင်း',
-  opts: ['ရှည်', 'လတ်', 'တို']
-}];
-const RECT_PERS_DEFS = [{
-  key: 'speech',
-  label: 'စကား',
-  opts: ['စကားများ', 'စကားနည်း']
-}, {
-  key: 'pace',
-  label: 'လုပ်ရပ်',
-  opts: ['လုပ်ရပ်မြန်', 'လုပ်ရပ်နှေး']
-}, {
-  key: 'openness',
-  label: 'ပွင့်လင်းမှု',
-  opts: ['ပွင့်လင်း', 'လျို့ဝှက်']
-}, {
-  key: 'honesty',
-  label: 'ရိုးသားမှု',
-  opts: ['ရိုးသား', 'နောက်ကွယ်က လုပ်တတ်']
-}, {
-  key: 'decision',
-  label: 'ဆုံးဖြတ်ပုံ',
-  opts: ['တစ်ဇွတ်ထိုး', 'အစီအစဉ် ဗျူဟာသမား']
-}];
 function _rectConnection(bp, kpData, def, planet) {
   if (!planet || bp[planet] == null) return 0;
   let sc = 0;
@@ -12757,19 +12725,6 @@ function MainApp() {
     date: ''
   }]);
   const [rectAppSign, setRectAppSign] = useState('');
-  const [rectAppDetail, setRectAppDetail] = useState({
-    height: '',
-    complexion: '',
-    build: '',
-    fingers: ''
-  });
-  const [rectPers, setRectPers] = useState({
-    speech: '',
-    pace: '',
-    openness: '',
-    honesty: '',
-    decision: ''
-  });
   const [rectResults, setRectResults] = useState(null);
   const [rectBusy, setRectBusy] = useState(false);
   const [rectSelected, setRectSelected] = useState(null);
@@ -12798,11 +12753,9 @@ function MainApp() {
     const evs = rectEvents.filter(e => e.date || e.approx && e.year);
     if (evs.length === 0) {
       setRectResults([]);
-      setRectPanel(null);
       return;
     }
     setRectBusy(true);
-    setRectPanel(null);
     setTimeout(() => {
       try {
         setRectResults(rectifyBirthTime({
@@ -12835,12 +12788,9 @@ function MainApp() {
       const candJD = getJulianDay(sY, sM, sD, Math.floor(r.mins / 60), r.mins % 60, birthTzEffForRect);
       const bpC = calculateNASA_JPL_Planets(candJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
       const af = v647AutoFill(bpC);
-      setRectAppDetail(af.picks.appDetail);
-      setRectPers(af.picks.pers);
       setRectSelected({
         i,
-        display: af.display,
-        conflicts: af.conflicts
+        display: af.display
       });
     } catch (e) {
       setRectSelected(null);
@@ -14099,45 +14049,7 @@ function MainApp() {
   }, "— မရွေးပါ —"), APPEARANCE_BY_SIGN.map((t, i) => /*#__PURE__*/React.createElement("option", {
     key: i,
     value: i
-  }, t)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    className: "text-[10px] text-slate-500"
-  }, "👀 ရုပ်ရည် အသေးစိတ် — ကိုယ်တိုင် နှိုင်းယှဉ်ရန် သက်သက် (အမှတ်ထဲ မပါ, မူလ လဂ် ရုပ်ရည် နှင့် သီးခြား)"), /*#__PURE__*/React.createElement("div", {
-    className: "grid grid-cols-2 gap-1.5 mt-0.5"
-  }, RECT_APP_DETAIL_DEFS.map(d => /*#__PURE__*/React.createElement("label", {
-    key: d.key,
-    className: "text-[10px] text-slate-500"
-  }, d.label, /*#__PURE__*/React.createElement("select", {
-    value: rectAppDetail[d.key] || '',
-    onChange: ev => setRectAppDetail({
-      ...rectAppDetail,
-      [d.key]: ev.target.value
-    }),
-    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
-  }, /*#__PURE__*/React.createElement("option", {
-    value: ""
-  }, "— မရွေးပါ —"), d.opts.map(o => /*#__PURE__*/React.createElement("option", {
-    key: o,
-    value: o
-  }, o))))))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    className: "text-[10px] text-slate-500"
-  }, "🧠 စရိုက် — ကိုယ်တိုင် နှိုင်းယှဉ်ရန် သက်သက် (အမှတ်ထဲ မပါ)"), /*#__PURE__*/React.createElement("div", {
-    className: "grid grid-cols-2 gap-1.5 mt-0.5"
-  }, RECT_PERS_DEFS.map(d => /*#__PURE__*/React.createElement("label", {
-    key: d.key,
-    className: "text-[10px] text-slate-500"
-  }, d.label, /*#__PURE__*/React.createElement("select", {
-    value: rectPers[d.key] || '',
-    onChange: ev => setRectPers({
-      ...rectPers,
-      [d.key]: ev.target.value
-    }),
-    className: "w-full mt-0.5 bg-white border border-slate-300 rounded p-1.5 text-[11px]"
-  }, /*#__PURE__*/React.createElement("option", {
-    value: ""
-  }, "— မရွေးပါ —"), d.opts.map(o => /*#__PURE__*/React.createElement("option", {
-    key: o,
-    value: o
-  }, o))))))), (() => {
+  }, t)))), (() => {
     try {
       const sb = computeShadbala(birthPlanets, birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, ayanamsa, nodeType);
       let best = null,
@@ -14161,7 +14073,7 @@ function MainApp() {
       const g = GUNA_MAP_BPHS[best];
       return /*#__PURE__*/React.createElement("div", {
         className: "bg-amber-50/70 border border-amber-100 rounded p-2 text-[10px] text-slate-600 leading-relaxed"
-      }, "🪔 ဂုဏ်/ဓာတ် (ကျမ်းလာ ပြကွက် — စရိုက် ရွေးချယ်မှုများနှင့် တွဲ၍ နှိုင်းယှဉ်ရန်၊ အမှတ်ထဲ မပါ၊ dropdown များကို အစားမထိုးပါ): အားအကောင်းဆုံး ဂြိုဟ် ", best, " (Shadbala ", (bestTot / 60).toFixed(1), " ရူပါ) — ဂုဏ် ", g, " (BPHS File 1 Ch.3 v22) · ", SARAVALI_GUNA[g].my, " ", /*#__PURE__*/React.createElement("span", {
+      }, "🪔 ဂုဏ်/ဓာတ် (ကျမ်းလာ ပြကွက် — ကိုယ်တိုင် နှိုင်းယှဉ်ရန်၊ အမှတ်ထဲ မပါ၊ လဂ် dropdown ကို အစားမထိုးပါ): အားအကောင်းဆုံး ဂြိုဟ် ", best, " (Shadbala ", (bestTot / 60).toFixed(1), " ရူပါ) — ဂုဏ် ", g, " (BPHS File 1 Ch.3 v22) · ", SARAVALI_GUNA[g].my, " ", /*#__PURE__*/React.createElement("span", {
         className: "text-slate-400"
       }, "(", SARAVALI_GUNA[g].en, ")"), "; ဓာတ် ငါးပါး အနက် အားအကောင်းဆုံး ", bestT, " → ", TATWA_MY[tat], " ဓာတ် → ", DOSHA_MY[TATWA_DOSHA[tat]], " (Saravali Ch.38 v.5; ဓာတ်→ခန္ဓာဓာတ် အဆက်မှာ စံ Ayurvedic အဆက် ဖြစ်ပြီး Ch.38 က တစ်ပါးချင်း မတွဲပြပါ)", best !== bestT && (best === 'Sun' || best === 'Moon') ? ' — မှတ်ချက်: နေ/တနင်္လာသည် Ch.38 v.5 ၏ ငါးပါးတွင် မပါသဖြင့် ဓာတ်ကို ထို ငါးပါး အနက် အားအကောင်းဆုံးမှ ပြထားသည်။' : '');
     } catch (e) {
@@ -14186,19 +14098,6 @@ function MainApp() {
         date: ''
       }]);
       setRectAppSign('');
-      setRectAppDetail({
-        height: '',
-        complexion: '',
-        build: '',
-        fingers: ''
-      });
-      setRectPers({
-        speech: '',
-        pace: '',
-        openness: '',
-        honesty: '',
-        decision: ''
-      });
       setRectResults(null);
       setRectSelected(null);
     },
@@ -14207,17 +14106,7 @@ function MainApp() {
     className: "text-[10px] text-rose-500"
   }, "ဖြစ်စဉ် ရက်စွဲ အနည်းဆုံး တစ်ခု ထည့်ပါ (သို့) ရလဒ် မတွေ့ပါ။") : /*#__PURE__*/React.createElement("div", {
     className: "space-y-1.5"
-  }, RECT_APP_DETAIL_DEFS.some(d => rectAppDetail[d.key]) && /*#__PURE__*/React.createElement("div", {
-    className: "bg-slate-50 border border-slate-200 rounded p-2 text-[10px] text-slate-600"
-  }, "👀 ရွေးထားသော ရုပ်ရည် အသေးစိတ် (အမှတ်ထဲ မပါ — မူလ လဂ် ရုပ်ရည် နှင့် ကိုယ်တိုင် နှိုင်းယှဉ်ရန်): ", RECT_APP_DETAIL_DEFS.filter(d => rectAppDetail[d.key]).map(d => /*#__PURE__*/React.createElement("span", {
-    key: d.key,
-    className: "mr-2"
-  }, d.label, " ", rectAppDetail[d.key]))), RECT_PERS_DEFS.some(d => rectPers[d.key]) && /*#__PURE__*/React.createElement("div", {
-    className: "bg-slate-50 border border-slate-200 rounded p-2 text-[10px] text-slate-600"
-  }, "🧠 ရွေးထားသော စရိုက် (အမှတ်ထဲ မပါ — ကိုယ်တိုင် နှိုင်းယှဉ်ရန်): ", RECT_PERS_DEFS.filter(d => rectPers[d.key]).map(d => /*#__PURE__*/React.createElement("span", {
-    key: d.key,
-    className: "mr-2"
-  }, d.label, " ", rectPers[d.key]))), rectResults.map((r, i) => {
+  }, rectResults.map((r, i) => {
     const h24 = Math.floor(r.mins / 60),
       mm = r.mins % 60,
       h12 = (h24 + 11) % 12 + 1,
@@ -14230,7 +14119,7 @@ function MainApp() {
       className: "flex-1 min-w-0"
     }, /*#__PURE__*/React.createElement("div", {
       onClick: () => selectRectCandidate(i, r),
-      title: "နှိပ်လိုက်လျှင် အပေါ်က အကွက်တွေ auto-fill ဖြစ်မည်",
+      title: "နှိပ်လိုက်လျှင် ဤလဂ်အောက်တွင် Display details ပေါ်မည်",
       className: "text-[11px] font-bold text-slate-800 cursor-pointer"
     }, i + 1, ". ", h12, ":", String(mm).padStart(2, '0'), " ", ap, " — လဂ် ", RASI_NAMES_MY[r.lagnaSign], " ", r.lagnaDeg, "° · အမှတ် ", r.total, rectSelected && rectSelected.i === i ? ' ✓ ရွေးပြီး' : ''), /*#__PURE__*/React.createElement("div", {
       className: "text-[9px] text-slate-500 mt-0.5"
@@ -14241,24 +14130,71 @@ function MainApp() {
       onClick: () => {
         applyRectTime(r.mins);
         setRectAppliedEO({
-          timeLabel: i + 1 + '. ' + h12 + ':' + String(mm).padStart(2, '0') + ' ' + ap,
-          appDetail: Object.assign({}, rectAppDetail),
-          pers: Object.assign({}, rectPers)
+          timeLabel: i + 1 + '. ' + h12 + ':' + String(mm).padStart(2, '0') + ' ' + ap
         });
       },
       className: "shrink-0 bg-violet-700 text-white text-[10px] font-bold px-2 py-1 rounded"
-    }, "ဒီအချိန် သုံးမယ်")), rectSelected && rectSelected.i === i && /*#__PURE__*/React.createElement("div", {
-      className: "mt-1 bg-emerald-50/60 border border-emerald-100 rounded p-2 text-[10px] leading-relaxed"
+    }, "ဒီအချိန် သုံးမယ်")), rectSelected && rectSelected.i === i && rectSelected.display && /*#__PURE__*/React.createElement("div", {
+      className: "mt-1 border border-violet-100 rounded p-2 space-y-1 bg-white"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "font-bold text-slate-700"
-    }, "✓ ရွေးထားသော အချိန် — အပေါ်က အကွက်တွေ auto-fill ဖြစ်ပြီ (အမှတ်ထဲ မပါ — လူနှင့် တိုက်၍ နှိုင်းယှဉ်ရန်)"), rectSelected.conflicts.map((c, j) => /*#__PURE__*/React.createElement("div", {
-      key: 'c' + j,
-      className: "text-amber-700"
-    }, "⚠ ", c.label, " စာသားအတွင်း ကွဲလွဲ: ", c.values.join(' / '), " — အကွက် လွတ်ထားသည်။")), rectSelected.display.map((row, j) => /*#__PURE__*/React.createElement("div", {
-      key: j
-    }, /*#__PURE__*/React.createElement("strong", null, row.label, ":"), " ", row.values.join('၊ '))), /*#__PURE__*/React.createElement("div", {
-      className: "text-slate-400 mt-1"
-    }, "ရာဟု/ကေတု အပိုင်းများသည် စနေ/အင်္ဂါ အပိုင်းကို စည်းမျဉ်းဖြင့် ယူပြထားသည်။ တူသော တန်ဖိုးကို တစ်ကြိမ်သာ ပြပြီး ကွဲသော တန်ဖိုးများကို ထပ်ပေါင်း ပြထားသည်။")), /*#__PURE__*/React.createElement("details", {
+      className: "text-[10px] font-bold text-slate-700"
+    }, "Display details ", /*#__PURE__*/React.createElement("span", {
+      className: "font-normal text-slate-400"
+    }, "— အမှတ်ထဲ မပါ")), (() => {
+      const tabRows = ['EYES', 'FACE', 'BODY', 'VEINS', 'HAIR-BODYHAIR', 'SKIN', 'BEAUTY', 'DRESS-MANNER', 'SCARS', 'SPEECH-MANNER', 'INTELLECT', 'TEMPERAMENT', 'GENEROSITY', 'PHYSICAL-INTELLECTUAL', 'SOCIAL', 'HAND'];
+      const byRow = {};
+      rectSelected.display.forEach(d => {
+        byRow[d.row] = d.values;
+      });
+      const veinRe = /သွေးပြန်ကြော|သွေးပြွန်ကြော/;
+      const bodyVals = (byRow.BODY || []).filter(v => !veinRe.test(v));
+      const veinVals = [];
+      (byRow.BODY || []).forEach(v => {
+        if (veinRe.test(v) && veinVals.indexOf(v) === -1) veinVals.push(v);
+      });
+      const tabLabel = {
+        EYES: 'မျက်စိ',
+        FACE: 'မျက်နှာ',
+        BODY: 'ကိုယ်အစိတ်အပိုင်း',
+        VEINS: 'သွေးကြော',
+        'HAIR-BODYHAIR': 'ဆံပင်/အမွေး',
+        SKIN: 'အသားအရေ',
+        BEAUTY: 'ရုပ်ရည်အလှ',
+        'DRESS-MANNER': 'အဝတ်/အပြင်ဟန်',
+        SCARS: 'ဒဏ်ရာ/အမာရွတ်',
+        'SPEECH-MANNER': 'အသံ/စကားဟန်',
+        INTELLECT: 'ဉာဏ်ရည်',
+        TEMPERAMENT: 'သတ္တိ/စိတ်ဓာတ်',
+        GENEROSITY: 'ရက်ရော/တွန့်တို',
+        'PHYSICAL-INTELLECTUAL': 'ကာယ/ညာဏ',
+        SOCIAL: 'ဆက်ဆံရေး',
+        HAND: 'လက်'
+      };
+      return tabRows.map(rk => {
+        const vals = rk === 'VEINS' ? veinVals : rk === 'BODY' ? bodyVals : byRow[rk] || [];
+        return /*#__PURE__*/React.createElement("div", {
+          key: rk,
+          className: "text-[10px] leading-relaxed"
+        }, /*#__PURE__*/React.createElement("strong", {
+          className: "text-slate-700"
+        }, tabLabel[rk], ":"), " ", vals.length ? vals.join('၊ ') : '');
+      });
+    })(), /*#__PURE__*/React.createElement("div", {
+      className: "text-[9px] text-slate-400 mt-1"
+    }, "ရာဟု/ကေတု အပိုင်းများသည် စနေ/အင်္ဂါ အပိုင်းကို စည်းမျဉ်းဖြင့် ယူပြထားသည်။ ကွက်လပ်မှာ ကျမ်းက မဖော်ပြလို့ ဘာမှ မထည့်ထားပါ။")), rectSelected && rectSelected.i === i && rectSelected.display && (() => {
+      const smallRows = ['INTERESTS', 'WORKTYPE', 'BELIEF', 'HABITS'];
+      const vals = [];
+      rectSelected.display.forEach(d => {
+        if (smallRows.indexOf(d.row) !== -1) {
+          d.values.forEach(v => {
+            if (vals.indexOf(v) === -1) vals.push(v);
+          });
+        }
+      });
+      return vals.length ? /*#__PURE__*/React.createElement("div", {
+        className: "text-[10px] text-slate-600 mt-1 leading-relaxed"
+      }, vals.join('၊ ')) : null;
+    })(), /*#__PURE__*/React.createElement("details", {
       className: "mt-1 bg-amber-50/60 border border-amber-100 rounded p-2 text-[10px] leading-relaxed"
     }, /*#__PURE__*/React.createElement("summary", {
       className: "cursor-pointer font-bold text-slate-700"
@@ -14604,15 +14540,7 @@ function MainApp() {
     }
   })()), rectAppliedEO && /*#__PURE__*/React.createElement("div", {
     className: "border-t border-emerald-700/60 pt-1.5 text-emerald-100 text-[11px] leading-relaxed"
-  }, /*#__PURE__*/React.createElement("strong", null, "အချိန်ရှာမှ အတည်ပြုထားသော ပုံစံ:"), " ", rectAppliedEO.timeLabel, RECT_APP_DETAIL_DEFS.filter(d => rectAppliedEO.appDetail[d.key]).map(d => /*#__PURE__*/React.createElement("span", {
-    key: 'a' + d.key,
-    className: "mr-2"
-  }, d.label, " ", rectAppliedEO.appDetail[d.key])), RECT_PERS_DEFS.filter(d => rectAppliedEO.pers[d.key]).map(d => /*#__PURE__*/React.createElement("span", {
-    key: 'p' + d.key,
-    className: "mr-2"
-  }, d.label, " ", rectAppliedEO.pers[d.key])), /*#__PURE__*/React.createElement("span", {
-    className: "text-[9px] text-emerald-200/60"
-  }, " (cross-check သာ — အမှတ်ထဲ မပါ)"))), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("strong", null, "အချိန်ရှာမှ အတည်ပြုထားသော ပုံစံ:"), " ", rectAppliedEO.timeLabel)), /*#__PURE__*/React.createElement("div", {
     className: "bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex justify-between items-baseline border-b pb-1"
