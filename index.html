@@ -66,6 +66,8 @@
 // v6.51 (2026-10-29): user correction with screenshots — the Display details FIELD GROUP moves from the results-area Tab section into the UPPER pick-fields area, immediately after the personality pick fields and before the guna block (the blue-circled place the user originally asked for). Same 16 fields, same values, same rules (classical + 12-house-9-planet book from unchanged v647AutoFill display data; blanks literally blank; vein routing; Mars-Aries exception; footnotes move with the group). The separate Tab section below the echo boxes is removed. Picks, under-lagna small text, EO block, Saravali details, echo boxes and search unchanged. Nothing else changed.
 // v6.52 (2026-10-29): user decision — the whole pick-fields block is REMOVED (lagna dropdown + appearance/personality picks + echo boxes were redundant once Display details auto-fills); Display details returns UNDER THE SELECTED CANDIDATE'S LAGNA LINE ONLY (16 fields, same values/rules, blanks blank; small untitled INTERESTS/WORKTYPE/BELIEF/HABITS line directly below the field set). Consequences: the +3 lagna-match score goes with the dropdown (rectification outputs stay identical for all new-UI inputs; old +3-inclusive outputs superseded); EO light block now shows the selected time only (picks line dropped); v647AutoFill pick computation kept internally (dead computation, later cleanup). Search flow, events, guna, Saravali details, apply behavior unchanged. Nothing else changed.
 // v6.53 (2026-10-29): user ruling — the lagna dropdown is KEPT (original main thing, the texts' main appearance check): dropdown + +3 lagna-match score restored verbatim from v651 (options, state, call, Reset clearing, footnote clause); appearance/personality pick fields, echo boxes, upper group and Tab stay removed; Display details stays under the selected candidate's lagna line only; EO stays time-only. Calculation methods re-verified (see test59): no scoring drift beyond the +3 restoration. Nothing else changed.
+// v6.54 (2026-11-07): user order — Tropical monthly forecast added to the Tropical readings tab: Sun Sign Predictions (General) + Personal Transit + Lunation Predictions (Details), one month at a time with prev/next month navigation (state tropMonthOff, 0 = current month). New pure functions solveLunationJD / findLunationsInMonth / generateTropicalMonthly — Western tables only (WESTERN_SIGNS, WESTERN_HOUSE_DOMAIN, WESTERN_ASPECT_TEXT, WESTERN_PLANET_MY); no Vedic layers, no Rahu/Ketu in the monthly text; transit aspects reuse calculateTransitAspects; lunation solver follows the solveSolarReturnJD iterative pattern. Nothing else changed.
+// v6.55 (2026-11-07): user feedback after phone live-check of v6.54, refined by his clarification — the monthly transit-aspect lines only named the aspect and its generic kind text, without saying what tends to happen. Fixed: each aspect line now says HOW (the aspect), IN WHICH AREA (the natal planet's Placidus house + WESTERN_HOUSE_DOMAIN), and WHAT tends to happen (the two planets' WESTERN_PLANET_THEME composed with the aspect kind — flow = the two themes support each other and flow smoothly, tension = friction between the two themes that pushes growth, merge = the two themes act fused in one place). No new invented significations; WESTERN_ASPECT_TEXT generic sentence dropped from these lines (still used by the natal Aspects section). Nothing else changed.
 // v6.37 (2026-10-22): Classical-correctness fixes from an external (ChatGPT) audit, verified against the code before fixing — (A) Mahapurusha sign lists corrected to own/exaltation signs only (Hamsa [3,8,11] — Libra/Capricorn removed; Malavya [1,6,11] — Gemini/Scorpio removed; Ruchaka [0,7,9] — Aquarius replaced by Capricorn; Bhadra/Sasa were already correct). (B) Vimshottari first mahadasha now uses the elapsed method: antardashas fully elapsed before birth are skipped and the running one is trimmed to birth; mahadasha boundaries and MD2-9 antardashas are byte-identical to before. (C) Bhava Bala is now a REAL per-chart calculation (house lord's Shadbala + Dig Bala by sign class + Drig Bala by whole-sign aspects, benefic +15/malefic -15 as in Shadbala's Drik) — until v6.36 it returned a static score array identical for every chart. Nothing else changed: golden output identical to the v6.33 baseline; test45 27/27.
 // v6.33 (2026-10-18): Jaimini Chara Karaka SURFACED — charaKarakas() helper (checkAllYogas Jaimini block refactored onto it, yogas unchanged); AK/AmK/BK/MK/PK/GK/DK badges beside planet names in the Nakshatra table; new KarakaPanel card in the sidereal Birth Chart (all 7 with sign/degree/house/role + AK and AmK house-theme lines). Display layer only.
 // v6.32 (2026-10-18): Art income source — the evidence line now lists the reasons that ACTUALLY fired for this chart (Venus strength / yogakaraka / star-lord channel / lordship / placement only when the placement itself scores). v6.31's bare Venus-placement caption could imply a non-scoring house (e.g. Venus in the 9th) was a reason; engine scores unchanged.
@@ -8110,6 +8112,139 @@ function generateAnnualForecast(birthDate, birthPlanets, transitPlanets, transit
 }
 
 // ==========================================
+// TROPICAL MONTHLY FORECAST (v6.54 — see version comment at top of file)
+// Western-only monthly: Sun Sign Predictions (General) + Personal Transit
+// + Lunation Predictions (Details). Classical basis: transiting planets
+// through natal houses (whole-sign counted from the Sun sign for the
+// General layer, Placidus natal houses for the Personal layer),
+// transit-to-natal aspects (WESTERN_ASPECT_DEFS orbs via
+// calculateTransitAspects), and lunations (New Moon = new beginnings,
+// Full Moon = culmination) in natal houses. All wording composes existing
+// Western tables only — no invented significations, no Vedic layers,
+// no Rahu/Ketu. Lunation solver follows the solveSolarReturnJD
+// iterative pattern.
+// ==========================================
+const TROP_MONTH_NAMES_MY = ['ဇန်နဝါရီ', 'ဖေဖော်ဝါရီ', 'မတ်', 'ဧပြီ', 'မေ', 'ဇွန်', 'ဇူလိုင်', 'သြဂုတ်', 'စက်တင်ဘာ', 'အောက်တိုဘာ', 'နိုဝင်ဘာ', 'ဒီဇင်ဘာ'];
+function solveLunationJD(targetElong, approxJD, lat, lon, nodeType) {
+  // targetElong: 0 = New Moon, 180 = Full Moon. Iterative, same pattern as solveSolarReturnJD.
+  let jd = approxJD;
+  for (let i = 0; i < 8; i++) {
+    const p = calculateNASA_JPL_Planets(jd, lat, lon, 'tropical', nodeType);
+    const elong = norm360(p.Moon - p.Sun);
+    const err = (targetElong - elong + 540) % 360 - 180;
+    jd += err / 12.1907; // mean relative Moon-Sun motion, deg/day
+    if (Math.abs(err) < 0.005) break;
+  }
+  return jd;
+}
+function jdToDateInTz(jd, tz) {
+  // JD -> Date shifted into the given tz offset (hours); read with getUTC* methods.
+  return new Date((jd - 2440587.5) * 86400000 + (tz || 0) * 3600000);
+}
+function findLunationsInMonth(y, m, lat, lon, nodeType, tz) {
+  // y = full year, m = 0-based month. Returns { newMoon, fullMoon }; each is null when that phase falls outside this calendar month (e.g. a February with no Full Moon).
+  const tzEff = tz == null || isNaN(tz) ? 6.5 : tz;
+  const startJD = getJulianDay(y, m + 1, 1, 0, 0, tzEff);
+  const ny = m === 11 ? y + 1 : y,
+    nm = m === 11 ? 1 : m + 2;
+  const endJD = getJulianDay(ny, nm, 1, 0, 0, tzEff);
+  const out = {};
+  [[0, 'newMoon'], [180, 'fullMoon']].forEach(([target, key]) => {
+    const p0 = calculateNASA_JPL_Planets(startJD, lat, lon, 'tropical', nodeType);
+    const e0 = norm360(p0.Moon - p0.Sun);
+    const days = ((target - e0) % 360 + 360) % 360 / 12.1907;
+    const solved = solveLunationJD(target, startJD + days, lat, lon, nodeType);
+    if (solved >= startJD && solved < endJD) {
+      const d = jdToDateInTz(solved, tzEff);
+      out[key] = {
+        jd: solved,
+        label: `${TROP_MONTH_NAMES_MY[d.getUTCMonth()]} ${d.getUTCDate()} (${d.getUTCFullYear()})`
+      };
+    } else out[key] = null;
+  });
+  return out;
+}
+function generateTropicalMonthly(birthPlanets, tropCusps, y, m, lat, lon, nodeType, tz) {
+  const tzEff = tz == null || isNaN(tz) ? 6.5 : tz;
+  const latN = parseFloat(lat) || 16.84,
+    lonN = parseFloat(lon) || 96.17;
+  const midJD = getJulianDay(y, m + 1, 15, 12, 0, tzEff);
+  const tp = calculateNASA_JPL_Planets(midJD, latN, lonN, 'tropical', nodeType);
+  const monthLabel = `${TROP_MONTH_NAMES_MY[m]} (${y})`;
+  const sunSignIdx = Math.floor(norm360(birthPlanets.Sun) / 30);
+  const sunSign = WESTERN_SIGNS[sunSignIdx];
+  const houseFromSun = signIdx => (signIdx - sunSignIdx + 12) % 12 + 1;
+  const pn = k => k === 'Lagna' ? 'လဂ်' : WESTERN_PLANET_MY[k];
+  // --- General: Sun Sign Predictions (same for everyone with this Sun sign) ---
+  const general = [];
+  const tSunSign = Math.floor(norm360(tp.Sun) / 30);
+  const sunH = houseFromSun(tSunSign);
+  general.push(`ဒီလ နေ ဟာ ${WESTERN_SIGNS[tSunSign].my}မှာ ရှိနေတယ် — ${sunSign.my}ဖွား အတွက် နေ ဟာ ${sunH} တန့် (${WESTERN_HOUSE_DOMAIN[sunH - 1]}) မှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ဒီလ အလေး ရောက်ရာ ဟာ ${WESTERN_HOUSE_DOMAIN[sunH - 1]} ဖြစ်တယ်။`);
+  ['Mercury', 'Venus', 'Mars'].forEach(k => {
+    if (typeof tp[k] !== 'number') return;
+    const s = Math.floor(norm360(tp[k]) / 30),
+      h = houseFromSun(s);
+    general.push(`${WESTERN_PLANET_MY[k]} ဟာ ${WESTERN_SIGNS[s].my}မှာ၊ ${h} တန့်မှာ ရှိနေတယ် — ${WESTERN_HOUSE_DOMAIN[h - 1]} ဘက်မှာ လှုပ်ရှားမှု ရှိတယ်။`);
+  });
+  const jupS = Math.floor(norm360(tp.Jupiter) / 30),
+    satS = Math.floor(norm360(tp.Saturn) / 30);
+  general.push(`ကြာသပတေး ဟာ ${WESTERN_SIGNS[jupS].my}မှာ၊ စနေ ဟာ ${WESTERN_SIGNS[satS].my}မှာ ရှိနေတယ် — ရေရှည် ${WESTERN_HOUSE_DOMAIN[houseFromSun(jupS) - 1]} နဲ့ ${WESTERN_HOUSE_DOMAIN[houseFromSun(satS) - 1]} ဘက်တွေမှာ ဖြည်းဖြည်းချင်း ပြောင်းလဲနေတဲ့ ကာလ ဖြစ်တယ်။`);
+  // --- Personal: transit-to-natal aspects (mid-month) ---
+  const personal = [];
+  const tAsps = calculateTransitAspects(tp, birthPlanets).slice(0, 6);
+  // v6.55: each line says HOW (aspect), IN WHICH AREA (natal planet's Placidus house), and WHAT tends to happen (both planets' themes + aspect kind).
+  const ASPECT_AREA_EFFECT = {
+    flow: 'ချောမွေ့ပြီး အထောက်အပံ့ ရတတ်',
+    tension: 'ပွတ်တိုက်မှု ရှိတတ်ပြီး အဲ့ဒီ အားပြိုင်မှုကနေပဲ တိုးတက်အောင် တွန်းပေးတတ်',
+    merge: 'ပေါင်းစည်း လှုပ်ရှားတတ်'
+  };
+  tAsps.forEach(a => {
+    const tTheme = WESTERN_PLANET_THEME[a.t] || '';
+    const nTheme = WESTERN_PLANET_THEME[a.n] || '';
+    const nHouse = tropCusps && typeof birthPlanets[a.n] === 'number' ? westernHouseOf(birthPlanets[a.n], tropCusps) : null;
+    const area = nHouse ? WESTERN_HOUSE_DOMAIN[nHouse - 1] : '';
+    const effect = ASPECT_AREA_EFFECT[a.kind] || '';
+    const areaPart = nHouse ? ` — မွေး ${pn(a.n)} ဟာ ${nHouse} တန့် (${area}) မှာ ရှိနေတယ်။` : '';
+    personal.push(`Transit ${pn(a.t)} ဟာ မွေး ${pn(a.n)}နဲ့ ${a.typeMy} ဖြစ်နေတယ်${areaPart} ဒီရပ်တည်မှုကြောင့် ${area ? area + ' ဘက်မှာ ' : ''}${tTheme} နဲ့ ${nTheme} ${effect}တဲ့ ကာလ ဖြစ်တယ်။`);
+  });
+  // --- Personal: fast-planet transit houses (Placidus natal houses) ---
+  ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars'].forEach(k => {
+    if (typeof tp[k] !== 'number' || !tropCusps) return;
+    const h = westernHouseOf(tp[k], tropCusps);
+    if (h) personal.push(`Transit ${WESTERN_PLANET_MY[k]} ဟာ ${h} တန့် (${WESTERN_HOUSE_DOMAIN[h - 1]}) မှာ ရှိနေတယ်။`);
+  });
+  if (tropCusps && typeof tp.Jupiter === 'number' && typeof tp.Saturn === 'number') {
+    const hj = westernHouseOf(tp.Jupiter, tropCusps),
+      hs = westernHouseOf(tp.Saturn, tropCusps);
+    if (hj && hs) personal.push(`Transit ကြာသပတေး ဟာ ${hj} တန့်မှာ၊ Transit စနေ ဟာ ${hs} တန့်မှာ ရှိနေတယ် — ရေရှည် နယ်ပယ် နှစ်ခု ဖြစ်တဲ့ ${WESTERN_HOUSE_DOMAIN[hj - 1]} နဲ့ ${WESTERN_HOUSE_DOMAIN[hs - 1]} ဘက်မှာ ဖြည်းဖြည်းချင်း အလုပ် လုပ်နေတဲ့ ကာလ ဖြစ်တယ်။`);
+  }
+  // --- Lunations in this month ---
+  const luns = findLunationsInMonth(y, m, latN, lonN, nodeType, tzEff);
+  const lunLine = (kind, lun) => {
+    if (!lun) return `ဒီလထဲမှာ ${kind === 'new' ? 'လဆန်း' : 'လပြည့်'} မကျပါ။`;
+    const lp = calculateNASA_JPL_Planets(lun.jd, latN, lonN, 'tropical', nodeType);
+    const s = Math.floor(norm360(lp.Moon) / 30);
+    const h = tropCusps ? westernHouseOf(lp.Moon, tropCusps) : null;
+    const dom = h ? WESTERN_HOUSE_DOMAIN[h - 1] : WESTERN_SIGNS[s].my;
+    const where = h ? `${WESTERN_SIGNS[s].my}မှာ၊ ${h} တန့် (${dom}) မှာ` : `${WESTERN_SIGNS[s].my}မှာ`;
+    if (kind === 'new') return `လဆန်း (${lun.label}) ဟာ ${where} ကျတယ် — ဒီလ အစ အသစ် စရမယ့် နယ်ပယ် ဟာ ${dom} ဖြစ်တယ်။`;
+    return `လပြည့် (${lun.label}) ဟာ ${where} ကျတယ် — ${dom} ဘက်က ရလဒ် မြင်ရပြီး ဟန်ချက် ပြန်ညှိရတဲ့ အချိန် ဖြစ်တယ်။`;
+  };
+  const lunations = [lunLine('new', luns.newMoon), lunLine('full', luns.fullMoon)];
+  return {
+    monthLabel,
+    sunSignIdx,
+    sunSign: sunSign.en,
+    general,
+    personal,
+    lunations,
+    newMoon: luns.newMoon,
+    fullMoon: luns.fullMoon,
+    transitAspects: tAsps
+  };
+}
+
+// ==========================================
 // AUTHENTIC ASHTAKOOTA (36 POINTS) & SYNASTRY
 // ==========================================
 function calculateSynastry(bPlanets, gPlanets, ayanamsa, bDate, gDate) {
@@ -12670,6 +12805,7 @@ class ErrorBoundary extends Component {
 // ==========================================
 function MainApp() {
   const [activeTab, setActiveTab] = useState('transit');
+  const [tropMonthOff, setTropMonthOff] = useState(0); // v6.54: Tropical monthly forecast month offset (0 = current month)
   const [extraDashasOpen, setExtraDashasOpen] = useState(false); // v6.44: added-dasha submenu toggle
   const [agreed, setAgreed] = useState(false);
   const agreeDisclaimer = () => {
@@ -13188,6 +13324,11 @@ function MainApp() {
   const nowJD = Date.now() / 86400000 + 2440587.5;
   const solarReturn = isTrop ? calculateSolarReturn(birthJD, birthPlanets.Sun, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, nodeType, nowJD) : null;
   const progressions = isTrop ? calculateProgressions(birthJD, parseFloat(birthLat) || 16.84, parseFloat(birthLon) || 96.17, nodeType, nowJD) : null;
+  const tropMonthly = isTrop ? (() => {
+    const nowD = new Date();
+    const base = new Date(nowD.getFullYear(), nowD.getMonth() + tropMonthOff, 1);
+    return generateTropicalMonthly(birthPlanets, tropCusps, base.getFullYear(), base.getMonth(), parseFloat(transitLat) || 16.84, parseFloat(transitLon) || 96.17, nodeType, transitTzEff);
+  })() : null;
   const aspectPatterns = isTrop ? detectAspectPatterns(birthPlanets) : [];
   const tJD = transitDate.getTime() / 86400000 + 2440587.5;
   const transitPlanets = calculateNASA_JPL_Planets(tJD, parseFloat(transitLat) || 16.84, parseFloat(transitLon) || 96.17, ayanamsa, nodeType);
@@ -14455,7 +14596,48 @@ function MainApp() {
     className: "text-slate-700 leading-relaxed"
   }, "Progressed နေ သည် ", WESTERN_SIGNS[Math.floor(norm360(progressions.planets.Sun) / 30)].my, " ရာသီမှာ ရှိနေတယ် — ", Math.floor(norm360(progressions.planets.Sun) / 30) !== Math.floor(norm360(birthPlanets.Sun) / 30) ? 'မွေး နေ ရာသီ (' + WESTERN_SIGNS[Math.floor(norm360(birthPlanets.Sun) / 30)].en + ') ကနေ ပြောင်းသွား ပြီ၊ စရိုက် အသစ် တစ်ခု ကြီးထွား လာနေတဲ့ ကာလ ဖြစ်တယ်။' : 'မွေး နေ ရာသီ အတိုင်းပဲ ရှိသေးတယ်။'), /*#__PURE__*/React.createElement("p", {
     className: "text-slate-700 leading-relaxed"
-  }, "လ စက်ဝန်း အဆင့်: ", progressions.phaseInfo.my, " (Progressed Moon–Sun ", Math.floor(progressions.phase), "°)")), /*#__PURE__*/React.createElement("div", {
+  }, "လ စက်ဝန်း အဆင့်: ", progressions.phaseInfo.my, " (Progressed Moon–Sun ", Math.floor(progressions.phase), "°)")), tropMonthly && /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border-2 border-emerald-600 p-3 rounded-lg shadow space-y-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between border-b border-emerald-200 pb-1.5"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "font-bold text-slate-800 text-xs"
+  }, "📅 လစဉ် ဟောစာတမ်း — ", tropMonthly.monthLabel, " (Tropical)"), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: () => setTropMonthOff(tropMonthOff - 1),
+    className: "px-2 py-0.5 border border-emerald-300 rounded bg-emerald-50 text-emerald-800 font-bold",
+    "aria-label": "ပြီးခဲ့တဲ့ လ"
+  }, "‹"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: () => setTropMonthOff(0),
+    className: "px-2 py-0.5 border border-emerald-300 rounded bg-white text-emerald-800"
+  }, "ဒီလ"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: () => setTropMonthOff(tropMonthOff + 1),
+    className: "px-2 py-0.5 border border-emerald-300 rounded bg-emerald-50 text-emerald-800 font-bold",
+    "aria-label": "နောက်လ"
+  }, "›"))), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1.5"
+  }, /*#__PURE__*/React.createElement("h4", {
+    className: "font-bold text-emerald-800 text-xs"
+  }, "☀️ Sun Sign Predictions — အထွေထွေ (", WESTERN_SIGNS[tropMonthly.sunSignIdx].my, ")"), tropMonthly.general.map((g, i) => /*#__PURE__*/React.createElement("p", {
+    key: i,
+    className: "text-slate-700 leading-relaxed"
+  }, g))), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1.5 border-t border-slate-100 pt-2"
+  }, /*#__PURE__*/React.createElement("h4", {
+    className: "font-bold text-emerald-800 text-xs"
+  }, "🔭 Personal Transit + Lunation — ကိုယ်ပိုင် အသေးစိတ်"), tropMonthly.personal.map((g, i) => /*#__PURE__*/React.createElement("p", {
+    key: i,
+    className: "text-slate-700 leading-relaxed"
+  }, g)), tropMonthly.lunations.map((g, i) => /*#__PURE__*/React.createElement("p", {
+    key: i,
+    className: "text-slate-700 leading-relaxed"
+  }, g))), /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-slate-500"
+  }, "တစ်လချင်း မြှားနဲ့ ရွှေ့ကြည့်နိုင်ပါတယ် — ပြီးခဲ့တဲ့ လနဲ့ နောက်လကို နှိပ်ကြည့်ရုံပဲ။ Transit တွေကို လလယ် (၁၅ ရက်) မှာ တွက်ထားပါတယ်။")), /*#__PURE__*/React.createElement("div", {
     className: "text-[11px] text-slate-500 bg-amber-50 border border-amber-200 rounded p-2"
   }, "ဒီ အဟောတွေက Western (Tropical) နည်း သက်သက် ပါ — နက္ခတ်၊ ဒသာ၊ ယောဂ စတဲ့ Vedic အလွှာတွေကို Tropical မှာ မရောထားပါ။")), activeTab === 'readings' && !isTrop && /*#__PURE__*/React.createElement("div", {
     className: "p-3 space-y-3 text-xs"
