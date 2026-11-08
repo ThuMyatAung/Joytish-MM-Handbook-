@@ -68,6 +68,7 @@
 // v6.53 (2026-10-29): user ruling — the lagna dropdown is KEPT (original main thing, the texts' main appearance check): dropdown + +3 lagna-match score restored verbatim from v651 (options, state, call, Reset clearing, footnote clause); appearance/personality pick fields, echo boxes, upper group and Tab stay removed; Display details stays under the selected candidate's lagna line only; EO stays time-only. Calculation methods re-verified (see test59): no scoring drift beyond the +3 restoration. Nothing else changed.
 // v6.54 (2026-11-07): user order — Tropical monthly forecast added to the Tropical readings tab: Sun Sign Predictions (General) + Personal Transit + Lunation Predictions (Details), one month at a time with prev/next month navigation (state tropMonthOff, 0 = current month). New pure functions solveLunationJD / findLunationsInMonth / generateTropicalMonthly — Western tables only (WESTERN_SIGNS, WESTERN_HOUSE_DOMAIN, WESTERN_ASPECT_TEXT, WESTERN_PLANET_MY); no Vedic layers, no Rahu/Ketu in the monthly text; transit aspects reuse calculateTransitAspects; lunation solver follows the solveSolarReturnJD iterative pattern. Nothing else changed.
 // v6.55 (2026-11-07): user feedback after phone live-check of v6.54, refined by his clarification — the monthly transit-aspect lines only named the aspect and its generic kind text, without saying what tends to happen. Fixed: each aspect line now says HOW (the aspect), IN WHICH AREA (the natal planet's Placidus house + WESTERN_HOUSE_DOMAIN), and WHAT tends to happen (the two planets' WESTERN_PLANET_THEME composed with the aspect kind — flow = the two themes support each other and flow smoothly, tension = friction between the two themes that pushes growth, merge = the two themes act fused in one place). No new invented significations; WESTERN_ASPECT_TEXT generic sentence dropped from these lines (still used by the natal Aspects section). Nothing else changed.
+// v6.56 (2026-11-08): user order — Vedic monthly forecast (Gochara) added to the Vedic readings tab, after the Annual Forecast: Moon = General (gochara from the natal Moon sign) + Lagna = Personal (gochara from lagna), one month at a time with prev/next month navigation (state vedMonthOff, 0 = current month). Source: Phaladeepika Ch.26 (Kapoor ed., file supplied by the user 2026-11-08) — full extraction in gochara-table-v656.md. NEW: Vedha IS checked here (the Annual Forecast never checked it — grep "vedha" over v6.55 = 0 hits): a good-house result stands only when its Vedha house is free (per-planet exceptions applied); a Vedha hit is named in the line. Ketu excluded (no results in Ch.26). Lifespan-adjacent rules (vv.33-34) excluded per his standing rule. Nothing else changed.
 // v6.37 (2026-10-22): Classical-correctness fixes from an external (ChatGPT) audit, verified against the code before fixing — (A) Mahapurusha sign lists corrected to own/exaltation signs only (Hamsa [3,8,11] — Libra/Capricorn removed; Malavya [1,6,11] — Gemini/Scorpio removed; Ruchaka [0,7,9] — Aquarius replaced by Capricorn; Bhadra/Sasa were already correct). (B) Vimshottari first mahadasha now uses the elapsed method: antardashas fully elapsed before birth are skipped and the running one is trimmed to birth; mahadasha boundaries and MD2-9 antardashas are byte-identical to before. (C) Bhava Bala is now a REAL per-chart calculation (house lord's Shadbala + Dig Bala by sign class + Drig Bala by whole-sign aspects, benefic +15/malefic -15 as in Shadbala's Drik) — until v6.36 it returned a static score array identical for every chart. Nothing else changed: golden output identical to the v6.33 baseline; test45 27/27.
 // v6.33 (2026-10-18): Jaimini Chara Karaka SURFACED — charaKarakas() helper (checkAllYogas Jaimini block refactored onto it, yogas unchanged); AK/AmK/BK/MK/PK/GK/DK badges beside planet names in the Nakshatra table; new KarakaPanel card in the sidereal Birth Chart (all 7 with sign/degree/house/role + AK and AmK house-theme lines). Display layer only.
 // v6.32 (2026-10-18): Art income source — the evidence line now lists the reasons that ACTUALLY fired for this chart (Venus strength / yogakaraka / star-lord channel / lordship / placement only when the placement itself scores). v6.31's bare Venus-placement caption could imply a non-scoring house (e.g. Venus in the 9th) was a reason; engine scores unchanged.
@@ -8245,6 +8246,163 @@ function generateTropicalMonthly(birthPlanets, tropCusps, y, m, lat, lon, nodeTy
 }
 
 // ==========================================
+// VEDIC MONTHLY FORECAST (GOCHARA) — v6.56 (see version comment at top of file)
+// Phaladeepika Ch.26 (Kapoor ed.). Moon = General, lagna = Personal.
+// Full extraction + authority notes: gochara-table-v656.md.
+// Vedha IS checked here (Ch.26 vv.3-8): a good-house result stands only
+// when its Vedha house is free (per-planet exceptions applied); a Vedha
+// hit is named in the line. Ketu excluded (no results in Ch.26).
+// Lifespan-adjacent rules (vv.33-34) excluded per his standing rule.
+// Vedha is evaluated at the mid-month snapshot, same as the transits.
+// ==========================================
+const GOCHARA_PLANETS = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu'];
+const GOCHARA_PLANET_MY = {
+  Sun: 'နေ',
+  Moon: 'တနင်္လာ',
+  Mars: 'အင်္ဂါ',
+  Mercury: 'ဗုဒ္ဓဟူး',
+  Jupiter: 'ကြာသပတေး',
+  Venus: 'သောကြာ',
+  Saturn: 'စနေ',
+  Rahu: 'ရာဟု',
+  Ketu: 'ကေတု'
+};
+const GOCHARA_GOOD = {
+  Sun: [3, 6, 10, 11],
+  Moon: [1, 3, 6, 7, 10, 11],
+  Mars: [3, 6, 11],
+  Mercury: [2, 4, 6, 8, 10, 11],
+  Jupiter: [2, 5, 7, 9, 11],
+  Venus: [1, 2, 3, 4, 5, 8, 9, 11, 12],
+  Saturn: [3, 6, 11],
+  Rahu: [3, 6, 10, 11]
+};
+// Vedha: good house -> vedha house (Ch.26 vv.3-8). Mercury 8/10/11: NOT STATED in this edition — no check. Rahu: no Vedha verse — no check.
+const GOCHARA_VEDHA = {
+  Sun: {
+    3: 5,
+    6: 9,
+    10: 4,
+    11: 12
+  },
+  Moon: {
+    1: 5,
+    3: 9,
+    6: 12,
+    7: 2,
+    10: 4,
+    11: 8
+  },
+  Mars: {
+    3: 12,
+    6: 9,
+    11: 5
+  },
+  Mercury: {
+    2: 5,
+    4: 3,
+    6: 9
+  },
+  Jupiter: {
+    2: 12,
+    5: 4,
+    7: 3,
+    9: 10,
+    11: 8
+  },
+  Venus: {
+    1: 8,
+    2: 7,
+    3: 1,
+    4: 10,
+    5: 9,
+    8: 5,
+    9: 11,
+    11: 6,
+    12: 3
+  },
+  Saturn: {
+    3: 12,
+    6: 9,
+    11: 5
+  },
+  Rahu: {}
+};
+// Vedha exception: this planet in the vedha house does NOT mar the good effect.
+const GOCHARA_VEDHA_EXCEPT = {
+  Sun: 'Saturn',
+  Moon: 'Mercury',
+  Saturn: 'Sun'
+};
+// House results from the reference (Ch.26 vv.9-24), index 1-12. See gochara-table-v656.md for source phrases.
+const GOCHARA_RESULTS = {
+  Sun: ['', 'ခရီးပန်းတာ၊ ပင်ပန်းတာ၊ ရောဂါဖြစ်တာ', 'ငွေဆုံးရှုံးတာ၊ စိတ်မချမ်းသာတာ၊ ခေါင်းမာတာ၊ သူများ လှည့်ဖျားတာ', 'နေရာသစ် ရတာ၊ ငွေဝင်တာ၊ စိတ်ချမ်းသာတာ၊ ရောဂါကင်းတာ၊ ရန်သူ ပျက်စီးတာ', 'ရောဂါဖြစ်တာ၊ ကာမဆက်ဆံမှု အနှောင့်အယှက် ရှိတာ', 'စိတ်သောက ရောက်တာ၊ ကျန်းမာရေး ညံ့တာ၊ အရှက်ရတာ', 'ရောဂါကင်းတာ၊ ရန်သူ ပျက်စီးတာ၊ စိတ်သောက ကင်းတာ', 'ခရီးပန်းတာ၊ ဝမ်းရောဂါ၊ စအိုနာတာ၊ အရှက်ရတာ', 'ကြောက်စိတ် ဝင်တာ၊ ရောဂါဖြစ်တာ၊ ရန်ဖြစ်တာ၊ မင်းအမျက်ခံရတာ၊ အပူလွန်တာ', 'အန္တရာယ် ရှိတာ၊ အရှက်ရတာ၊ ရင်းနှီးသူတွေနဲ့ ကွဲကွာတာ၊ စိတ်ဓာတ်ကျတာ', 'ကြီးကျယ်တဲ့ လုပ်ငန်း အောင်မြင်တာ', 'နေရာသစ် ရတာ၊ ဂုဏ်ရတာ၊ ငွေဝင်တာ၊ ရောဂါကင်းတာ', 'စိတ်ဆင်းရဲတာ၊ ငွေဆုံးရှုံးတာ၊ မိတ်ဆွေနဲ့ ရန်ဖြစ်တာ၊ ဖျားတာ'],
+  Moon: ['', 'ကံကောင်းခြင်း အစ ပြုတာ', 'ငွေဆုံးရှုံးတာ', 'အောင်မြင်တာ', 'ကြောက်စိတ် ဝင်တာ', 'စိတ်ဆင်းရဲတာ', 'ရောဂါကင်းတာ', 'စိတ်ချမ်းသာတာ', 'စိတ်မချမ်းသာတဲ့၊ ဒုက္ခပေးတဲ့ အဖြစ်တွေ', 'ဖျားနာတာ', 'ရည်မှန်းချက် ပြည့်တာ', 'ပျော်ရွှင်တာ', 'ငွေကုန်တာ'],
+  Mars: ['', 'စိတ်ဓာတ်ကျတာ၊ ဆွေမျိုးနဲ့ ကွဲကွာတာ၊ သွေး/သည်းခြေ/အပူ ရောဂါတွေ', 'ကြောက်စိတ် ဝင်တာ၊ စကားကြမ်းနဲ့ ရန်ဖြစ်တာ၊ ငွေဆုံးရှုံးတာ', 'လုပ်ငန်းတိုင်း အောင်မြင်တာ၊ ရွှေထည် ရတာ၊ ပျော်ရွှင်တာ', 'ရာထူး ဆုံးရှုံးတာ၊ ဝမ်းရောဂါ၊ ဆွေမျိုးကြောင့် စိတ်ဆင်းရဲတာ', 'ဖျားတာ၊ မလိုအပ်တဲ့ ဆန္ဒတွေ၊ သားကြောင့် စိတ်သောက၊ ဆွေမျိုးနဲ့ ရန်ဖြစ်တာ', 'ရန်ပွဲ ပြီးတာ၊ ရန်သူ ဆုတ်ခွာတာ၊ ရောဂါကင်းတာ၊ အောင်ပွဲ ရတာ၊ ငွေဝင်တာ၊ လုပ်ငန်းတိုင်း အောင်မြင်တာ', 'ဇနီးနဲ့ နားလည်မှု လွဲတာ၊ မျက်စိရောဂါ၊ ဝမ်းနာတာ', 'ဖျားတာ၊ သွေးအားနည်းတာ၊ ငွေနဲ့ ဂုဏ် ဆုံးရှုံးတာ', 'အရှက်ရတာ၊ အားနည်းလို့ လမ်းလျှောက်ရ ခက်တာ၊ ကိုယ်ခန္ဓာ အားနည်းတာ', 'မလျော်တဲ့ အပြုအမူ၊ ကြိုးစားတာ မအောင်တာ၊ ပင်ပန်းတာ', 'ငွေဝင်တာ၊ ရောဂါကင်းတာ၊ မြေယာ တိုးတာ', 'ငွေဆုံးရှုံးတာ၊ အပူလွန်လို့ ဖျားတာ'],
+  Mercury: ['', 'ငွေဆုံးရှုံးတာ', 'ငွေဝင်တာ', 'ရန်သူကို ကြောက်ရတာ', 'ငွေဝင်တာ', 'ဇနီးနဲ့ သားသမီးနဲ့ ရန်ဖြစ်တာ', 'အောင်မြင်တာ', 'နားလည်မှု လွဲတာ', 'ငွေဝင်တာ၊ သားသမီး ရတာ', 'လုပ်ငန်း ပျက်စီးတာ', 'အဘက်ဘက်က စိတ်ချမ်းသာတာ', 'စည်းစိမ် တိုးတာ', 'အရှက်ရမှာကို ကြောက်ရတာ'],
+  Jupiter: ['', 'မွေးရပ်ကနေ ခွာတာ၊ ငွေအကုန်အကျ များတာ၊ သူများကို မလိုမုန်းထားတာ', 'ငွေဝင်တာ၊ အိမ်တွင်း စိတ်ချမ်းသာတာ၊ သူများကို လွှမ်းမိုးနိုင်တာ', 'ရာထူး ဆုံးရှုံးတာ၊ မိတ်ဆွေနဲ့ ကွဲကွာတာ၊ စီးပွားရေး အတားအဆီး၊ ရောဂါ', 'ဆွေမျိုးကြောင့် စိတ်ဆင်းရဲတာ၊ အရှက်ရတာ၊ တိရစ္ဆာန်ကြောင့် အန္တရာယ်', 'သားသမီး ရတာ၊ မြင့်မြတ်သူတွေနဲ့ ပေါင်းသင်းတာ၊ မင်းအကြိုက်ခံရတာ', 'ရန်သူနဲ့ ဆွေမျိုးကြောင့် ဒုက္ခ၊ ရောဂါ', 'မင်္ဂလာရှိတဲ့ လုပ်ငန်းအတွက် ခရီးထွက်တာ၊ ဇနီးနဲ့ စိတ်ချမ်းသာတာ၊ သားသမီး ရတာ', 'ပင်ပန်းတဲ့ ခရီး၊ ပင်ပန်းတာ၊ ကံမကောင်းတာ၊ စိတ်ဆင်းရဲတာ၊ ငွေဆုံးရှုံးတာ', 'အဘက်ဘက်က ကြီးပွားတာ', 'ပစ္စည်း၊ ရာထူး၊ သားသမီး အန္တရာယ် ရှိတာ', 'သားသမီး ရတာ၊ ရာထူးသစ် ရတာ၊ ဂုဏ်ရတာ', 'စိတ်ဆင်းရဲတာ၊ ပစ္စည်းကြောင့် ကြောက်ရတာ'],
+  Venus: ['', 'အမျိုးမျိုး ခံစားရတာ', 'ငွေဝင်တာ', 'ကြီးပွားတာ', 'စိတ်ချမ်းသာတာ၊ မိတ်ဆွေ တိုးတာ', 'သားသမီး ရတာ', 'မတော်တဆမှု', 'ဇနီး ဒုက္ခရောက်တာ', 'ငွေဝင်တာ', 'စိတ်ချမ်းသာတာ', 'ရန်ဖြစ်တာ', 'လုံခြုံတာ', 'ငွေဝင်တာ'],
+  Saturn: ['', 'ရောဂါဖြစ်တာ၊ နာရေးကိစ္စ လုပ်ရတာ', 'ငွေနဲ့ သားသမီး ဆုံးရှုံးတာ', 'ရာထူး/အလုပ် ရတာ၊ ငွေဝင်တာ၊ အစေခံ ရတာ', 'ဇနီး၊ ဆွေမျိုး၊ ငွေ ဆုံးရှုံးတာ', 'ငွေလျော့တာ၊ သားသမီး ဆုံးရှုံးတာ၊ စိတ်ရှုပ်တာ', 'အဘက်ဘက်က စိတ်ချမ်းသာတာ', 'ဇနီး ဒုက္ခရောက်တာ၊ ခရီးမှာ အန္တရာယ်', 'သားသမီး၊ ကျွဲနွား၊ မိတ်ဆွေ၊ ငွေ ဆုံးရှုံးတာ၊ ရောဂါ', 'ငွေဆုံးရှုံးတာ၊ ကောင်းမှု လုပ်တာ အတားအဆီး၊ အဖနဲ့ တူတဲ့ လူကြီး ဆုံးတာ၊ အမြဲ စိတ်ဆင်းရဲတာ', 'မကောင်းမှု လုပ်တာ၊ ဂုဏ် ဆုံးရှုံးတာ၊ ရောဂါ', 'အမျိုးမျိုး စိတ်ချမ်းသာတာ၊ ငွေဝင်တာ၊ ထူးခြားတဲ့ ဂုဏ်ရတာ', 'အမြတ်မရတဲ့ စီးပွားရေး လုပ်တာ၊ ရန်သူကြောင့် ငွေဆုံးရှုံးတာ၊ ဇနီးနဲ့ သား ဖျားနာတာ'],
+  Rahu: ['', 'ဖျားနာတာ၊ ကျန်းမာရေး အန္တရာယ်', 'ငွေဆုံးရှုံးတာ', 'ပျော်ရွှင်တာ', 'စိတ်ဆင်းရဲတာ', 'ငွေဆုံးရှုံးတာ', 'ပျော်ရွှင်တာ', 'ဆုံးရှုံးတာ', 'အန္တရာယ် ရှိတာ', 'ဆုံးရှုံးတာ', 'ရတာ', 'ပျော်ရွှင်တာ', 'ငွေကုန်တာ']
+};
+function generateVedicMonthly(birthPlanets, y, m, lat, lon, ayanamsa, nodeType, tz) {
+  const tzEff = tz == null || isNaN(tz) ? 6.5 : tz;
+  const latN = parseFloat(lat) || 16.84,
+    lonN = parseFloat(lon) || 96.17;
+  const midJD = getJulianDay(y, m + 1, 15, 12, 0, tzEff);
+  const tp = calculateNASA_JPL_Planets(midJD, latN, lonN, ayanamsa, nodeType);
+  const monthLabel = `${TROP_MONTH_NAMES_MY[m]} (${y})`;
+  const moonSign = Math.floor(norm360(birthPlanets.Moon) / 30);
+  const lagnaSign = Math.floor(norm360(birthPlanets.Lagna) / 30);
+  const signOf = lon => Math.floor(norm360(lon) / 30);
+  const houseFrom = (sign, ref) => (sign - ref + 12) % 12 + 1;
+  const ALL9 = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
+  const housesFrom = ref => {
+    const out = {};
+    ALL9.forEach(k => {
+      if (typeof tp[k] === 'number') out[k] = houseFrom(signOf(tp[k]), ref);
+    });
+    return out;
+  };
+  const housesMoon = housesFrom(moonSign);
+  const housesLagna = housesFrom(lagnaSign);
+  const linesFor = (refSign, houses) => {
+    const refName = refSign === moonSign ? 'တနင်္လာ' : 'လဂ်';
+    const lines = [];
+    GOCHARA_PLANETS.forEach(k => {
+      if (typeof tp[k] !== 'number') return;
+      const h = houses[k];
+      if (!h) return;
+      let line = `ဒီလ ${GOCHARA_PLANET_MY[k]} ဟာ ${refName}ကနေ ${h} တန့်မှာ ရှိနေတယ် — ${GOCHARA_RESULTS[k][h]}။`;
+      if (GOCHARA_GOOD[k].includes(h)) {
+        const vHouse = GOCHARA_VEDHA[k][h];
+        if (vHouse) {
+          const except = GOCHARA_VEDHA_EXCEPT[k];
+          const occupants = ALL9.filter(pk => houses[pk] === vHouse);
+          const blockers = occupants.filter(pk => pk !== except);
+          if (blockers.length > 0) {
+            line += ` ဒါပေမဲ့ ဗေဓတန့် (${vHouse}) မှာ ${blockers.map(b => GOCHARA_PLANET_MY[b]).join('၊ ')} ရှိနေလို့ ဒီကောင်းကျိုး ပျက်ယွင်းနိုင်တယ်။`;
+          } else if (occupants.length > 0) {
+            line += ` ဗေဓတန့် (${vHouse}) မှာ ${GOCHARA_PLANET_MY[except]} ရှိနေပေမဲ့ ခြွင်းချက်အရ ကောင်းကျိုး မပျက်ဘူး။`;
+          } else {
+            line += ` ဗေဓတန့် (${vHouse}) လွတ်နေလို့ ဒီကောင်းကျိုး အပြည့်ရတတ်တယ်။`;
+          }
+        }
+      }
+      lines.push(line);
+    });
+    return lines;
+  };
+  return {
+    monthLabel,
+    moonSignIdx: moonSign,
+    lagnaSignIdx: lagnaSign,
+    general: linesFor(moonSign, housesMoon),
+    personal: linesFor(lagnaSign, housesLagna)
+  };
+}
+
+// ==========================================
 // AUTHENTIC ASHTAKOOTA (36 POINTS) & SYNASTRY
 // ==========================================
 function calculateSynastry(bPlanets, gPlanets, ayanamsa, bDate, gDate) {
@@ -12806,6 +12964,7 @@ class ErrorBoundary extends Component {
 function MainApp() {
   const [activeTab, setActiveTab] = useState('transit');
   const [tropMonthOff, setTropMonthOff] = useState(0); // v6.54: Tropical monthly forecast month offset (0 = current month)
+  const [vedMonthOff, setVedMonthOff] = useState(0); // v6.56: Vedic monthly forecast month offset (0 = current month)
   const [extraDashasOpen, setExtraDashasOpen] = useState(false); // v6.44: added-dasha submenu toggle
   const [agreed, setAgreed] = useState(false);
   const agreeDisclaimer = () => {
@@ -13369,6 +13528,11 @@ function MainApp() {
   const marriageTiming = marriageTimingWindows(birthPlanets, dashaTree, birthDateObj);
   const relationshipTiming = relationshipTimingWindows(birthPlanets, dashaTree, birthDateObj);
   const annualForecast = generateAnnualForecast(birthDateObj, birthPlanets, transitPlanets, transitDate, transitLat, transitLon, ayanamsa, nodeType, transitTzEff);
+  const vedMonthly = !isTrop ? (() => {
+    const nowD = new Date();
+    const base = new Date(nowD.getFullYear(), nowD.getMonth() + vedMonthOff, 1);
+    return generateVedicMonthly(birthPlanets, base.getFullYear(), base.getMonth(), parseFloat(transitLat) || 16.84, parseFloat(transitLon) || 96.17, ayanamsa, nodeType, transitTzEff);
+  })() : null;
   const conjunctionsAndAspects = analyzeConjunctionsAndAspects(birthPlanets);
   const liveTransitPredictions = analyzeLiveTransit(birthPlanets, transitPlanets);
   const toggleBank = item => {
@@ -15112,7 +15276,45 @@ function MainApp() {
     className: "text-slate-700 text-[11px] leading-relaxed mt-0.5"
   }, item.theme), /*#__PURE__*/React.createElement("div", {
     className: "text-[9px] text-slate-500 mt-1"
-  }, "Career ", item.scores?.career ?? 0, " · Wealth ", item.scores?.wealth ?? 0, " · Love ", item.scores?.love ?? 0, " · Pressure ", item.scores?.pressure ?? 0))))), eventWindows && /*#__PURE__*/React.createElement("div", {
+  }, "Career ", item.scores?.career ?? 0, " · Wealth ", item.scores?.wealth ?? 0, " · Love ", item.scores?.love ?? 0, " · Pressure ", item.scores?.pressure ?? 0))))), vedMonthly && /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border-2 border-emerald-600 p-3 rounded-lg shadow space-y-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between border-b border-emerald-200 pb-1.5"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "font-bold text-emerald-900 text-xs"
+  }, "📅 လစဉ် ဟောစာတမ်း — ", vedMonthly.monthLabel, " (Vedic Gochara · Phaladeepika Ch.26)"), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: () => setVedMonthOff(vedMonthOff - 1),
+    className: "px-2 py-0.5 border border-emerald-300 rounded bg-emerald-50 text-emerald-800 font-bold",
+    "aria-label": "ပြီးခဲ့တဲ့ လ"
+  }, "‹"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: () => setVedMonthOff(0),
+    className: "px-2 py-0.5 border border-emerald-300 rounded bg-white text-emerald-800"
+  }, "ဒီလ"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: () => setVedMonthOff(vedMonthOff + 1),
+    className: "px-2 py-0.5 border border-emerald-300 rounded bg-emerald-50 text-emerald-800 font-bold",
+    "aria-label": "နောက်လ"
+  }, "›"))), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1.5"
+  }, /*#__PURE__*/React.createElement("h4", {
+    className: "font-bold text-emerald-800 text-xs"
+  }, "🌙 တနင်္လာ General — တနင်္လာရာသီကနေ ရေတွက်တဲ့ ကောဇာ"), vedMonthly.general.map((g, i) => /*#__PURE__*/React.createElement("p", {
+    key: i,
+    className: "text-slate-700 text-[11px] leading-relaxed"
+  }, g))), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1.5 border-t border-slate-100 pt-2"
+  }, /*#__PURE__*/React.createElement("h4", {
+    className: "font-bold text-emerald-800 text-xs"
+  }, "⬆️ လဂ် Personal — လဂ်ကနေ ရေတွက်တဲ့ ကောဇာ"), vedMonthly.personal.map((g, i) => /*#__PURE__*/React.createElement("p", {
+    key: i,
+    className: "text-slate-700 text-[11px] leading-relaxed"
+  }, g))), /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-slate-500"
+  }, "ကောင်းတဲ့အိမ်မှာ ရှိနေရင် ဗေဓတန့် စစ်ပြီးသား — ဗေဓမိရင် စာကြောင်းမှာ ပြောထားတယ်။ Transit တွေကို လလယ် (၁၅ ရက်) မှာ တွက်ထားပါတယ်။ ကေတု ကောဇာ ရလဒ် Phaladeepika Ch.26 မှာ မပါလို့ မထည့်ထားပါ။")), eventWindows && /*#__PURE__*/React.createElement("div", {
     className: "bg-white rounded-xl shadow-sm border border-indigo-100 overflow-hidden"
   }, /*#__PURE__*/React.createElement("div", {
     className: "bg-indigo-50 px-3 py-2 border-b border-indigo-100"
