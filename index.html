@@ -70,6 +70,10 @@
 // v6.55 (2026-11-07): user feedback after phone live-check of v6.54, refined by his clarification — the monthly transit-aspect lines only named the aspect and its generic kind text, without saying what tends to happen. Fixed: each aspect line now says HOW (the aspect), IN WHICH AREA (the natal planet's Placidus house + WESTERN_HOUSE_DOMAIN), and WHAT tends to happen (the two planets' WESTERN_PLANET_THEME composed with the aspect kind — flow = the two themes support each other and flow smoothly, tension = friction between the two themes that pushes growth, merge = the two themes act fused in one place). No new invented significations; WESTERN_ASPECT_TEXT generic sentence dropped from these lines (still used by the natal Aspects section). Nothing else changed.
 // v6.56 (2026-11-08): user order — Vedic monthly forecast (Gochara) added to the Vedic readings tab, after the Annual Forecast: Moon = General (gochara from the natal Moon sign) + Lagna = Personal (gochara from lagna), one month at a time with prev/next month navigation (state vedMonthOff, 0 = current month). Source: Phaladeepika Ch.26 (Kapoor ed., file supplied by the user 2026-11-08) — full extraction in gochara-table-v656.md. NEW: Vedha IS checked here (the Annual Forecast never checked it — grep "vedha" over v6.55 = 0 hits): a good-house result stands only when its Vedha house is free (per-planet exceptions applied); a Vedha hit is named in the line. Ketu excluded (no results in Ch.26). Lifespan-adjacent rules (vv.33-34) excluded per his standing rule. Nothing else changed.
 // v6.57 (2026-11-10): user order — wealth-read fixes after a third-party chart (20 Jul 1983, Scorpio lagna) read Middle by hand + teacher but Moderate 53/100 by the app. (1) Score: strength-3 Dhana structures now count at half weight (strength>=4 full, 3 half, below 3 none) — a weak yoga gives weak fruit, not zero fruit; the binary >=4 gate zeroed an 8-yoga stack. (2) Income-pattern rules: 'foreign' gains +1 for 4th lord in 12th (foreign residence) and +1 for Rahu in 7th (foreign partner); 'art' gains +1 for Venus in 10th from Moon. (3) Assets: a foreign-settlement line when the 4th lord is in the 12th. (4) Wealth windows gain a tier-2 (antar-only) list, mirroring the Hard Season v6.38 pattern, so a wealth antar inside a non-wealth mahadasha still shows under a light label. (5) Timing peak: the headline peak is now the best period starting before age 80 (presentation cap, not a classical rule); a later top scorer is noted in one short line. Nothing else changed.
+// v6.58 (2026-11-10): user order — wealth-read fixes after a second third-party chart (4 Apr 2004, Aries lagna) read foreign-favoured + art-strong by hand but showed NO foreign source and art joint-last (2) by the app, while reality (student abroad, Fine Art → Product Design, only-daughter inheritance of house/shop/gold/father's paintings) confirmed the manual read. (1) 'foreign' gains +1 each for 5th lord in 12th (foreign education), Rahu in lagna (foreign life/connections), 12th lord in 5th (foreign education/creativity), Ketu in 7th (foreign partner) — same narrow-rule class as the v6.57 foreign fix. (2) 'art' gains +1 for Venus own/exalted in 2nd (income through art/beauty) and +1 for Jupiter in 5th (creative intelligence). Score, windows, timing, assets and every other rule unchanged. Nothing else changed.
+// v6.59 (2026-11-10): user order — build the family-profile gaps in one go (spouse detail lines + children card + siblings card). (1) Spouse profile gains three explicit lines after the meet line: distance (7th lord in 9th/12th = far/foreign, in 1st/2nd/4th/7th = near/home, else silent), background (Rahu/Ketu on 7th/7th lord/Venus or 7th lord in 12th = foreign/other background; clean 7th + Venus >= 50 = same community, else silent), age DIRECTION only (Saturn links = older, Mercury links = younger, Venus links = similar; no year count — the texts give none, so none is invented). (2) NEW buildChildrenProfile: promise from 5th lord + Jupiter (putrakaraka) + malefics in 5th, benefit from 5th lord house (1/9/10/11 = benefit, 6/8/12 = worry/expense), Jupiter-in-5th line, malefic-in-5th difficulty line with a medical-advice caveat, and a timing line when the current maha/antar lord is the 5th lord or Jupiter (via rpCurrentLords). (3) NEW buildSiblingsProfile: younger siblings from 3rd lord + malefics in 3rd, elder siblings from 11th lord, Mars as sibling karaka, benefit from 3rd lord house. Both cards render beside the spouse block in the အကျိုးပေး အနှစ်ချုပ် card. Scores, wealth rules, windows, timing, rectification and every other rule unchanged. Nothing else changed.
+// v6.60 (2026-11-10): user order — teacher's-notes supplements, built after the resort/Rahu-Ketu text check. (1) Rahu/Ketu special aspects 5/9/12 counted clockwise (teacher's lineage rule; BPHS Ch.26 names specials only for Saturn/Jupiter/Mars) live in a NEW helper _aspectHousesN used only by the new v6.60 lines — _aspectHouses itself is untouched, so Sudarshana, wealth, yogas and rectification stay byte-identical. (2) Resort gains a second path: Jupiter-Venus link (teacher's VE+JU rule) worth 2 points beside the v6.21 Saturn/Venus/Moon components (gate still >=3). (3) NEW buildMarriageDetail: 5+7 love marriage vs 5!=7 (teacher's note: MARRIAGE, not MIRAGE), delay/difficulty/early wording only, multiple (sequential) marriages + separation (BPHS Ch.18 vv.4-6, 17-21, 42 + 6th-house link), second marriage read from 9th/2nd, sign mobility (chara/sthira/dvisvabhava) of 7th + Venus sign. (4) Character traits in mindProfileRows: အညှိုးကြီး (Moon+Saturn), ယုံကြည် (strong Jupiter on Moon/lagna), သဘောကောင်း (Venus/Jupiter on Moon + Moon strong). (5) UR/NE: conjunct (<=10 deg) + science links = science/innovation line; conjunct + 8th/12th/Moon affliction without science links = occult-pull line (Hawking example NOT verified — UR-NE 123 deg apart at 02:29 Oxford — no person named in-app). (6) Black-magic/attack indication: Moon/Lagna afflicted by BOTH Saturn and Rahu (teacher's note), Ketu in 5th as support (Phaladeepika: oppressed by evil spirits; Mars = witchcraft significator). (7) Property types in assets: building (Mars), factory/hospital (Mars+Saturn), shophouse (Mercury), complex (Mars+Mercury) on the 4th. NOT built: entrepreneur type (no classical seed), film-career combos + combination rules (meanings sit in the unread Burmese glosses). Scores unchanged; wealth sources change only by the intended resort addition on charts where VE+JU links. Nothing else changed.
+// v6.61 (2026-11-10): user order — text-matched additions only (cross-check file teacher-notes-text-crosscheck-2026-11-10.md). (1) Speculation-loss line in assets: 12th lord in 5th OR 5th lord in 12th -> loss-in-speculation caution (Phaladeepika v.30); the gains side was already covered ('windfall' source + 'finance' + shares line) and the 2-11 Dhana exchange already exists as a Dhana Yoga pair, so neither is re-added. (2) Karakamsa Mantra/Tantra line in mindProfileRows (BPHS vv.75-76, verified verbatim): two malefics in one kona from Karakamsa -> knowledge of Mantra/Tantra; a malefic aspecting both -> malevolent use; a benefic aspecting both -> public-good use; D9 aspects are sign-based. (3) Prashna: 4 new questions only where missing — love-special group gains 'get the one I love' / 'will they leave me' / 'will I leave them' (the teacher's relationship topics; 'runs off with another', divorce, heartbreak, return and marriage-with-this-person questions already existed); 6th group gains 'Black Magic attack — am I being attacked' (h:[6,8,12], k:Rahu/Saturn). NOT built, per the text-match rule: film-career combos (Phaladeepika's actor is Mercury+Jupiter, not Jup+Ra+Venus), UR combos (0 text hits), Jupiter=liver (not in either text), photo-6 divorce boxes (meanings unread; 6-11 exchange is classically a GOOD Maha Yoga), SAYA'S, photo-4 character numbers, purushartha display (engine-only per his ruling), natal litigation line (win/lose is Prashna — question already exists; 'law' income source already covers legal-profession income), partner-infidelity natal line (text basis is native-side only; female horoscopy excluded by his ruling). Scores, wealth sources, rectification and every other rule unchanged. Nothing else changed.
 // v6.37 (2026-10-22): Classical-correctness fixes from an external (ChatGPT) audit, verified against the code before fixing — (A) Mahapurusha sign lists corrected to own/exaltation signs only (Hamsa [3,8,11] — Libra/Capricorn removed; Malavya [1,6,11] — Gemini/Scorpio removed; Ruchaka [0,7,9] — Aquarius replaced by Capricorn; Bhadra/Sasa were already correct). (B) Vimshottari first mahadasha now uses the elapsed method: antardashas fully elapsed before birth are skipped and the running one is trimmed to birth; mahadasha boundaries and MD2-9 antardashas are byte-identical to before. (C) Bhava Bala is now a REAL per-chart calculation (house lord's Shadbala + Dig Bala by sign class + Drig Bala by whole-sign aspects, benefic +15/malefic -15 as in Shadbala's Drik) — until v6.36 it returned a static score array identical for every chart. Nothing else changed: golden output identical to the v6.33 baseline; test45 27/27.
 // v6.33 (2026-10-18): Jaimini Chara Karaka SURFACED — charaKarakas() helper (checkAllYogas Jaimini block refactored onto it, yogas unchanged); AK/AmK/BK/MK/PK/GK/DK badges beside planet names in the Nakshatra table; new KarakaPanel card in the sidereal Birth Chart (all 7 with sign/degree/house/role + AK and AmK house-theme lines). Display layer only.
 // v6.32 (2026-10-18): Art income source — the evidence line now lists the reasons that ACTUALLY fired for this chart (Venus strength / yogakaraka / star-lord channel / lordship / placement only when the placement itself scores). v6.31's bare Venus-placement caption could imply a non-scoring house (e.g. Venus in the 9th) was a reason; engine scores unchanged.
@@ -5874,6 +5878,12 @@ const PRASHNA_BANK = [{
     p: 6,
     h: [1, 6, 11],
     k: 'Saturn'
+  }, {
+    t: 'Black Magic အတိုက်အခိုက် ခံနေရလား',
+    q: 'Black Magic/မကောင်းတဲ့ စွမ်းအင်နဲ့ အတိုက်အခိုက် ခံနေရလား',
+    p: 6,
+    h: [6, 8, 12],
+    k: 'Rahu / Saturn'
   }]
 }, {
   g: '၇ တန့် · အိမ်ထောင် / ဖက်တွဲ',
@@ -6070,6 +6080,27 @@ const PRASHNA_BANK = [{
     q: 'အသဲကွဲ/ခွဲခွာမှု ကိန်း ရှိလား',
     p: 5,
     h: [5, 6, 8, 12],
+    k: 'Venus / Saturn',
+    r: 7
+  }, {
+    t: 'ကိုယ်ချစ်တဲ့လူကို ရမလား',
+    q: 'ကိုယ်ချစ်တဲ့လူကို ရနိုင်မလား',
+    p: 5,
+    h: [5, 7, 11],
+    k: 'Venus',
+    r: 7
+  }, {
+    t: 'သူ ကိုယ့်ကို ထားခဲ့မလား',
+    q: 'သူ ကိုယ့်ကို ထားခဲ့မလား',
+    p: 7,
+    h: [5, 7, 8, 12],
+    k: 'Venus / Saturn',
+    r: 7
+  }, {
+    t: 'ကိုယ် သူ့ကို ထားခဲ့မိမလား',
+    q: 'ကိုယ် သူ့ကို ထားခဲ့မိမလား',
+    p: 7,
+    h: [1, 6, 7, 12],
     k: 'Venus / Saturn',
     r: 7
   }]
@@ -6923,6 +6954,12 @@ function _aspectHouses(p, name) {
   const offs = name === 'Mars' ? [4, 7, 8] : name === 'Jupiter' ? [5, 7, 9] : name === 'Saturn' ? [3, 7, 10] : [7];
   return offs.map(o => (h + o - 2) % 12 + 1);
 }
+// v6.60: Rahu/Ketu special aspects — teacher's lineage rule (7/5/9/12, counted CLOCKWISE because the nodes move retrograde). BPHS File 1 Ch.26 vv.2-5 names special aspects ONLY for Saturn (3/10), Jupiter (5/9), Mars (4/8); Phaladeepika gives no node-aspect rule — so this helper is kept SEPARATE from _aspectHouses and used only by the new v6.60 lines, keeping Sudarshana/wealth/yogas/rectification byte-identical.
+function _aspectHousesN(p, name) {
+  if (name !== 'Rahu' && name !== 'Ketu') return _aspectHouses(p, name);
+  const h = _planetHouse(p, name);
+  return [5, 7, 9, 12].map(o => ((h - o) % 12 + 12) % 12 + 1);
+}
 function mindProfileRows(p) {
   const H = n => _planetHouse(p, n),
     L = h => _lordOfHouse(p, h);
@@ -6955,6 +6992,59 @@ function mindProfileRows(p) {
   const llGroup = [1, 4, 7, 10].includes(llH) ? 'လုပ်ဆောင် မှု က နေ ကိုယ့် ကို ပြန် တည် ဆောက် တတ် တဲ့ သဘာဝ ရှိ တယ်။' : [5, 9].includes(llH) ? 'အဓိပ္ပါယ် နဲ့ ယုံကြည် ချက် ကို ရှာ ဖွေ ရင်း လမ်း တွေ့ တတ် တဲ့ သဘာဝ ရှိ တယ်။' : [3, 6, 11].includes(llH) ? 'ကြိုးစား ရင်း တက် လာ ရတဲ့ သဘာဝ — အခက် ကို ကျော် မှ အား ရ တတ် တယ်။' : 'အတွင်း နက် ရှိုင်း တတ် တယ်, ပြောင်း လဲ မှု ကြုံ ပြီး နောက် ပြန် ထ လာ တတ် တဲ့ သဘာဝ ရှိ တယ်။';
   lines.push(`လဂ် အရှင် ${PLANET_MY[L(1)]} သည် ${llH} တန့် မှာ ရှိ နေ တယ် — ${llGroup}`);
   if (H('Rahu') === H('Moon') || H('Rahu') === 1 || H('Rahu') === 10) lines.push('ရာဟု ရဲ့ လှုံ့ ဆော် မှု ပြင်း တယ် — ရည်မှန်းချက် ကြီး တယ်, မကျေနပ် စိတ် က တွန်း အား ဖြစ် တတ် တယ်, အစွဲ ကြီး သွား တာ ကို တော့ သတိ ထား ရ မယ်။');
+  // v6.60: character traits (user-ordered: အညှိုးကြီး / ယုံကြည် / သဘောကောင်း) — short lines, silent when the pattern is not clear. Also usable when reading work collaboration.
+  const _sJupM = _planetStrength(p, 'Jupiter') || 0,
+    _sVenM = _planetStrength(p, 'Venus') || 0,
+    _sMoonM = _planetStrength(p, 'Moon') || 0,
+    _sMerM = _planetStrength(p, 'Mercury') || 0;
+  const _satOnMoon = H('Saturn') === H('Moon') || _aspectHouses(p, 'Saturn').includes(H('Moon'));
+  const _jupOnMoon = H('Jupiter') === H('Moon') || _aspectHouses(p, 'Jupiter').includes(H('Moon'));
+  const _jupOnLagna = H('Jupiter') === 1 || _aspectHouses(p, 'Jupiter').includes(1);
+  const _venOnMoon = H('Venus') === H('Moon') || _aspectHouses(p, 'Venus').includes(H('Moon'));
+  if (_satOnMoon) lines.push('စိတ်နေစိတ်ထား: စနေ တနင်္လာ နဲ့ ဆက်နေလို့ အညှိုး ကြီး တတ်တယ် — ခံရတာ ကို ကြာကြာ မှတ်ထားတတ်တယ်, ဒါပေမယ့် အဲ့ဒီ မှတ်ဉာဏ် ကြောင့်ပဲ သစ္စာ ရှိပြီး သည်းခံနိုင်တဲ့ ဘက်လည်း ရှိတယ်။');
+  if ((_jupOnMoon || _jupOnLagna) && _sJupM >= 65) lines.push('စိတ်နေစိတ်ထား: ကြာသပတေး အားကောင်းပြီး တနင်္လာ/လဂ် နဲ့ ဆက်နေလို့ ယုံကြည်ရတတ်တယ် — ပြောထားတဲ့ စကားကို တည်တတ်တယ်။');
+  if ((_venOnMoon || _jupOnMoon) && _sMoonM >= 50) lines.push('စိတ်နေစိတ်ထား: သောကြာ/ကြာသပတေး တနင်္လာ နဲ့ ဆက်ပြီး တနင်္လာ အားရှိလို့ သဘောကောင်းတတ်တယ် — လူနဲ့ ပေါင်းသင်းရတာ ချောမွေ့တတ်တယ်။');
+  // v6.60: UR/NE (teacher's rule) — conjunct (<=10 deg) + science links = science/innovation; conjunct + 8th/12th/Moon affliction without science links = occult pull. No person is named in-app: the Hawking example did NOT verify (UR-NE 123 deg apart, neither in lagna at 02:29 Oxford).
+  if (typeof p.Uranus === 'number' && typeof p.Neptune === 'number') {
+    const _sepUN = Math.min(Math.abs(norm360(p.Uranus - p.Neptune)), 360 - Math.abs(norm360(p.Uranus - p.Neptune)));
+    if (_sepUN <= 10) {
+      const _unH = _planetHouse(p, 'Uranus'),
+        _neH = _planetHouse(p, 'Neptune');
+      const _sciLink = _sMerM >= 65 || _sJupM >= 65 || [1, 5, 9, 10].includes(_unH) || [1, 5, 9, 10].includes(_neH);
+      if (_sciLink) lines.push('Uranus + Neptune ပူးနေလို့ သိပ္ပံ/ဆန်းသစ်မှု ထူးချွန်တတ်တယ် — အသစ်အဆန်းကို စမ်းသပ် တီထွင်တဲ့ ဘက် အားကောင်းတယ်။');else if ([8, 12].includes(_unH) || [8, 12].includes(_neH) || H('Uranus') === H('Moon') || H('Neptune') === H('Moon')) lines.push('Uranus + Neptune ပူးနေပြီး သိပ္ပံ လမ်း အားနည်းလို့ နက်နဲတဲ့ အတတ်ပညာ/အောက်လမ်း ဘက် စိတ်ဝင်စားတတ်တယ် — အဲ့ဒီ ဘက်ကို သတိနဲ့ ချဉ်းကပ်ဖို့ လိုတယ်။');
+    }
+  }
+  // v6.60: black-magic / others' attacks (teacher's note: Moon/Lagna + Saturn & Rahu; Phaladeepika — Ketu in 5th: oppressed by evil spirits; Mars = witchcraft significator). Bounded, light framing — a tendency, never a certainty.
+  const _rahuOnMoon = H('Rahu') === H('Moon') || _aspectHousesN(p, 'Rahu').includes(H('Moon'));
+  const _rahuOnLagna = H('Rahu') === 1 || _aspectHousesN(p, 'Rahu').includes(1);
+  const _satOnLagna = H('Saturn') === 1 || _aspectHouses(p, 'Saturn').includes(1);
+  if (_satOnMoon && _rahuOnMoon || _satOnLagna && _rahuOnLagna) lines.push('အတိုက်အခိုက်: တနင်္လာ/လဂ် ကို စနေ + ရာဟု နှစ်ပါးလုံး ထိထားလို့ သူများ အတိုက်အခိုက် / မကောင်းတဲ့ စွမ်းအင် ခံရတတ်တဲ့ အရိပ် ရှိ တယ် — သတိထား, ကာကွယ်မှု လုပ်ထားတာ ကောင်းတယ်, ဒါက အရိပ်သာ ဖြစ်ပြီး ဖြစ်ကိုဖြစ်မယ်လို့ ဆိုတာ မဟုတ်ပါ။');else if (H('Ketu') === 5) lines.push('အတိုက်အခိုက်: ကေတု ၅ တန့်မှာ ရပ်နေလို့ မကောင်းတဲ့ စွမ်းအင် / စိတ်အနှောင့်အယှက် ခံရတတ်တဲ့ အရိပ် ရှိ တယ် — သတိထားဖို့ လိုတယ်။');
+  // v6.61: Karakamsa Mantra/Tantra (BPHS vv.75-76, verified verbatim) — the actor side of the teacher's black-magic topic (the victim side is the line above, v6.60). AK = charaKarakas(p).AK; Karakamsa = AK's D9 sign; kona = 1/5/9 from it. Two malefics (Sun/Mars/Saturn/Rahu/Ketu) in ONE kona sign -> knowledge of Mantra/Tantra; a malefic aspecting both -> malevolent use; a benefic aspecting both -> public-good use. D9 aspects are sign-based (7th + Mars 4/8, Jupiter 5/9, Saturn 3/10; nodes 7th only).
+  try {
+    const _ck61 = charaKarakas(p);
+    const _ak61 = _ck61 && _ck61.AK;
+    if (_ak61) {
+      const _d9 = n => calculateVarga(p[n], 9);
+      const _kark = _d9(_ak61);
+      const _kona = [_kark, (_kark + 4) % 12, (_kark + 8) % 12];
+      const _mals61 = ['Sun', 'Mars', 'Saturn', 'Rahu', 'Ketu'];
+      const _bens61 = ['Moon', 'Mercury', 'Jupiter', 'Venus'];
+      const _d9Asp = n => {
+        const _s = _d9(n);
+        const _offs = n === 'Mars' ? [4, 7, 8] : n === 'Jupiter' ? [5, 7, 9] : n === 'Saturn' ? [3, 7, 10] : [7];
+        return _offs.map(o => (_s + o - 1) % 12);
+      };
+      for (const _ks of _kona) {
+        const _inKona = _mals61.filter(m => _d9(m) === _ks);
+        if (_inKona.length >= 2) {
+          const _malAsp = _mals61.some(m => _inKona.every(t => _d9Asp(m).includes(_d9(t))));
+          const _benAsp = _bens61.some(b => _inKona.every(t => _d9Asp(b).includes(_d9(t))));
+          if (_malAsp) lines.push('မန္တရ/တန္တရ အတတ်: Karakamsa မှ ကိန်း/တြိကုဏ်မှာ malefic ၂ လုံး ရှိပြီး malefic အမြင်ပါ ရလို့ မန္တရ/တန္တရ ပညာကို မကောင်းတဲ့ဘက် သုံးမိတတ်တဲ့ အရိပ် ရှိ တယ် — ဒီဘက်ကို မသွားတာ အကောင်းဆုံးပါ (BPHS Karakamsa vv.75-76)။');else if (_benAsp) lines.push('မန္တရ/တန္တရ အတတ်: Karakamsa မှ ကိန်း/တြိကုဏ်မှာ malefic ၂ လုံး ရှိပေမယ့် benefic အမြင် ရလို့ မန္တရ/တန္တရ ပညာကို အများအကျိုးဘက် သုံးတတ်တဲ့ ပုံစံ ရှိ တယ် (BPHS Karakamsa vv.75-76)။');else lines.push('မန္တရ/တန္တရ အတတ်: Karakamsa မှ ကိန်း/တြိကုဏ်မှာ malefic ၂ လုံး ရှိလို့ မန္တရ/တန္တရ ပညာ တတ်မြောက်တတ်တဲ့ အရိပ် ရှိ တယ် — ဘယ်ဘက် သုံးမလဲ ဆိုတာက အမြင်ပေးတဲ့ ဂြိုဟ်ပေါ် မူတည်တယ် (BPHS Karakamsa vv.75-76)။');
+          break;
+        }
+      }
+    }
+  } catch (e) {}
   return lines;
 }
 function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
@@ -6995,6 +7085,14 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
     _artParts.push(1);
     _artWhy.push(fact('Venus'));
   }
+  if (inH('Venus', [2]) && S('Venus') >= 80) {
+    _artParts.push(1);
+    _artWhy.push('သောကြာ သည် 2 တန့် (ဝင်ငွေ အိမ်) တွင် မိမိ/ဥစ္စ ရာသီ ဖြင့် ရှိ တယ်။');
+  } // wealth fix v6.58: Venus own/exalted in 2nd = income through art/beauty
+  if (inH('Jupiter', [5])) {
+    _artParts.push(1);
+    _artWhy.push(fact('Jupiter'));
+  } // wealth fix v6.58: Jupiter in 5th = creative intelligence, education-linked art
   if ((H('Venus') - H('Moon') + 12) % 12 + 1 === 10) {
     _artParts.push(1);
     _artWhy.push('သောကြာ သည် တနင်္လာမှ 10 တန့်တွင် ရှိနေတယ်။');
@@ -7031,11 +7129,12 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
   add('estate', 'အိမ်ခြံမြေ / ဆောက် လုပ်ရေး ဝင်ငွေ', (inH('Mars', [4, 10]) ? 1 : 0) + (lordIn(4, [2, 11]) ? 1 : 0) + (inH('Saturn', [4, 10]) ? 1 : 0), `${fact('Mars')} ${lfact(4)}`);
   add('inherit', 'အမွေ အကျိုးပေး', (lordIn(8, [2, 11]) ? 2 : 0) + ((H(L(2)) === 8 || H(L(11)) === 8) && S(L(8)) >= 50 ? 1 : 0) + (asp(L(8)).includes(2) || asp(L(8)).includes(11) ? 1 : 0) + (lordIn(9, [2, 11]) ? 1 : 0), lfact(8));
   add('familybiz', 'မိဘ / မိသားစု လုပ်ငန်း ဆက်ခံ အကျိုး', ([10, 11].includes(H(L(8))) || [10, 11].includes(H(L(9))) ? 1 : 0) + (L(10) === 'Mercury' || L(10) === 'Saturn' ? 1 : 0) + (aspH('Jupiter', 2) ? 1 : 0), `${lfact(9)} ${lfact(8)}`);
-  add('resort', 'အပန်းဖြေ စခန်း / စိုက်ခင်း (Resort / Plantation)', (inH('Saturn', [4]) || aspH('Saturn', 4) ? 1 : 0) + (inH('Venus', [4, 12]) || aspH('Venus', 4) ? 1 : 0) + ([4, 10, 11, 12].includes(H(L(4))) ? 1 : 0) + (inH('Moon', [4, 9, 12]) ? 1 : 0), `${lfact(4)} ${fact('Saturn')}`);
+  const _veJu = H('Jupiter') === H('Venus') || aspH('Jupiter', H('Venus')) || aspH('Venus', H('Jupiter')); // v6.60: teacher's VE+JU resort link (Jupiter's 5th/9th special aspect, BPHS Ch.26) — a complete standalone signature, worth 2 points beside the v6.21 components
+  add('resort', 'အပန်းဖြေ စခန်း / စိုက်ခင်း (Resort / Plantation)', (inH('Saturn', [4]) || aspH('Saturn', 4) ? 1 : 0) + (inH('Venus', [4, 12]) || aspH('Venus', 4) ? 1 : 0) + ([4, 10, 11, 12].includes(H(L(4))) ? 1 : 0) + (inH('Moon', [4, 9, 12]) ? 1 : 0) + (_veJu ? 2 : 0), `${lfact(4)} ${fact('Saturn')}${_veJu ? ' + ကြာသပတေး-သောကြာ ဆက်စပ်မှု' : ''}`);
   const wfChain = (H(L(5)) === 11 ? 1 : 0) + (H(L(8)) === 11 ? 1 : 0) + ([5, 8].includes(H(L(11))) ? 1 : 0) + (inH('Rahu', [5, 8, 11]) ? 1 : 0);
   add('windfall', 'ထီကံ / ရုတ်တရက် အစုလိုက် ဝင်ငွေ', wfChain, `${lfact(5)} ${lfact(8)} ${lfact(11)}`);
   add('spouse', 'အိမ်ထောင် ဖက် / မိတ် ဖက် ကြောင့် ဝင်ငွေ', (lordIn(7, [2, 11]) ? 2 : 0) + (H(L(2)) === 7 || H(L(11)) === 7 ? 1 : 0), lfact(7));
-  add('foreign', 'နိုင်ငံ ခြား ဝင်ငွေ', (lordIn(10, [12]) || lordIn(11, [12]) ? 1 : 0) + (lordIn(12, [10, 11]) ? 1 : 0) + (inH('Rahu', [9, 12]) ? 1 : 0) + (H(L(4)) === 12 ? 1 : 0) + (H('Rahu') === 7 ? 1 : 0), `${lfact(12)} ${fact('Rahu')}${H(L(4)) === 12 ? ' ' + lfact(4) : ''}`); // wealth fix: 4th lord in 12th = living away from birthplace / abroad; Rahu in 7th = foreign partner
+  add('foreign', 'နိုင်ငံ ခြား ဝင်ငွေ', (lordIn(10, [12]) || lordIn(11, [12]) ? 1 : 0) + (lordIn(12, [10, 11]) ? 1 : 0) + (inH('Rahu', [9, 12]) ? 1 : 0) + (H(L(4)) === 12 ? 1 : 0) + (H('Rahu') === 7 ? 1 : 0) + (lordIn(5, [12]) ? 1 : 0) + (inH('Rahu', [1]) ? 1 : 0) + (lordIn(12, [5]) ? 1 : 0) + (H('Ketu') === 7 ? 1 : 0), `${lfact(12)} ${fact('Rahu')}${H(L(4)) === 12 ? ' ' + lfact(4) : ''}${lordIn(5, [12]) ? ' ' + lfact(5) : ''}${H('Ketu') === 7 ? ' ' + fact('Ketu') : ''}`); // wealth fix v6.58: 5th lord in 12th = foreign education; Rahu in lagna = foreign life/connections; 12th lord in 5th = foreign education/creativity; Ketu in 7th = foreign partner
   add('govt', 'အစိုးရ / အာဏာ ပိုင်း ဝင်ငွေ', (inH('Sun', [1, 10]) && S('Sun') >= 65 ? 2 : 0) + (L(10) === 'Sun' ? 1 : 0), fact('Sun'));
   add('medicine', 'ဆေး / ကျန်းမာ ရေး ဝင်ငွေ', (lordIn(6, [10, 11]) ? 1 : 0) + (inH('Ketu', [6, 10]) || inH('Mars', [6, 10]) ? 1 : 0) + (L(10) === 'Ketu' || L(10) === 'Mars' ? 1 : 0), lfact(6));
   add('law', 'ဥပဒေ / တရား ရေးရာ ဝင်ငွေ', (inH('Jupiter', [1, 4, 7, 10]) && inH('Saturn', [1, 4, 7, 10]) ? 2 : 0) + (L(10) === 'Jupiter' || L(10) === 'Saturn' ? 1 : 0), `${fact('Jupiter')} ${fact('Saturn')}`);
@@ -7069,7 +7168,15 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
   if ([1, 5, 9].includes(signOf(L(4))) || inH('Saturn', [4])) assets.push('မြေ / ခြံ ပိုင် နိုင် တဲ့ အရိပ် ရှိ တယ်။');
   if (inH('Venus', [2]) || inH('Sun', [2]) || S(L(2)) >= 65) assets.push('ရွှေ / ကျောက် စုဆောင်း ထား နိုင် တယ်။');
   if ((H(L(5)) === 11 || H(L(11)) === 5) && (S('Mercury') >= 50 || S('Jupiter') >= 50)) assets.push('ရှယ်ယာ ရင်းနှီး မြှုပ်နှံ မှု က အကျိုး ပေး နိုင် တယ်။');
+  // v6.61: speculation loss (Phaladeepika v.30, verified verbatim) — 12th lord in 5th -> 'loss in speculation'; 5th lord in 12th -> loss of 5th significations incl. speculation. The gains side already exists ('windfall' source + 'finance' + shares), so only the loss caution is added.
+  if (H(L(12)) === 5 || H(L(5)) === 12) assets.push('ထီ/ကံစမ်း (speculation) မှာ ဆုံးရှုံးတတ်တဲ့ အရိပ် ရှိ တယ် — ၁၂ တန့် အရှင် ၅ တန့်မှာ / ၅ တန့် အရှင် ၁၂ တန့်မှာ ရှိနေလို့ ကံစမ်းတာ လျော့တာ ကောင်းတယ်။');
   if (S('Venus') >= 65 && (inH('Venus', [2, 5]) || H(L(5)) === 2 || aspH('Venus', 5))) assets.push('ပန်းချီ / အနုပညာ ပစ္စည်း Collection လက် ထဲ စုဆောင်း ထား နိုင် တယ်။');
+  // v6.60: property types (teacher's table) — supplementary asset lines, 4th-house based.
+  const _on4 = n => inH(n, [4]) || aspH(n, 4);
+  if (_on4('Mars') && S('Mars') >= 50) assets.push('အဆောက်အအုံ / Building အမျိုးအစား ပစ္စည်း (အင်္ဂါ ၄ တန့် ဘက် အားရှိ) ပိုင် နိုင် တဲ့ အရိပ် ရှိ တယ်။');
+  if (_on4('Mars') && _on4('Saturn')) assets.push('စက်ရုံ / ဆေးရုံ အမျိုးအစား ပစ္စည်း (အင်္ဂါ + စနေ ၄ တန့် ဘက်) ပိုင် နိုင် တဲ့ အရိပ် ရှိ တယ်။');
+  if (_on4('Mercury') && S('Mercury') >= 50) assets.push('ဆိုင်ခန်း / Shophouse အမျိုးအစား ပစ္စည်း (ဗုဒ္ဓဟူး ၄ တန့် ဘက် အားရှိ) ပိုင် နိုင် တဲ့ အရိပ် ရှိ တယ်။');
+  if (_on4('Mars') && _on4('Mercury')) assets.push('Complex အမျိုးအစား ပစ္စည်း (အင်္ဂါ + ဗုဒ္ဓဟူး ၄ တန့် ဘက်) ပိုင် နိုင် တဲ့ အရိပ် ရှိ တယ်။');
   // ---- wealth windows (dasha) ----
   const windows = [];
   const weakWindows = [];
@@ -8986,6 +9093,17 @@ function buildSpouseProfile(bp, dashaTree) {
   const venSign = rpSignOf(bp.Venus);
   if (dk) lines.push(`Dararakaraka (အိမ်ထောင်ဖက်ပြ ဂြိုဟ်) မှာ ${dk} ဖြစ်ပြီး ${RP_SIGN_MM[dkSign]} ရာသီတွင် ရပ်တယ် — ${RP_DK_TRAITS[dkSign]}`);
   if (l7) lines.push(`၇ တန့် အရှင် ${l7} သည် ${l7h} တန့်တွင် ရှိတယ် — ${RP_MEET_TEXTS[l7h - 1]}`);
+  // v6.59 spouse detail lines: distance / background / age-direction (classical, direction-only)
+  if (l7) {
+    if (l7h === 9 || l7h === 12) lines.push(`အိမ်ထောင်ဖက် အကွာအဝေး: ၇ တန့် အရှင် ${l7} သည် ${l7h} တန့်မှာ ရပ်လို့ အိမ်ထောင်ဖက် က ရပ်ဝေး/နိုင်ငံခြားဘက်က လူ ဖြစ်တတ်တယ်။`);else if ([1, 2, 4, 7].includes(l7h)) lines.push(`အိမ်ထောင်ဖက် အကွာအဝေး: ၇ တန့် အရှင် ${l7} သည် ${l7h} တန့်မှာ ရပ်လို့ အိမ်ထောင်ဖက် က ရပ်နီး/ကိုယ့် ဇာတိဘက်က လူ ဖြစ်တတ်တယ်။`);
+    const _spOcc7 = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].filter(pl => _planetHouse(bp, pl) === 7);
+    const _spForeign = _spOcc7.includes('Rahu') || _spOcc7.includes('Ketu') || _planetHouse(bp, 'Rahu') === l7h || _planetHouse(bp, 'Ketu') === l7h || _planetHouse(bp, 'Rahu') === _planetHouse(bp, 'Venus') || _planetHouse(bp, 'Ketu') === _planetHouse(bp, 'Venus') || l7h === 12;
+    if (_spForeign) lines.push('အိမ်ထောင်ဖက် နောက်ခံ: ရာဟု/ကေတု ၇ တန့်/၇ တန့် အရှင်/သောကြာ နဲ့ ဆက်နေလို့ အိမ်ထောင်ဖက် က လူမျိုး/နောက်ခံ မတူသူ ဖြစ်တတ်တယ်။');else if ((_planetStrength(bp, 'Venus') || 0) >= 50) lines.push('အိမ်ထောင်ဖက် နောက်ခံ: ၇ တန့် သန့်ရှင်းပြီး သောကြာ ထိခိုက်မှု မရှိလို့ အိမ်ထောင်ဖက် က ကိုယ့် အသိုင်းအဝိုင်း/လူမျိုး ထဲက လူ ဖြစ်တတ်တယ်။');
+    const _spSat = _spOcc7.includes('Saturn') || _planetHouse(bp, 'Saturn') === l7h || _planetHouse(bp, 'Saturn') === _planetHouse(bp, 'Venus') || l7 === 'Saturn';
+    const _spMer = _spOcc7.includes('Mercury') || _planetHouse(bp, 'Mercury') === l7h || _planetHouse(bp, 'Mercury') === _planetHouse(bp, 'Venus') || l7 === 'Mercury';
+    const _spVen = _spOcc7.includes('Venus') || l7 === 'Venus' || _planetHouse(bp, 'Venus') === l7h;
+    if (_spSat && !_spMer) lines.push('အိမ်ထောင်ဖက် အသက်: စနေ ၇ တန့်/၇ တန့် အရှင်/သောကြာ နဲ့ ဆက်နေလို့ အိမ်ထောင်ဖက် က ကိုယ့်ထက် အသက်ကြီးသူ ဖြစ်တတ်တယ်။');else if (_spMer && !_spSat) lines.push('အိမ်ထောင်ဖက် အသက်: ဗုဒ္ဓဟူး ၇ တန့်/၇ တန့် အရှင်/သောကြာ နဲ့ ဆက်နေလို့ အိမ်ထောင်ဖက် က ကိုယ့်ထက် အသက်ငယ်သူ ဖြစ်တတ်တယ်။');else if (_spVen && !_spSat && !_spMer) lines.push('အိမ်ထောင်ဖက် အသက်: သောကြာ ၇ တန့်ဘက် အားကောင်းလို့ အိမ်ထောင်ဖက် က အရွယ်တူ/အသက် နီးစပ်သူ ဖြစ်တတ်တယ်။');
+  }
   lines.push(`Upapada (ဖူးစာ တန့်) မှာ ${RP_SIGN_MM[ul]} ရာသီ ဖြစ်ပြီး ၎င်းအရှင် ${ulLord} သည် ${ulLordHouse} တန့်တွင် ရပ်တယ် — ${[1, 4, 5, 7, 9, 10, 11].includes(ulLordHouse) ? 'အိမ်ထောင် တည်ငြိမ်ဖို့ အခြေခံ ကောင်းတယ်' : 'အိမ်ထောင်ရေးမှာ ကြိုးစား ထိန်းသိမ်းရတာ များတတ်တယ် — မဖြစ်နိုင်တာ မဟုတ် အားထုတ်မှု ပိုလိုတာ'}`);
   lines.push(`သောကြာသည် ${RP_SIGN_MM[venSign]} ရာသီတွင် ရပ်တယ် — ချစ်ခြင်းမှာ ${RP_VENUS_TEXTS[venSign]}`);
   try {
@@ -9028,6 +9146,120 @@ function buildSpouseProfile(bp, dashaTree) {
     dk,
     dkSign,
     ul
+  };
+}
+// v6.59 NEW: children profile — 5th house + Jupiter (putrakaraka) + 5th lord house + current dasha timing.
+// Classical general significations only; no child count, no per-child split (that needs the children's own charts).
+function buildChildrenProfile(bp, dashaTree) {
+  const lines = [];
+  const l5 = _lordOfHouse(bp, 5);
+  const l5h = l5 ? _planetHouse(bp, l5) : null;
+  const sL5 = l5 ? _planetStrength(bp, l5) || 0 : 0;
+  const sJup = _planetStrength(bp, 'Jupiter') || 0;
+  const occ5 = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].filter(pl => _planetHouse(bp, pl) === 5);
+  const malefic5 = occ5.filter(pl => ['Saturn', 'Rahu', 'Ketu', 'Mars'].includes(pl));
+  if (sL5 >= 65 && sJup >= 50 && malefic5.length === 0) lines.push(`သားသမီး အခြေခံ: ၅ တန့် အရှင် ${l5} အားကောင်း ပြီး ကြာသပတေး (သားသမီး ကာရက) လည်း အားရှိလို့ သားသမီး ရနိုင်တဲ့ အခြေခံ အားကောင်းတယ်။`);else if (sL5 >= 50 && sJup >= 35) lines.push(`သားသမီး အခြေခံ: ၅ တန့် အရှင် ${l5} အလယ်အလတ် အားရှိလို့ သားသမီး ရနိုင်တဲ့ အခြေခံ ရှိတယ်။`);else lines.push(`သားသမီး အခြေခံ: ၅ တန့် အရှင် ${l5}/ကြာသပတေး အားနည်းချက်ရှိလို့ သားသမီး ရဖို့ အခက်အခဲ ရှိနိုင်တယ် — ကြိုးစား/စောင့်ဆိုင်း ရတာ များတတ်တယ်။`);
+  if (l5 && [1, 9, 10, 11].includes(l5h)) lines.push(`သားသမီး အကျိုးပေး: ၅ တန့် အရှင် ${l5} သည် ${l5h} တန့်မှာ ရပ်လို့ သားသမီးက အကျိုးပေးတတ်တယ် — ဂုဏ်/ပျော်ရွှင်မှု ပေးတတ်တယ်။`);else if (l5 && [6, 8, 12].includes(l5h)) lines.push(`သားသမီး အကျိုးပေး: ၅ တန့် အရှင် ${l5} သည် ${l5h} တန့်မှာ ရပ်လို့ သားသမီးကြောင့် စိတ်ပူပင်မှု/စရိတ် များတတ်တယ် — ဂရုစိုက် ထိန်းသိမ်းရတာ များတယ်။`);
+  if (_planetHouse(bp, 'Jupiter') === 5) lines.push('ကြာသပတေး ၅ တန့်မှာ ရပ်လို့ သားသမီး ပညာရှိ/ဂုဏ်ရှိသူ ဖြစ်တတ်ပြီး အကျိုးပေးတတ်တယ်။');
+  if (malefic5.length) lines.push(`၅ တန့်ထဲ ${malefic5.join(', ')} ရပ်နေလို့ သားသမီး ကိစ္စမှာ အတားအဆီး/နှောင့်နှေးမှု ရှိနိုင်တယ် — ဒါက ဇာတာ အရိပ်သာ ဖြစ်ပြီး ဆေးပညာ အကြံကို အစားမထိုးပါ။`);
+  const cur = typeof rpCurrentLords === 'function' ? rpCurrentLords(dashaTree) : null;
+  if (cur && (cur.maha === l5 || cur.maha === 'Jupiter' || cur.antar === l5 || cur.antar === 'Jupiter')) lines.push(`အချိန်: ခု ${cur.maha} မဟာဒဿာ${cur.antar ? `/${cur.antar} အန္တရ` : ''} ကာလ မှာ သားသမီး ကိစ္စ အကျိုးပေးနိုင်တဲ့ အချိန် ဖြစ်တယ်။`);
+  const verdict = l5 ? `သားသမီး အကျဉ်း: ၅ တန့် အရှင် ${l5} ${l5h} တန့်မှာ ရပ်တယ် — အသေးစိတ် အောက်မှာ` : '—';
+  return {
+    verdict,
+    lines
+  };
+}
+// v6.59 NEW: siblings profile — 3rd house (younger) + 11th house (elder) + Mars (sibling karaka).
+function buildSiblingsProfile(bp) {
+  const lines = [];
+  const l3 = _lordOfHouse(bp, 3);
+  const l3h = l3 ? _planetHouse(bp, l3) : null;
+  const sL3 = l3 ? _planetStrength(bp, l3) || 0 : 0;
+  const l11 = _lordOfHouse(bp, 11);
+  const l11h = l11 ? _planetHouse(bp, l11) : null;
+  const sL11 = l11 ? _planetStrength(bp, l11) || 0 : 0;
+  const sMars = _planetStrength(bp, 'Mars') || 0;
+  const occ3 = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].filter(pl => _planetHouse(bp, pl) === 3);
+  const malefic3 = occ3.some(pl => ['Saturn', 'Rahu', 'Ketu'].includes(pl));
+  if (sL3 >= 65) lines.push(`ညီငယ် မောင်နှမ: ၃ တန့် အရှင် ${l3} အားကောင်းလို့ ညီငယ် မောင်နှမတွေနဲ့ ဆက်ဆံရေး ကောင်းတတ်တယ်။`);else if (sL3 < 35) lines.push(`ညီငယ် မောင်နှမ: ၃ တန့် အရှင် ${l3} အားနည်းလို့ ညီငယ် မောင်နှမတွေနဲ့ သဘောထား ကွဲတတ်တယ်။`);else if (malefic3) lines.push(`ညီငယ် မောင်နှမ: ၃ တန့်ထဲ ${occ3.filter(pl => ['Saturn', 'Rahu', 'Ketu'].includes(pl)).join(', ')} ရပ်နေလို့ ညီငယ် မောင်နှမတွေနဲ့ သဘောထား ကွဲတတ်တယ်။`);
+  if (sL11 >= 65) lines.push(`အစ်ကိုကြီး/အစ်မကြီး: ၁၁ တန့် အရှင် ${l11} အားကောင်းလို့ အစ်ကိုကြီး/အစ်မကြီးတွေက ထောက်ကူပေးတတ်တယ်။`);else if (sL11 < 35) lines.push(`အစ်ကိုကြီး/အစ်မကြီး: ၁၁ တန့် အရှင် ${l11} အားနည်းလို့ အစ်ကိုကြီး/အစ်မကြီးတွေဆီက အကူအညီ ရဖို့ ခက်တတ်တယ်။`);
+  if (sMars >= 65) lines.push('အင်္ဂါ (မောင်နှမ ကာရက) အားကောင်းလို့ မောင်နှမအချင်းချင်း ကာကွယ်/ထောက်ကူ တတ်တယ်။');else if (sMars < 35) lines.push('အင်္ဂါ (မောင်နှမ ကာရက) အားနည်းလို့ မောင်နှမကြား ဒေါသ/စကားများတတ်တယ် — စိတ်ရှည်ဖို့ လိုတယ်။');
+  if (l3 && [1, 10, 11].includes(l3h)) lines.push(`မောင်နှမ အကျိုးပေး: ၃ တန့် အရှင် ${l3} သည် ${l3h} တန့်မှာ ရပ်လို့ မောင်နှမတွေက အကျိုးပေးတတ်တယ်။`);else if (l3 && [6, 8, 12].includes(l3h)) lines.push(`မောင်နှမ အကျိုးပေး: ၃ တန့် အရှင် ${l3} သည် ${l3h} တန့်မှာ ရပ်လို့ မောင်နှမကြောင့် စိတ်ပူပင်မှု များတတ်တယ်။`);
+  const verdict = l3 ? `မောင်နှမ အကျဉ်း: ၃ တန့် အရှင် ${l3} ${l3h} တန့်မှာ ရပ်တယ် — အသေးစိတ် အောက်မှာ` : '—';
+  return {
+    verdict,
+    lines
+  };
+}
+// v6.60 NEW: marriage detail — 5+7 love marriage vs 5!=7 (teacher's note: MARRIAGE, not MIRAGE); delay/difficulty/early wording ONLY (user ruling — never "will never marry"); multiple (sequential) marriages + separation (BPHS Ch.18 vv.4-6, 17-21, 42 + 6th-house link); second marriage read from 9th (3rd from 7th) + 2nd lord; sign mobility (chara/sthira/dvisvabhava) of the 7th sign + Venus sign.
+function buildMarriageDetail(bp) {
+  const lines = [];
+  const H = n => _planetHouse(bp, n),
+    L = h => _lordOfHouse(bp, h),
+    S = n => _planetStrength(bp, n) || 0;
+  const l5 = L(5),
+    l7 = L(7),
+    l6 = L(6);
+  const l5h = l5 ? H(l5) : null,
+    l7h = l7 ? H(l7) : null;
+  const sL7 = l7 ? S(l7) : 0,
+    sVen = S('Venus');
+  const occ7 = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].filter(pl => H(pl) === 7);
+  const malefic7 = occ7.filter(pl => ['Saturn', 'Rahu', 'Ketu', 'Mars'].includes(pl));
+  const _conj = (a, b) => H(a) === H(b);
+  const _asp = (a, b) => _aspectHouses(bp, a).includes(H(b));
+  const _linked = (a, b) => a && b && a !== b && (_conj(a, b) || _asp(a, b) || _asp(b, a));
+  // 5+7 love marriage: 5th lord and 7th lord linked, or 5th lord in 7th / 7th lord in 5th, or their exchange.
+  // Love marriage (5+7) — v6.60 correction (2026-11-10, verified against Phaladeepika Kapoor): Maha Yoga #19 (Ch.6) is the EXCHANGE ONLY — "the lord of the 5th in the 7th and the lord of the 7th in the 5th". A one-way placement is NOT a love indication: Ch.10 v.2 reads 7th lord in 5th alone as "lose his wife or become sonless", and 5th lord in 7th alone as "the wife does not survive" — so one-way placements stay SILENT here (a single placement must not trigger a dark line either). The lord-link (conjunction / mutual aspect) is the other text-supported path: Ch.10 v.1, 5th/7th "flourish if associated with or aspected by their lords".
+  const _loveLink = _linked(l5, l7) || l5h === 7 && l7h === 5;
+  if (_loveLink) lines.push('ချစ် အိမ်ထောင်: ၅ တန့် အရှင် နဲ့ ၇ တန့် အရှင် ဆက်နွယ်နေလို့ ကိုယ်ချစ်တဲ့လူနဲ့ လက်ထပ်တတ်တယ် (၅+၇ ဆက်စပ်မှု)။');else if ([6, 8, 12].includes(l5h) || [6, 8, 12].includes(l7h) || sVen < 35) lines.push('ချစ် အိမ်ထောင်: ၅ တန့်/၇ တန့် အချက် အားနည်းလို့ ချစ်တဲ့လူနဲ့ လက်ထပ်တဲ့လူ တူချင်မှ တူမယ် (၅≠၇) — အချစ် နဲ့ အိမ်ထောင် လမ်း မတူတဲ့ ပုံစံ ရှိနိုင်တယ်။');
+  // Delay / difficulty / early — wording only (never "will never marry").
+  const _satOn7 = occ7.includes('Saturn') || _aspectHouses(bp, 'Saturn').includes(7);
+  const _l7Weak = sL7 <= 35 || l7 && _isCombust(bp, l7);
+  const _l7VeryWeak = sL7 < 35 || l7 && _isCombust(bp, l7); // v6.60 fix: enemy-sign (35) alone is too mild for a difficulty line — the 1983 anchor (happily married, L7 Venus in Leo = enemy sign) proved it; _l7Weak (<=35) stays for the multi/sep counts, which need >=2 hits anyway.
+  const _l7Dusthana = [6, 8, 12].includes(l7h);
+  if (_satOn7) lines.push('အိမ်ထောင် နှောင့်နှေး: စနေ ၇ တန့်နဲ့ ဆက်နေလို့ အိမ်ထောင် ကျဖို့ အချိန် ယူတတ်တယ်, စောင့်ဆိုင်း ရတာ များတတ်တယ်။');else if (_l7Dusthana || _l7VeryWeak) lines.push('အိမ်ထောင် ခက်ခဲ: ၇ တန့် အရှင် အားနည်းချက်/ဒုဌာနမှာ ရပ်နေလို့ အိမ်ထောင် ကျဖို့ အတားအဆီး များတတ်တယ် — မဖြစ်နိုင်တာ မဟုတ်, ကြိုးစား ရတာ များတာ။');else if (sL7 >= 65 && sVen >= 65 && malefic7.length === 0) lines.push('အိမ်ထောင် စောစော: ၇ တန့် အရှင် + သောကြာ အားကောင်းလို့ အိမ်ထောင် စောစော ကျ တတ်တယ်။');
+  // Multiple (sequential) marriages — BPHS Ch.18 vv.4-6, 19-21. Needs >=2 hits to speak.
+  let _multi = 0;
+  if (_l7Weak) _multi++;
+  const _sL7Sign = l7 ? calculateVarga(bp[l7], 1) : null; // 0-based sign (calculateVarga(...,1) returns 0-11)
+  const _lordOfL7Sign = _sL7Sign != null ? RASI_LORDS[_sL7Sign] : null;
+  const _benOnL7 = l7h && (H('Jupiter') === l7h || _aspectHouses(bp, 'Jupiter').includes(l7h) || ['Venus', 'Mercury', 'Moon'].filter(n => n !== l7).some(n => H(n) === l7h || _aspectHouses(bp, n).includes(l7h))); // BPHS v.6: drishtied by a benefic OTHER than the lord itself
+  if ((_lordOfL7Sign === 'Saturn' || _lordOfL7Sign === 'Venus') && _benOnL7) _multi++;
+  const _venSign = calculateVarga(bp.Venus, 1); // 0-based: dual signs are Gemini 2, Virgo 5, Sagittarius 8, Pisces 11
+  const _venSignLord = RASI_LORDS[_venSign];
+  if ([2, 5, 8, 11].includes(_venSign) && _venSignLord && S(_venSignLord) >= 95 && sL7 >= 65) _multi++;
+  if (occ7.includes('Mars') && occ7.includes('Venus')) _multi++;
+  if (occ7.includes('Saturn') && l7h !== null && H(L(1)) === 8) _multi++;
+  if (_multi >= 2) {
+    lines.push('အိမ်ထောင်ဆက် များ: BPHS Ch.18 အရ ၇ တန့် အချက် များ ရှိလို့ အိမ်ထောင် တစ်ဆက်ပြီး တစ်ဆက် ဖြစ်တတ်တဲ့ အရိပ် ရှိ တယ် (တစ်ပြိုင်တည်း များတာ မဟုတ်) — အချိန် အလိုက် ပြောင်းလဲ တတ်တဲ့ ပုံစံ ပါ။');
+    lines.push('ဒုတိယ အိမ်ထောင်: ၉ တန့် (၇ တန့်မှ ၃ တန့်) + ၂ တန့် အရှင် အခြေအနေ နဲ့ ဖတ်ရတယ် — ၉ တန့် အရှင် အားကောင်းရင် ဒုတိယ အိမ်ထောင် ပို တည်ငြိမ် တတ်တယ်။');
+  }
+  // Separation / divorce tendency — BPHS Ch.18 v.17, v.42, v.18 + 6th-house vs spouse (user's point). Needs >=2 hits to speak.
+  let _sep = 0;
+  if (_l7Weak && _l7Dusthana) _sep++;
+  if (H('Mars') === 6 && H('Rahu') === 7 && H('Saturn') === 8) _sep += 2;
+  if (H('Moon') === 7 && l7h === 12 && sVen < 50) _sep++;
+  if (l6 && H(l6) === 7 || l7h === 6) _sep++;
+  if (malefic7.length >= 2) _sep++;
+  if (_sep >= 2) lines.push('အိမ်ထောင် ခွဲခွာ: ၇ တန့် အချက် များ ရှိလို့ အိမ်ထောင် ခွဲခွာ တတ်တဲ့ အရိပ် ရှိ တယ် — အဆိုးဆုံး အချိန် တစ်ချိန် အနေနဲ့ ဖြတ်သန်း နိုင်ပြီး ပြန်လည် တည်ဆောက် နိုင်တဲ့ ဘက် လည်း ရှိတယ်, စကားပြော ညှိနှိုင်း ဖို့ လိုတယ်။');
+  // Sign mobility (chara / sthira / dvisvabhava) — 7th sign + Venus sign. Signs are 0-based here: chara = 0/3/6/9, sthira = 1/4/7/10, dvisvabhava = 2/5/8/11.
+  const _signQ = s => s % 3 === 0 ? 'စရ' : s % 3 === 1 ? 'ထိရ' : 'ဒွေးဒဟ';
+  const _qTxt = {
+    'စရ': 'ပြောင်းလဲလွယ်တတ်တယ်',
+    'ထိရ': 'တည်မြဲတတ်တယ်',
+    'ဒွေးဒဟ': 'နှစ်မျိုး/အပြောင်းအလဲ ရှိနိုင်တယ်'
+  };
+  const _lagnaSign = calculateVarga(bp.Lagna, 1);
+  const _sign7 = (_lagnaSign + 6) % 12;
+  const _q7 = _signQ(_sign7),
+    _qV = _signQ(_venSign);
+  lines.push(`ရာသီ သဘော: ၇ တန့် ရာသီ ${_q7} (${_qTxt[_q7]}) — သောကြာ ရာသီ ${_qV} (${_qTxt[_qV]})။`);
+  const verdict = l7 ? `အိမ်ထောင် အကျဉ်း: ၇ တန့် အရှင် ${l7} ${l7h} တန့်မှာ ရပ်တယ် — အသေးစိတ် အောက်မှာ` : '—';
+  return {
+    verdict,
+    lines
   };
 }
 function rpCurrentLords(tree) {
@@ -13547,6 +13779,9 @@ function MainApp() {
   const lifeOverview = generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas);
   const careerBenefit = calculateCareerBenefitSummary(birthPlanets, dashaTree);
   const spouseProfile = buildSpouseProfile(birthPlanets, dashaTree);
+  const childrenProfile = buildChildrenProfile(birthPlanets, dashaTree);
+  const siblingsProfile = buildSiblingsProfile(birthPlanets);
+  const marriageDetail = buildMarriageDetail(birthPlanets);
   const ayuReading = generateAyuReading(birthPlanets, dashaTree);
   const eventWindows = calculateEventWindows(birthPlanets, dashaTree, {
     ayanamsa,
@@ -15465,6 +15700,33 @@ function MainApp() {
   }, "💍 အိမ်ထောင်ဖက် ပုံစံ (ဖူးစာ ပုံစံ)"), /*#__PURE__*/React.createElement("div", {
     className: "text-slate-800 text-[11px] font-semibold leading-relaxed"
   }, spouseProfile.verdict), spouseProfile.lines.map((ln, j) => /*#__PURE__*/React.createElement("div", {
+    key: j,
+    className: "text-[10px] text-slate-600 leading-relaxed"
+  }, "• ", ln))), /*#__PURE__*/React.createElement("div", {
+    className: "border-t border-indigo-200 pt-1.5 mt-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-rose-900 text-[11px]"
+  }, "💍 အိမ်ထောင် အသေးစိတ် (ချစ် / နှောင့်နှေး / ကွဲ / ဆက်)"), /*#__PURE__*/React.createElement("div", {
+    className: "text-slate-800 text-[11px] font-semibold leading-relaxed"
+  }, marriageDetail.verdict), marriageDetail.lines.map((ln, j) => /*#__PURE__*/React.createElement("div", {
+    key: j,
+    className: "text-[10px] text-slate-600 leading-relaxed"
+  }, "• ", ln))), /*#__PURE__*/React.createElement("div", {
+    className: "border-t border-indigo-200 pt-1.5 mt-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-rose-900 text-[11px]"
+  }, "👶 သားသမီး ပုံစံ"), /*#__PURE__*/React.createElement("div", {
+    className: "text-slate-800 text-[11px] font-semibold leading-relaxed"
+  }, childrenProfile.verdict), childrenProfile.lines.map((ln, j) => /*#__PURE__*/React.createElement("div", {
+    key: j,
+    className: "text-[10px] text-slate-600 leading-relaxed"
+  }, "• ", ln))), /*#__PURE__*/React.createElement("div", {
+    className: "border-t border-indigo-200 pt-1.5 mt-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-rose-900 text-[11px]"
+  }, "👥 မောင်နှမ ပုံစံ"), /*#__PURE__*/React.createElement("div", {
+    className: "text-slate-800 text-[11px] font-semibold leading-relaxed"
+  }, siblingsProfile.verdict), siblingsProfile.lines.map((ln, j) => /*#__PURE__*/React.createElement("div", {
     key: j,
     className: "text-[10px] text-slate-600 leading-relaxed"
   }, "• ", ln))), relationshipTiming && /*#__PURE__*/React.createElement("div", {
