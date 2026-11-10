@@ -69,6 +69,7 @@
 // v6.54 (2026-11-07): user order — Tropical monthly forecast added to the Tropical readings tab: Sun Sign Predictions (General) + Personal Transit + Lunation Predictions (Details), one month at a time with prev/next month navigation (state tropMonthOff, 0 = current month). New pure functions solveLunationJD / findLunationsInMonth / generateTropicalMonthly — Western tables only (WESTERN_SIGNS, WESTERN_HOUSE_DOMAIN, WESTERN_ASPECT_TEXT, WESTERN_PLANET_MY); no Vedic layers, no Rahu/Ketu in the monthly text; transit aspects reuse calculateTransitAspects; lunation solver follows the solveSolarReturnJD iterative pattern. Nothing else changed.
 // v6.55 (2026-11-07): user feedback after phone live-check of v6.54, refined by his clarification — the monthly transit-aspect lines only named the aspect and its generic kind text, without saying what tends to happen. Fixed: each aspect line now says HOW (the aspect), IN WHICH AREA (the natal planet's Placidus house + WESTERN_HOUSE_DOMAIN), and WHAT tends to happen (the two planets' WESTERN_PLANET_THEME composed with the aspect kind — flow = the two themes support each other and flow smoothly, tension = friction between the two themes that pushes growth, merge = the two themes act fused in one place). No new invented significations; WESTERN_ASPECT_TEXT generic sentence dropped from these lines (still used by the natal Aspects section). Nothing else changed.
 // v6.56 (2026-11-08): user order — Vedic monthly forecast (Gochara) added to the Vedic readings tab, after the Annual Forecast: Moon = General (gochara from the natal Moon sign) + Lagna = Personal (gochara from lagna), one month at a time with prev/next month navigation (state vedMonthOff, 0 = current month). Source: Phaladeepika Ch.26 (Kapoor ed., file supplied by the user 2026-11-08) — full extraction in gochara-table-v656.md. NEW: Vedha IS checked here (the Annual Forecast never checked it — grep "vedha" over v6.55 = 0 hits): a good-house result stands only when its Vedha house is free (per-planet exceptions applied); a Vedha hit is named in the line. Ketu excluded (no results in Ch.26). Lifespan-adjacent rules (vv.33-34) excluded per his standing rule. Nothing else changed.
+// v6.57 (2026-11-10): user order — wealth-read fixes after a third-party chart (20 Jul 1983, Scorpio lagna) read Middle by hand + teacher but Moderate 53/100 by the app. (1) Score: strength-3 Dhana structures now count at half weight (strength>=4 full, 3 half, below 3 none) — a weak yoga gives weak fruit, not zero fruit; the binary >=4 gate zeroed an 8-yoga stack. (2) Income-pattern rules: 'foreign' gains +1 for 4th lord in 12th (foreign residence) and +1 for Rahu in 7th (foreign partner); 'art' gains +1 for Venus in 10th from Moon. (3) Assets: a foreign-settlement line when the 4th lord is in the 12th. (4) Wealth windows gain a tier-2 (antar-only) list, mirroring the Hard Season v6.38 pattern, so a wealth antar inside a non-wealth mahadasha still shows under a light label. (5) Timing peak: the headline peak is now the best period starting before age 80 (presentation cap, not a classical rule); a later top scorer is noted in one short line. Nothing else changed.
 // v6.37 (2026-10-22): Classical-correctness fixes from an external (ChatGPT) audit, verified against the code before fixing — (A) Mahapurusha sign lists corrected to own/exaltation signs only (Hamsa [3,8,11] — Libra/Capricorn removed; Malavya [1,6,11] — Gemini/Scorpio removed; Ruchaka [0,7,9] — Aquarius replaced by Capricorn; Bhadra/Sasa were already correct). (B) Vimshottari first mahadasha now uses the elapsed method: antardashas fully elapsed before birth are skipped and the running one is trimmed to birth; mahadasha boundaries and MD2-9 antardashas are byte-identical to before. (C) Bhava Bala is now a REAL per-chart calculation (house lord's Shadbala + Dig Bala by sign class + Drig Bala by whole-sign aspects, benefic +15/malefic -15 as in Shadbala's Drik) — until v6.36 it returned a static score array identical for every chart. Nothing else changed: golden output identical to the v6.33 baseline; test45 27/27.
 // v6.33 (2026-10-18): Jaimini Chara Karaka SURFACED — charaKarakas() helper (checkAllYogas Jaimini block refactored onto it, yogas unchanged); AK/AmK/BK/MK/PK/GK/DK badges beside planet names in the Nakshatra table; new KarakaPanel card in the sidereal Birth Chart (all 7 with sign/degree/house/role + AK and AmK house-theme lines). Display layer only.
 // v6.32 (2026-10-18): Art income source — the evidence line now lists the reasons that ACTUALLY fired for this chart (Venus strength / yogakaraka / star-lord channel / lordship / placement only when the placement itself scores). v6.31's bare Venus-placement caption could imply a non-scoring house (e.g. Venus in the 9th) was a reason; engine scores unchanged.
@@ -6994,6 +6995,10 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
     _artParts.push(1);
     _artWhy.push(fact('Venus'));
   }
+  if ((H('Venus') - H('Moon') + 12) % 12 + 1 === 10) {
+    _artParts.push(1);
+    _artWhy.push('သောကြာ သည် တနင်္လာမှ 10 တန့်တွင် ရှိနေတယ်။');
+  } // wealth fix: Venus in 10th from Moon = art as career (same 10th-from-Moon logic as Amala Yoga)
   if (aspH('Venus', 10) || aspH('Venus', 2)) {
     _artParts.push(1);
     _artWhy.push('သောကြာ ရဲ့ အမြင် ' + (aspH('Venus', 10) ? '10' : '2') + ' တန့် အပေါ် ရှိ တယ်။');
@@ -7030,7 +7035,7 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
   const wfChain = (H(L(5)) === 11 ? 1 : 0) + (H(L(8)) === 11 ? 1 : 0) + ([5, 8].includes(H(L(11))) ? 1 : 0) + (inH('Rahu', [5, 8, 11]) ? 1 : 0);
   add('windfall', 'ထီကံ / ရုတ်တရက် အစုလိုက် ဝင်ငွေ', wfChain, `${lfact(5)} ${lfact(8)} ${lfact(11)}`);
   add('spouse', 'အိမ်ထောင် ဖက် / မိတ် ဖက် ကြောင့် ဝင်ငွေ', (lordIn(7, [2, 11]) ? 2 : 0) + (H(L(2)) === 7 || H(L(11)) === 7 ? 1 : 0), lfact(7));
-  add('foreign', 'နိုင်ငံ ခြား ဝင်ငွေ', (lordIn(10, [12]) || lordIn(11, [12]) ? 1 : 0) + (lordIn(12, [10, 11]) ? 1 : 0) + (inH('Rahu', [9, 12]) ? 1 : 0), `${lfact(12)} ${fact('Rahu')}`);
+  add('foreign', 'နိုင်ငံ ခြား ဝင်ငွေ', (lordIn(10, [12]) || lordIn(11, [12]) ? 1 : 0) + (lordIn(12, [10, 11]) ? 1 : 0) + (inH('Rahu', [9, 12]) ? 1 : 0) + (H(L(4)) === 12 ? 1 : 0) + (H('Rahu') === 7 ? 1 : 0), `${lfact(12)} ${fact('Rahu')}${H(L(4)) === 12 ? ' ' + lfact(4) : ''}`); // wealth fix: 4th lord in 12th = living away from birthplace / abroad; Rahu in 7th = foreign partner
   add('govt', 'အစိုးရ / အာဏာ ပိုင်း ဝင်ငွေ', (inH('Sun', [1, 10]) && S('Sun') >= 65 ? 2 : 0) + (L(10) === 'Sun' ? 1 : 0), fact('Sun'));
   add('medicine', 'ဆေး / ကျန်းမာ ရေး ဝင်ငွေ', (lordIn(6, [10, 11]) ? 1 : 0) + (inH('Ketu', [6, 10]) || inH('Mars', [6, 10]) ? 1 : 0) + (L(10) === 'Ketu' || L(10) === 'Mars' ? 1 : 0), lfact(6));
   add('law', 'ဥပဒေ / တရား ရေးရာ ဝင်ငွေ', (inH('Jupiter', [1, 4, 7, 10]) && inH('Saturn', [1, 4, 7, 10]) ? 2 : 0) + (L(10) === 'Jupiter' || L(10) === 'Saturn' ? 1 : 0), `${fact('Jupiter')} ${fact('Saturn')}`);
@@ -7058,6 +7063,7 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
     } catch (e) {}
     assets.push(homeLine);
   } else if (s4 >= 50) assets.push('အိမ် တစ်လုံး ပိုင် နိုင် တဲ့ အခြေခံ ရှိ တယ်။');else assets.push('အိမ် ပိုင် ဆိုင် မှု က အချိန် ယူ တည်ဆောက် မှ ရမယ့် ပုံစံ — အစောပိုင်း မှာ ငှား နေ ရတာ များ နိုင် တယ်။');
+  if (H(L(4)) === 12) assets.push('ပြည်ပ မှာ အခြေချ နေထိုင်ဖို့ များတဲ့ ပုံစံ ရှိ တယ် (၄ တန့် အရှင် ၁၂ တန့်မှာ ရှိနေတယ်)။'); // wealth fix: 4th lord in 12th = residence abroad
   if (lordIn(4, [2, 11]) || p && ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'].filter(n => H(n) === 4).length >= 2) assets.push(S('Venus') >= 65 && s4 >= 60 ? 'ဇိမ်ခံ ကွန်ဒို (တန်ဖိုး မြင့် အဆင့်) ပိုင် နိုင် တဲ့ အရိပ် ရှိ တယ်။' : 'ကွန်ဒို / တိုက်ခန်း ပါ ထပ် ပိုင် နိုင် တဲ့ အရိပ် ရှိ တယ်။');
   if (S('Venus') >= 65 && (inH('Venus', [4, 10]) || lordIn(4, [1, 4, 7, 10]))) assets.push(inH('Saturn', [4]) || aspH('Saturn', 4) ? 'ကား ကောင်း ကောင်း ပိုင် နိုင် တယ် (အရွယ် ရောက် နောက်ပိုင်း ပို ခိုင် လာ မယ်)။' : 'ယာဉ် ကို ငယ် စဉ် ကတည်းက ကိုယ်ပိုင် သုံး နိုင် တဲ့ ပုံစံ ရှိ တယ် — ကား ကောင်း ကောင်း ပိုင် နိုင် တယ်။');else if (S('Venus') >= 50 && inH('Venus', [4])) assets.push('ကား ပိုင် နိုင် တယ်။');
   if ([1, 5, 9].includes(signOf(L(4))) || inH('Saturn', [4])) assets.push('မြေ / ခြံ ပိုင် နိုင် တဲ့ အရိပ် ရှိ တယ်။');
@@ -7066,6 +7072,7 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
   if (S('Venus') >= 65 && (inH('Venus', [2, 5]) || H(L(5)) === 2 || aspH('Venus', 5))) assets.push('ပန်းချီ / အနုပညာ ပစ္စည်း Collection လက် ထဲ စုဆောင်း ထား နိုင် တယ်။');
   // ---- wealth windows (dasha) ----
   const windows = [];
+  const weakWindows = [];
   if (Array.isArray(dashaTree)) {
     const windLords = [...new Set([L(5), L(8), L(11)])];
     const riseLords = [...new Set([L(2), L(9), L(10)])];
@@ -7092,6 +7099,31 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
     }
     cands.sort((a, b) => a.start < b.start ? -1 : 1);
     for (const c of cands.slice(0, 4)) windows.push(c);
+    // wealth fix: tier-2 — antar-only windows (maha condition dropped; same future-only + 2080 caps), minus ALL tier-1 candidates (not just the displayed slice — a two-level match beyond the tier-1 cap must not be relabelled as antar-only), mirroring the Hard Season tier-2 pattern, so a wealth antar inside a non-wealth mahadasha still shows
+    const _t1keys = new Set(cands.map(w => w.lord + '|' + w.mLord + '|' + w.start + '|' + w.end));
+    const weakCands = [];
+    for (const m of dashaTree) {
+      for (const a of m.antars || []) {
+        if (a.end < today) continue;
+        if (a.start > '2080-01-01') continue;
+        if (_t1keys.has(a.lord + '|' + m.lord + '|' + a.start + '|' + a.end)) continue;
+        if (windLords.includes(a.lord)) weakCands.push({
+          kind: 'windfall',
+          lord: a.lord,
+          mLord: m.lord,
+          start: a.start,
+          end: a.end
+        });else if (riseLords.includes(a.lord)) weakCands.push({
+          kind: 'rise',
+          lord: a.lord,
+          mLord: m.lord,
+          start: a.start,
+          end: a.end
+        });
+      }
+    }
+    weakCands.sort((a, b) => a.start < b.start ? -1 : 1);
+    for (const c of weakCands.slice(0, 4)) weakWindows.push(c);
   }
   // ---- exceptional gate (STRICT: multi-sided confirmation, conservative band) ----
   let exceptional = null;
@@ -7273,6 +7305,7 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
     sources,
     assets,
     windows,
+    weakWindows,
     exceptional
   };
 }
@@ -7418,8 +7451,9 @@ function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
     lord11 = _lordOfHouse(birthPlanets, 11);
   const wealthH = [2, 5, 9, 11].reduce((n, h) => n + ([2, 5, 9, 11].includes(_planetHouse(birthPlanets, _lordOfHouse(birthPlanets, h))) ? 1 : 0), 0);
   const wealthPlanets = ['Jupiter', 'Venus', 'Mercury', 'Saturn'].reduce((n, k) => n + _planetStrength(birthPlanets, k) / 100, 0);
-  const _ys = _yogaStructures((yogas || []).filter(y => (y.strength || 0) >= 4));
-  const dhanaYogaCount = _ys.pairs + _ys.dhanaNamed; // v6.30: only strength>=4 structures feed the score (a weak yoga gives weak fruit)
+  const _ys4 = _yogaStructures((yogas || []).filter(y => (y.strength || 0) >= 4));
+  const _ys3 = _yogaStructures((yogas || []).filter(y => (y.strength || 0) === 3));
+  const dhanaYogaCount = _ys4.pairs + _ys4.dhanaNamed + 0.5 * (_ys3.pairs + _ys3.dhanaNamed); // v6.30 + wealth fix: strength>=4 full weight, strength 3 half weight — a weak yoga gives weak fruit, not zero fruit (a binary gate zeroed a whole stack of moderate Dhana yogas)
   let savPts = 0,
     aspectPts = 0,
     pariPts = 0,
@@ -7537,6 +7571,7 @@ function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
     incomeSources: _wp.sources,
     assetProfile: _wp.assets,
     wealthWindows: _wp.windows,
+    wealthWeakWindows: _wp.weakWindows,
     exceptional: _wp.exceptional,
     hardSeason: _hsz,
     netWorthDesc: `ဓန Potential Score ${wealthScore}/100။ ${wealthScore >= 62 ? 'ဓနတိုးတက်ရန် အခြေခံ promise ကောင်းသည်၊ သို့သော် အကျိုးပေးသည့်ကာလကို ဒသာ/Transit ဖြင့် ချိန်ရမည်။' : 'အမြဲတမ်းမြင့်မားမည်ဟု မဆိုနိုင်ဘဲ အချိန်ကာလနှင့် စီမံခန့်ခွဲမှုက အဓိကဖြစ်သည်။'}${_adjusted ? ' တန်း ကို ဇာတာ အတွင်း အထောက်/အဖျက် နဲ့ ပြန် ချိန် ထား ပါ တယ်။' : ''}${yogaWeave} လက်ရှိ ${active ? active.lord + ' မဟာဒသာ' : ''} ကို trigger အဖြစ်ထည့်တွက်ထားသည်။`,
@@ -7759,9 +7794,13 @@ function wealthTimingSummary(bp, tree, birthDate) {
       state: d.end < today ? 'passed' : d.start <= today ? 'now' : 'ahead'
     };
   });
-  const top = Math.max.apply(null, periods.map(x => x.score));
-  const peak = periods.reduce((a, b) => b.score > a.score ? b : a, periods[0]);
-  const standouts = periods.filter(x => x.score >= Math.max(60, top - 8));
+  // wealth fix: headline peak must fall inside a livable working life — periods starting at/after 80 are excluded from the peak (presentation cap, not a classical rule); a later top scorer is noted in one short line below
+  const eligible = periods.filter(x => x.ageFrom == null || x.ageFrom < 80);
+  const pool = eligible.length ? eligible : periods;
+  const top = Math.max.apply(null, pool.map(x => x.score));
+  const peak = pool.reduce((a, b) => b.score > a.score ? b : a, pool[0]);
+  const overallTop = periods.reduce((a, b) => b.score > a.score ? b : a, periods[0]);
+  const standouts = pool.filter(x => x.score >= Math.max(60, top - 8));
   const second = standouts.filter(x => x !== peak).sort((a, b) => b.score - a.score)[0] || null;
   const cur = periods.find(x => x.state === 'now') || null;
   const PM = pl => PLANET_MY[pl] || pl;
@@ -7772,6 +7811,7 @@ function wealthTimingSummary(bp, tree, birthDate) {
   } else {
     lines.push(`ဓန အကျိုးပေး အပြင်းဆုံး ကာလ သည် ${PM(peak.lord)} မဟာဒဿာ (အသက် ${peak.ageFrom}–${peak.ageTo}) ဖြစ် ပြီး ${stateTxt(peak)}။ အဲ့ဒီ့ ကာလ ရဲ့ အဓိက လမ်းကြောင်း က ${_CH_LABEL[peak.ch]} ဖြစ် ပြီး ${_FLOW_LABEL[peak.flow]} နဲ့ အကျိုးပေး နိုင် တယ်။`);
     if (second) lines.push(`နောက် ထပ် အား ကောင်း တဲ့ ကာလ တစ် ခု က ${PM(second.lord)} မဟာဒဿာ (အသက် ${second.ageFrom}–${second.ageTo}) — ${stateTxt(second)}၊ ${_CH_LABEL[second.ch]} ဘက် က နေ အကျိုးပေး နိုင် တယ်။`);
+    if (overallTop !== peak) lines.push(`အသက် ${overallTop.ageFrom}–${overallTop.ageTo} ${PM(overallTop.lord)} မဟာဒဿာ မှာလည်း ဓန အကျိုးပေး အားကောင်း နိုင်တယ် (အသက် ကြီး ပိုင်း)။`);
   }
   const eraCh = (lo, hi) => {
     const xs = periods.filter(x => x.ageFrom != null && (x.ageFrom + x.ageTo) / 2 >= lo && (x.ageFrom + x.ageTo) / 2 < hi && x.score >= 45).sort((a, b) => b.score - a.score);
@@ -14986,6 +15026,13 @@ function MainApp() {
   }, "ဓန အခွင့်အလမ်း ပြတင်းများ (ဒဿာ)"), lifeOverview.wealthWindows.map((w, i) => /*#__PURE__*/React.createElement("p", {
     key: i,
     className: "text-[11px] text-slate-600 leading-relaxed"
+  }, w.kind === 'windfall' ? '🍀 ရုတ်တရက် / အစုလိုက် ပြတင်း' : '📈 တက် လမ်း ပြတင်း', " — ", PLANET_MY[w.lord] || w.lord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာဒဿာ အတွင်း) · ", w.start, " → ", w.end))), lifeOverview.wealthWeakWindows?.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1 border-t pt-1.5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] font-bold text-slate-500"
+  }, "ဓန ပြတင်း — အန္တရ သီးသန့် (တစ်ဆင့်တည်း ကိုက် — အထက် ပြတင်း လောက် မသေချာ ပါ)"), lifeOverview.wealthWeakWindows.map((w, i) => /*#__PURE__*/React.createElement("p", {
+    key: i,
+    className: "text-[11px] text-slate-500 leading-relaxed"
   }, w.kind === 'windfall' ? '🍀 ရုတ်တရက် / အစုလိုက် ပြတင်း' : '📈 တက် လမ်း ပြတင်း', " — ", PLANET_MY[w.lord] || w.lord, " အန္တရ (", PLANET_MY[w.mLord] || w.mLord, " မဟာဒဿာ အတွင်း) · ", w.start, " → ", w.end))), /*#__PURE__*/React.createElement("div", {
     className: "border-t pt-1.5"
   }, /*#__PURE__*/React.createElement("p", {
