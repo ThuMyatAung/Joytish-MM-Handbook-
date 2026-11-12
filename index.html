@@ -73,6 +73,11 @@
 // v6.58 (2026-11-10): user order — wealth-read fixes after a second third-party chart (4 Apr 2004, Aries lagna) read foreign-favoured + art-strong by hand but showed NO foreign source and art joint-last (2) by the app, while reality (student abroad, Fine Art → Product Design, only-daughter inheritance of house/shop/gold/father's paintings) confirmed the manual read. (1) 'foreign' gains +1 each for 5th lord in 12th (foreign education), Rahu in lagna (foreign life/connections), 12th lord in 5th (foreign education/creativity), Ketu in 7th (foreign partner) — same narrow-rule class as the v6.57 foreign fix. (2) 'art' gains +1 for Venus own/exalted in 2nd (income through art/beauty) and +1 for Jupiter in 5th (creative intelligence). Score, windows, timing, assets and every other rule unchanged. Nothing else changed.
 // v6.59 (2026-11-10): user order — build the family-profile gaps in one go (spouse detail lines + children card + siblings card). (1) Spouse profile gains three explicit lines after the meet line: distance (7th lord in 9th/12th = far/foreign, in 1st/2nd/4th/7th = near/home, else silent), background (Rahu/Ketu on 7th/7th lord/Venus or 7th lord in 12th = foreign/other background; clean 7th + Venus >= 50 = same community, else silent), age DIRECTION only (Saturn links = older, Mercury links = younger, Venus links = similar; no year count — the texts give none, so none is invented). (2) NEW buildChildrenProfile: promise from 5th lord + Jupiter (putrakaraka) + malefics in 5th, benefit from 5th lord house (1/9/10/11 = benefit, 6/8/12 = worry/expense), Jupiter-in-5th line, malefic-in-5th difficulty line with a medical-advice caveat, and a timing line when the current maha/antar lord is the 5th lord or Jupiter (via rpCurrentLords). (3) NEW buildSiblingsProfile: younger siblings from 3rd lord + malefics in 3rd, elder siblings from 11th lord, Mars as sibling karaka, benefit from 3rd lord house. Both cards render beside the spouse block in the အကျိုးပေး အနှစ်ချုပ် card. Scores, wealth rules, windows, timing, rectification and every other rule unchanged. Nothing else changed.
 // v6.60 (2026-11-10): user order — teacher's-notes supplements, built after the resort/Rahu-Ketu text check. (1) Rahu/Ketu special aspects 5/9/12 counted clockwise (teacher's lineage rule; BPHS Ch.26 names specials only for Saturn/Jupiter/Mars) live in a NEW helper _aspectHousesN used only by the new v6.60 lines — _aspectHouses itself is untouched, so Sudarshana, wealth, yogas and rectification stay byte-identical. (2) Resort gains a second path: Jupiter-Venus link (teacher's VE+JU rule) worth 2 points beside the v6.21 Saturn/Venus/Moon components (gate still >=3). (3) NEW buildMarriageDetail: 5+7 love marriage vs 5!=7 (teacher's note: MARRIAGE, not MIRAGE), delay/difficulty/early wording only, multiple (sequential) marriages + separation (BPHS Ch.18 vv.4-6, 17-21, 42 + 6th-house link), second marriage read from 9th/2nd, sign mobility (chara/sthira/dvisvabhava) of 7th + Venus sign. (4) Character traits in mindProfileRows: အညှိုးကြီး (Moon+Saturn), ယုံကြည် (strong Jupiter on Moon/lagna), သဘောကောင်း (Venus/Jupiter on Moon + Moon strong). (5) UR/NE: conjunct (<=10 deg) + science links = science/innovation line; conjunct + 8th/12th/Moon affliction without science links = occult-pull line (Hawking example NOT verified — UR-NE 123 deg apart at 02:29 Oxford — no person named in-app). (6) Black-magic/attack indication: Moon/Lagna afflicted by BOTH Saturn and Rahu (teacher's note), Ketu in 5th as support (Phaladeepika: oppressed by evil spirits; Mars = witchcraft significator). (7) Property types in assets: building (Mars), factory/hospital (Mars+Saturn), shophouse (Mercury), complex (Mars+Mercury) on the 4th. NOT built: entrepreneur type (no classical seed), film-career combos + combination rules (meanings sit in the unread Burmese glosses). Scores unchanged; wealth sources change only by the intended resort addition on charts where VE+JU links. Nothing else changed.
+// v6.67 (2026-11-12): user order — wealth zones + global tiers (display/mapping ONLY — wealth score, gates, power, idx, BANDS, _TIERS untouched; the wealth measurement FAILED so no score tuning). NEW calculateWealthZones: (1) zone from birth country — birthZone (IANA) -> country (the app's own ZONE_BY_COUNTRY + US/CA/AU state tables inverted by script, plus a small LatAm/other supplement) -> Zone 1/2/3; fallback lat/lon bounding boxes; last resort Zone 2 + note; China splits (middle tiers Zone 2, tycoon tier Zone 1 $500M+). (2) tier -> Nishka class (below-500 သာမန် / 500 လူလတ်တန်းစား / 1,000 သူဌေး / 2,000 အလွန်ချမ်းသာသူ / 6,000 တိုင်ကွန်း) with zone dollars (~$50M/$25M/$10M at 500 etc. per the zone table); labels are grades on the texts' wealth scale, not population classes. (3) exceptional band: the $100M+ absolute entry is retired as display; the entry rung is now the zone tycoon figure; the old 7-rung Ultra/Super ladder is shown as 3 rungs (tycoon -> G1 $1B+ king of kings -> G2 $100B+ Chakravarti/emperor), the rung picked from the existing band string's index (0-2 tycoon, 3-4 G1, 5-6 G2). Texts: BPHS Ch.22 Nishka amounts + relative conversion (6,000 ≈ 16,000x subsistence); Phala Ch.6 graded rulership; BPHS Chakr Yog. Renders as a zone line under the net-worth tier and a zone-aware band + ladder in the exceptional card. Migrant tension noted, not solved (birth-country anchor stands). Nothing else changed.
+// v6.66 (2026-11-12): user order — matching module (Kuja/Manglik dosha + Vedic synastry + dasha-overlap), measured in matching-measure.js (design 2026-11-12). NEW calculateMatchingModule: (1) Kuja — Phaladeepika Ch.4 set 1/2/4/7/8/12, Lagna reference ONLY; Moon/Venus shown only as traces/shadows (အရိပ်, "သတိထားသင့်" wording); both-Manglik cancel only (no BPHS benefic-cancel); card shown ONLY when a dosha is found, otherwise nothing. (2) Vedic synastry — 8-pair weighted table /100 (app-own sign-relation scorer, labelled; mode-neutral labels), cross-chart aspects 7x7 (conjunctions deduped, directional; Rahu/Ketu excluded), same-lord notes, ONE 7th-overlay line. (3) Dasha-overlap — merged-boundary timeline [now, +10y], per-person graded score v5 (base 40; maha good +25, antar good +15, placed in [1,5,9,10,11] +10, hard-lord penalties, benefic antar +5; Rahu/Ketu via dispositor; mixed lord neutral), good >=60 / hard <=30; good houses business [2,5,7,9,10,11] / marriage [2,5,7,9,11] with a mode toggle (default marriage); BOTH futureWindow + overlap timeline kept; both-hard wording is his approved line. Q5 = v5 (trikona 5/9) per his build order without an explicit Q5 answer — flagged for his correction. Renders as three cards in the Matching tab (Vedic side) below the Ashtakoota total, above Deep Synastry Metrics. Ashtakoota /36, dashaRelPct, futureWindow, KP, Right Person and all scores untouched. Nothing else changed.
+// v6.65 (2026-11-12): user order — role / အလုပ်အကိုင် module (Career potential), measured in v5 (PASS 25/25; v4 FAIL (1) Businessman prevalence fixed by his ruling: drop Businessman, replace with ကိုယ်ပိုင်လုပ်ငန်းရှင် Own-Business Owner, a COMMON role with a breadth gate — score>=4 with >=2 layers, no +2 requirement). NEW calculateRolePotential: 25 roles (StateInfluence/Minister/ArmyChief/Tycoon/Founder + 20 ordinary incl. OwnBiz), each scored from D1 structure + yoga + Phala Ch.5 navamsa profession + D10 support (one-fourth voice) + dasha activation, with agreement check (AmK / income sources / navamsa lord) and required elements; high-office roles need a +2 DIRECT text-named rule + support (honour card or exceptional band) and 3 capped layers incl. yoga. StateInfluence label is his exact wording "နိုင်ငံတော်အဆင့် ဩဇာလွှမ်းမိုးမှု ရရှိနိုင်သော". NO negative verdicts — only roles that fire are shown, FULL first then TRACE (partial support). Cross-event flags on shown high-office roles (Dushkriti / govt trouble / low public support / hard-season legal-fall-reputation). Tycoon sub-types (Elite/Crony/Tycoon) are interpretation. Renders as a new "Career (ဖြစ်နိုင်ခြေ)" section in Life Overview, just above income sources. Mahapurusha fold-in NOT included (separate pending decision — honour triad untouched). Scores, wealth, marriage, children, rectification and every other rule unchanged. Nothing else changed.
+// v6.64 (2026-11-11): user order — varga fold-in, starting with D10 (Dasamsa) for the honour card (user delegated the starting chart: "whichever chart you like"). Design: no standalone "according to D-X" readings — D10 evidence folds into the existing D1 honour line. BPHS Ch.7 vv.1-8 ("power (and position) from Dashamsa"); Phaladeepika Ch.3 v.3 (a varga's effect is one-fourth of Rasi for D10), so D10 is a supporting voice only: it never creates a card and is never named in the text. Support = >=2 of 3 (D1 10th lord dignified in D10; 10th lord in a D10 kendra/trikona from the D10 lagna; Sun dignified or in a D10 kendra) -> the tier wording gains " (ခိုင်မာတဲ့ အရိပ်)". Full contradiction (0 of 3) -> tier drops one level (lowest tier keeps the tier + " (အဟန့် ရှိနိုင်တယ်)"). Neutral (1 of 3) -> no change. D1 honour card absent -> D10 adds nothing. Measurement on the 12-case study set (honour dimension) decides whether it ships; see v664 report. Nothing else changed.
+// v6.63 (2026-11-11): user order — event-score redesign for rectification (the v6.62 top-1 bottleneck). Sample EXPANDED to 13 known-time cases: the original 7 (Studies 2/3) + 6 new verified cases (Jobs 24 Feb 1955 19:15 AA, Buffett 30 Aug 1930 15:00 A, Oprah 29 Jan 1954 04:30 A-rated with 19:50 dissent, Hanks 9 Jul 1956 11:17 AA, Streep 22 Jun 1949 08:05 AA, Dre 18 Feb 1965 10:56 AA-derived; birth times + event dates verified by web search; Gates excluded — time disputed). Baseline on the expanded set: run A top-1 5/13 (orig 7: 3/7, new 6: 2/6), mean clock error 234.5m, true lagna visible 11/13. Tried and MEASURED, each separately on both sets: (t1) transit-Jupiter-aspects-primary (+1), (t2) transit-Moon-in-primary (+1, exact events only), (b1) dasha lord aspects primary house (2), (b2) dasha lord conjuncts/aspects primary lord (2.5), (k1) karaka unlock (soft 2), (c1) dignity weighting, (e1) pratyantar level (0.75x, gate-opening), (d1) per-event median subtraction, and combos b1+t1, b1+k1, t1+k1, b1+t1+k1, b1+d1. NONE improved run-A top-1 on the expanded set (best ties: b1 and t2 at 5/13; all others 2-4/13). Partial gains that did NOT meet the apply rule (top-1 first): b1 top-2 5/13 -> 7/13 (top-1 tied, clock error slightly worse); k1 visibility 11/13 -> 13/13 (top-1 4/13); t1 run-B top-1 0/13 -> 2/13 and run-W 0/13 -> 3/13 (run-A top-1 4/13). Firing check at the true minute: every added signal also fires at wrong lagnas (b1 +22.3, b2 +32.6, e1 +47.3 net across 52 event scores) — the connection predicates are too permissive to separate signs, so adding signal raises all candidates. c1 actively worse (2/13). Structural diagnosis, not built: the score needs a discriminator that is high ONLY at truth (e.g. conjunction of conditions rather than max-of-conditions) — a new design direction for a future order. NULL RESULT: no scoring change ships in v6.63 — this file is behaviorally identical to v6.62 (verified by test69: rectification outputs + anchors byte-identical). Do NOT upload as an upgrade; v6.62 remains the current deliverable. Nothing else changed.
 // v6.62 (2026-11-11): user order — rectification accuracy work (accuracy over what changed). Experimented on the 7 known-time cases (Studies 2/3): applied (a) best-per-sign across the FULL scan before ranking (the old top-40-first cut hid the true lagna in 3/7 run-A cases; now visible in 6/7) and (b) graded appearance +3 exact / +1.5 adjacent / 0 otherwise (softens the all-or-nothing boundary mis-pick; wrong-pick top-2 0/7 -> 2/7, true lagna visible 1/7 -> 5/7). Dropped after measurement: approx x0.5 (no effect), antar lordship-only (clock error 262 -> 312m), Saturn-transit extension (lost a run-A top-1 when combined), per-sign 1-min refinement (no benefit), +1 for two-away signs (no gain over +1.5 adjacent). Top-1 stays 3/7 and mean clock error 262m — the event score itself is the bottleneck (wrong signs outscore the truth on its own events); no (a)-(d) variant moved it. The v6.42 byte-identical rectification rule is RETIRED by this order (old +3 line md5 01d2427159eabe42930511e2661b4e17 superseded). Scores, wealth, marriage, children and every other rule unchanged. Nothing else changed.
 // v6.37 (2026-10-22): Classical-correctness fixes from an external (ChatGPT) audit, verified against the code before fixing — (A) Mahapurusha sign lists corrected to own/exaltation signs only (Hamsa [3,8,11] — Libra/Capricorn removed; Malavya [1,6,11] — Gemini/Scorpio removed; Ruchaka [0,7,9] — Aquarius replaced by Capricorn; Bhadra/Sasa were already correct). (B) Vimshottari first mahadasha now uses the elapsed method: antardashas fully elapsed before birth are skipped and the running one is trimmed to birth; mahadasha boundaries and MD2-9 antardashas are byte-identical to before. (C) Bhava Bala is now a REAL per-chart calculation (house lord's Shadbala + Dig Bala by sign class + Drig Bala by whole-sign aspects, benefic +15/malefic -15 as in Shadbala's Drik) — until v6.36 it returned a static score array identical for every chart. Nothing else changed: golden output identical to the v6.33 baseline; test45 27/27.
 // v6.33 (2026-10-18): Jaimini Chara Karaka SURFACED — charaKarakas() helper (checkAllYogas Jaimini block refactored onto it, yogas unchanged); AK/AmK/BK/MK/PK/GK/DK badges beside planet names in the Nakshatra table; new KarakaPanel card in the sidereal Birth Chart (all 7 with sign/degree/house/role + AK and AmK house-theme lines). Display layer only.
@@ -7296,12 +7301,33 @@ function wealthPatternAnalysis(p, yogas, dashaTree, wealthScore) {
         if (v < 0.5) weakFacets.push(label);
       });
     }
+    // v6.64: D10 (Dasamsa) fold-in for the honour card — BPHS Ch.7 vv.1-8 ("power (and position) from Dashamsa");
+    // Phaladeepika Ch.3 v.3: a varga's effect is one-fourth of Rasi (D10), so D10 is a supporting voice only:
+    // it never creates an honour card, is never named in the text, and only firms (>=2 of 3) or reduces (0 of 3)
+    // the D1 honour line. Components: D1 10th lord dignified in D10; 10th lord in a D10 kendra/trikona from
+    // the D10 lagna; Sun dignified or in a D10 kendra.
+    const _d10Lagna = calculateVarga(p.Lagna, 10);
+    const _d10Str = n => {
+      if (typeof p[n] !== 'number') return 50;
+      const dg = getPlanetaryDignity(n, calculateVarga(p[n], 10)).label;
+      if (dg.includes('ဥစ္စ')) return 95;
+      if (dg.includes('သယံ')) return 80;
+      if (dg.includes('မိတ်')) return 65;
+      if (dg.includes('သမ')) return 50;
+      if (dg.includes('ရန်')) return 35;
+      if (dg.includes('နိစ္စ')) return 20;
+      return 50;
+    };
+    const _d10House = n => typeof p[n] !== 'number' || typeof p.Lagna !== 'number' ? 1 : (calculateVarga(p[n], 10) - _d10Lagna + 12) % 12 + 1;
+    const _d10Sup = typeof p.Lagna !== 'number' ? 1 : (_d10Str(L(10)) >= 65 ? 1 : 0) + ([1, 4, 5, 7, 9, 10].includes(_d10House(L(10))) ? 1 : 0) + (_d10Str('Sun') >= 65 || [1, 4, 7, 10].includes(_d10House('Sun')) ? 1 : 0);
     // v6.27: honor is judged by HONOR evidence only — the fame triad (Moon = public, Sun = authority, L10 = career lord): average strength + no collapsed leg. (The old rule also demanded the WEALTH yoga stack, which left the honor card dead: 0 fires in a 180-chart battery.)
     const _fameAvg = (S('Moon') + S('Sun') + S(L(10))) / 3;
     const _fameMin = Math.min(S('Moon'), S('Sun'), S(L(10)));
     let honor = null;
     if (_fameAvg >= 62 && _fameMin >= 45) {
-      honor = _fameAvg >= 78 ? 'ကမ္ဘာ အဆင့် ဂုဏ် (Nobel တန်း) ထိ တက် နိုင် တဲ့ အင်အား' : _fameAvg >= 64 ? 'အပြည်ပြည်ဆိုင်ရာ အသိအမှတ် ပြု ရ နိုင် တဲ့ အင်အား' : 'နိုင်ငံတော် အဆင့် ဆု ရ နိုင် တဲ့ အင်အား';
+      const _tier = _fameAvg >= 78 ? 2 : _fameAvg >= 64 ? 1 : 0;
+      const _tierTxt = ['နိုင်ငံတော် အဆင့် ဆု ရ နိုင် တဲ့ အင်အား', 'အပြည်ပြည်ဆိုင်ရာ အသိအမှတ် ပြု ရ နိုင် တဲ့ အင်အား', 'ကမ္ဘာ အဆင့် ဂုဏ် (Nobel တန်း) ထိ တက် နိုင် တဲ့ အင်အား'];
+      if (_d10Sup >= 2) honor = _tierTxt[_tier] + ' (ခိုင်မာတဲ့ အရိပ်)';else if (_d10Sup === 0 && _tier > 0) honor = _tierTxt[_tier - 1];else if (_d10Sup === 0) honor = _tierTxt[0] + ' (အဟန့် ရှိနိုင်တယ်)';else honor = _tierTxt[_tier];
     }
     const luxury = [];
     if (S('Rahu') >= 65 && lordIn(12, [1, 4, 5, 7, 9, 10]) && s4 >= 60) luxury.push('ကိုယ်ပိုင် လေယာဉ် အဆင့် ထိ သုံး နိုင် တဲ့ အရိပ်');
@@ -7540,6 +7566,2816 @@ function hardSeasonAnalysis(p, yogas, dashaTree) {
   } catch (e) {
     return null;
   }
+}
+
+// ===== v6.65 Role / အလုပ်အကိုင် module (Career potential) =====
+// Ported VERBATIM from the measured v5 harness (role-measure-v5.js, PASS 25/25):
+// rule predicates, gates and helpers are byte-identical to the measurement; only
+// identifiers are prefixed (_ROLE_/_role) to avoid collisions, and each rule gains
+// a Burmese `why` (evidence) string + each role a Burmese `labelMy`.
+// Framing: every role is POTENTIAL ("ဖြစ်တန်စွမ်း"), never a job verdict. NO negative
+// verdicts — only roles that fire are shown. Mahapurusha fold-in NOT included.
+const _ROLE_KENDRA = [1, 4, 7, 10],
+  _ROLE_TRIKONA = [1, 5, 9];
+const _ROLE_GRAHAS7 = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
+// strict Adhi (texts: benefics in 6th/7th/8th from Moon and/or Lagna — all three houses; app's Adhi is looser)
+function _roleAdhiStrict(d) {
+  const isBen = n => ['Jupiter', 'Venus', 'Mercury'].includes(n);
+  const from = ref => [6, 7, 8].filter(hh => _ROLE_GRAHAS7.some(n => isBen(n) && (d.H(n) - d.H(ref) + 12) % 12 + 1 === hh)).length;
+  const fromLagna = [6, 7, 8].filter(hh => _ROLE_GRAHAS7.some(n => isBen(n) && d.H(n) === hh)).length;
+  return Math.max(from('Moon'), fromLagna);
+}
+// Patronage links (BPHS Ch.21 v.4 / Ch.40 v.6, v.10): benefic on L10 or on AK.
+// NOTE: the benefic must be a DIFFERENT planet from the lord (a planet is trivially conjunct itself).
+function _rolePatronage(d) {
+  return ['Jupiter', 'Venus'].some(b => b !== d.L10 && b !== d.kk.AK && (d.conj(b, d.L10) || d.asp(b, d.L10) || d.conj(b, d.kk.AK) || d.asp(b, d.kk.AK)));
+}
+
+// ---- REDESIGN v2 helpers ----
+// Own / exaltation signs (0-based rasi index) for BPHS Ch.40 v.4 / v.8.
+const _ROLE_OWN_SIGNS = {
+  Sun: [4],
+  Moon: [3],
+  Mars: [0, 7],
+  Mercury: [2, 5],
+  Jupiter: [8, 11],
+  Venus: [1, 6],
+  Saturn: [9, 10]
+};
+const _ROLE_EXALT_SIGNS = {
+  Sun: [0],
+  Moon: [1],
+  Mars: [9],
+  Mercury: [5],
+  Jupiter: [3],
+  Venus: [11],
+  Saturn: [6]
+};
+const _roleIsOwnExalt = (d, p) => _ROLE_OWN_SIGNS[p].includes(d.sign(p)) || _ROLE_EXALT_SIGNS[p].includes(d.sign(p));
+const _roleDisp = (d, p) => RASI_LORDS[d.sign(p)]; // dispositor = lord of the planet's D1 sign
+const _roleLink = (d, a, b) => a !== b && (d.conj(a, b) || d.asp(a, b) || d.asp(b, a)); // non-degenerate association
+// _roleLink7: DIRECT association only - conjunction or 7th aspect (excludes special aspects).
+// A minister yoga (close association with the king's court) needs a direct link, not a special
+// aspect (e.g. Saturn's 3rd aspect). Used for BPHS Ch.40 v.1 / v.3.
+const _roleAsp7 = (d, a, b) => d.conj(a, b) || d.H(b) === (d.H(a) - 1 + 6) % 12 + 1;
+const _roleLink7 = (d, a, b) => a !== b && (_roleAsp7(d, a, b) || _roleAsp7(d, b, a));
+// BPHS Ch.40 minister yogas (v.1, v.3, v.4, v.5, v.8, v.15). Any one fires -> +2 yoga rule.
+// v.4 reading: "AK strong WITH a benefic" = AK strong AND conjunct/aspected by a DIFFERENT benefic
+// (Jupiter/Venus); the AK itself being a benefic does not count (self-triviality, same bug class
+// as the patronage self-conjunction fix). v.15 read conservatively: Lagna lord AND Putr lord both
+// in kendra/trikona (the AK-or-Lagna-lord reading is ambiguous and fires too broadly).
+function _roleCh40Minister(d) {
+  const AK = d.kk.AK,
+    AmK = d.kk.AmK,
+    L10 = d.L10,
+    L9 = d.L(9);
+  const v1 = _roleLink7(d, L10, AmK) || _roleLink7(d, L10, _roleDisp(d, AmK));
+  const v3 = _roleLink7(d, AmK, _roleDisp(d, AK));
+  const v4 = d.S(AK) >= 65 && ['Jupiter', 'Venus'].some(b => b !== AK && (d.asp(b, AK) || d.asp(AK, b))) || d.S(AmK) >= 65 && _roleIsOwnExalt(d, AmK);
+  const v5 = [1, 5, 9].includes(d.H(AK));
+  const v8 = (_ROLE_KENDRA.includes(d.H(AK)) || _ROLE_TRIKONA.includes(d.H(AK)) || _roleIsOwnExalt(d, AK)) && AK !== L9 && d.asp(AK, L9);
+  const v15 = (_ROLE_KENDRA.includes(d.H(d.L(1))) || _ROLE_TRIKONA.includes(d.H(d.L(1)))) && (_ROLE_KENDRA.includes(d.H(d.L(5))) || _ROLE_TRIKONA.includes(d.H(d.L(5))));
+  return v1 || v3 || v4 || v5 || v8 || v15;
+}
+
+// ---- role table (REDESIGN v5): 25 roles (24 v4-passers + OwnBiz replacing Businessman).
+// Gate (v2, unchanged for non-common roles): FULL = score>=3 AND capped layers>=need (high 3 incl. yoga, ordinary 2) AND at least one
+// +2 DIRECT text-named rule AND agreement AND support-v2 (high only) AND required element (if any).
+// Gate (v5, COMMON roles only): FULL = score>=4 AND capped layers>=2 AND agreement - breadth instead of
+// depth, NO +2 requirement, NO support requirement. TRACE = score>=3 AND capped layers==1 AND agreement.
+// Capped layers: D10 + dasha together count as at most ONE supporting layer (near-free points).
+// Support-v2 (high only): strong support (honour card OR exceptional band) OR the role's own
+// overwhelming evidence (score>=6 with all 4 capped layers) counts as its own eminence evidence.
+// Tycoon: honour does NOT count (wealth role) - band OR role-score only.
+// TRACE: score>=3 AND capped layers==need-1 AND agreement (+ support for high). No +2 requirement.
+// Required element (role.req): definitional - if absent the role does not show at all (not even TRACE).
+// Framing: every role is POTENTIAL/inclination ("becoming"), never a job verdict.
+// Prevalence: default ceiling = half the core set; a COMMON role may set role.prevMax (by its nature).
+
+const _ROLE_TABLE = [{
+  id: 'StateInfluence',
+  label: 'နိုင်ငံတော်အဆင့် ဩဇာလွှမ်းမိုးမှု ရရှိနိုင်သော — POTENTIAL, not literal office',
+  labelMy: 'နိုင်ငံတော်အဆင့် ဩဇာလွှမ်းမိုးမှု ရရှိနိုင်သော',
+  high: true,
+  amk: ['Sun', 'Jupiter', 'Mars', 'Mercury'],
+  src: ['govt'],
+  nav: ['Sun', 'Jupiter'],
+  keys: ['Sun', 'Jupiter'],
+  req: d => d.S('Saturn') >= 65,
+  // institutional weight: Saturn = administration/institutions; a state-level role needs it (Hanks S35 blocked; Obama/Churchill S80, Oprah S95 pass)
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.40 vv.1/4; Phala Ch.7 v.42',
+    test: d => [1, 10].includes(d.H('Sun')) || [1, 10].includes(d.H(d.L10)),
+    why: 'DIRECT BPHS Ch.40 vv.1/4; Phala Ch.7 v.42'
+  }, {
+    id: 'R2',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT Adhi (strict, >=2 of 6/7/8 from Moon/Lagna)',
+    test: d => _roleAdhiStrict(d) >= 2,
+    why: 'DIRECT Adhi (strict, >=2 of 6/7/8 from Moon/Lagna)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L10) >= 65 && (_ROLE_KENDRA.includes(d.H(d.L10)) || _ROLE_TRIKONA.includes(d.H(d.L10))),
+    why: '10th lord အားကောင်း'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Sun') >= 65 && [1, 4, 5, 9, 10].includes(d.H('Sun')),
+    why: 'တနင်္ဂနွေ အားကောင်း (1,4,5,9,10 အိမ်)'
+  }, {
+    id: 'R5',
+    layer: 'yoga',
+    w: 2,
+    test: d => d.yogaCount(/Raja Yoga/) >= 2 || d.hasYoga(/Mahapurusha/),
+    why: 'Raja Yoga Yoga'
+  }, {
+    id: 'R6',
+    layer: 'struct',
+    w: 1,
+    test: d => [11, 2].includes(d.H(d.L10)),
+    why: '10th lord 11/2 အိမ်'
+  }, {
+    id: 'R7',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Sun', 'Jupiter'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R8',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.40 minister yogas v.1/v.3/v.4/v.5/v.8/v.15',
+    test: d => _roleCh40Minister(d),
+    why: 'DIRECT BPHS Ch.40 minister yogas v.1/v.3/v.4/v.5/v.8/v.15'
+  }, {
+    id: 'R9',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT Shankha Yoga (Phala Ch.7 v.37) - kendra+trikona lords conjoined; Raja-class authority/minister yoga',
+    test: d => d.hasYoga(/Shankha/),
+    why: 'DIRECT Shankha Yoga (Phala Ch.7 v.37) - kendra+trikona lords conjoined; Raja-class authority/minister yoga'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Sun', d.L10, 'Jupiter']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Minister',
+  label: 'Minister',
+  labelMy: 'ဝန်ကြီး / အမတ် / အကြီးတန်း အုပ်ချုပ်ရေးမှူး',
+  high: true,
+  amk: ['Sun', 'Jupiter', 'Mars', 'Mercury'],
+  src: ['govt'],
+  nav: ['Sun', 'Jupiter'],
+  keys: ['Sun', 'Jupiter'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.40 vv.3/8 (Tula minister/adviser)',
+    test: d => [2, 11].includes(d.H(d.L10)) && (d.S('Sun') >= 65 || d.S('Jupiter') >= 65),
+    why: 'DIRECT BPHS Ch.40 vv.3/8 (Tula minister/adviser)'
+  }, {
+    id: 'R2',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT Adhi (strict)',
+    test: d => _roleAdhiStrict(d) >= 2,
+    why: 'DIRECT Adhi (strict)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Jupiter') >= 65 && (_ROLE_KENDRA.includes(d.H('Jupiter')) || _ROLE_TRIKONA.includes(d.H('Jupiter'))),
+    why: 'ကြာသပတေး အားကောင်း (ကိန်း/တြိကောဏ အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Sun') >= 65 && [1, 10].includes(d.H('Sun')),
+    why: 'တနင်္ဂနွေ အားကောင်း (1,10 အိမ်)'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    test: d => d.H(d.L10) === 7,
+    why: '10th lord 7th အိမ်'
+  }, {
+    id: 'R6',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Sun', 'Jupiter'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R8',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.40 minister yogas v.1/v.3/v.4/v.5/v.8/v.15',
+    test: d => _roleCh40Minister(d),
+    why: 'DIRECT BPHS Ch.40 minister yogas v.1/v.3/v.4/v.5/v.8/v.15'
+  }, {
+    id: 'R9',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT Shankha Yoga (Phala Ch.7 v.37) - kendra+trikona lords conjoined; Raja-class authority/minister yoga',
+    test: d => d.hasYoga(/Shankha/),
+    why: 'DIRECT Shankha Yoga (Phala Ch.7 v.37) - kendra+trikona lords conjoined; Raja-class authority/minister yoga'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Sun', 'Jupiter', d.L10]),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'ArmyChief',
+  label: 'Army chief',
+  labelMy: 'စစ်ဦးစီးချုပ် / တပ်မှူး',
+  high: true,
+  amk: ['Mars', 'Sun'],
+  src: ['govt'],
+  nav: ['Mars'],
+  keys: ['Mars', 'Sun'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.40 v.7',
+    test: d => d.S('Mars') >= 65 && [1, 3, 10].includes(d.H('Mars')) || d.H('Mars') === 10,
+    why: 'DIRECT BPHS Ch.40 v.7'
+  }, {
+    id: 'R2',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.33 Mars in Karakamsa',
+    test: d => d.inKarakamsa('Mars') && d.S('Mars') >= 65,
+    why: 'DIRECT BPHS Ch.33 Mars in Karakamsa'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Sun') >= 65 && [1, 10].includes(d.H('Sun')),
+    why: 'တနင်္ဂနွေ အားကောင်း (1,10 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.H(d.L10) === 3 || d.asp('Mars', d.L10),
+    why: '10th lord 3rd အိမ် / အင်္ဂါ အမြင်'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(3)) >= 65,
+    why: '3 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R6',
+    layer: 'prof',
+    w: 1,
+    test: d => d.navLord === 'Mars',
+    why: 'navamsa အရှင် အင်္ဂါ'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Mars', 'Sun']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Tycoon',
+  label: 'Tycoon',
+  labelMy: 'တိုင်ကွန် (စီးပွားရေး ဧရာမ)',
+  high: true,
+  bandRequired: true,
+  amk: ['Mercury', 'Jupiter', 'Venus'],
+  src: ['trade', 'windfall', 'foreign'],
+  nav: ['Mercury', 'Jupiter'],
+  keys: ['Mercury', 'Jupiter'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 2,
+    test: d => d.yogaCount(/Dhana Yoga/) >= 3,
+    why: 'Dhana Yoga Yoga'
+  }, {
+    id: 'R2',
+    layer: 'yoga',
+    w: 2,
+    test: d => d.hasYoga(/Mahapurusha/) || d.yogaCount(/Raja Yoga/) >= 3,
+    why: 'Mahapurusha Yoga'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [2, 5, 10, 11].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (2,5,10,11 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(11)) >= 65 && (_ROLE_KENDRA.includes(d.H(d.L(11))) || _ROLE_TRIKONA.includes(d.H(d.L(11))) || d.H(d.L(11)) === 11),
+    why: '11th lord အားကောင်း (ကိန်း/တြိကောဏ/11 အိမ်)'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(2)) >= 65 && (_ROLE_KENDRA.includes(d.H(d.L(2))) || _ROLE_TRIKONA.includes(d.H(d.L(2)))),
+    why: '2nd lord အားကောင်း (ကိန်း/တြိကောဏ အိမ်)'
+  }, {
+    id: 'R6',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Mercury', 'Jupiter'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Mercury', 'Jupiter', d.L(2), d.L(11)]),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Founder',
+  label: 'Founder (Enterprise)',
+  labelMy: 'လုပ်ငန်း တည်ထောင်သူ (Enterprise Founder)',
+  high: true,
+  amk: ['Mercury', 'Mars', 'Jupiter'],
+  src: ['trade', 'foreign', 'windfall'],
+  nav: ['Mercury', 'Mars', 'Jupiter'],
+  keys: ['Mercury', 'Mars'],
+  serviceCap: true,
+  // service pattern = strong negative weight (caps verdict at TRACE), NOT a hard block
+  req: d => d.S(d.L(7)) >= 65,
+  // DEFINING element: 7th lord (trade/partnership, BPHS Ch.7) strong - founding needs partnership/market capacity
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 2,
+    test: d => d.H(d.L10) === 7 || d.H(d.L(7)) === 10,
+    why: '10th lord 7th မှာ / 7th lord 10th မှာ'
+  }, {
+    id: 'R2',
+    layer: 'yoga',
+    w: 2,
+    tag: 'Phala Ch.7 v.16 Kesari (own valour) or Mahapurusha',
+    test: d => d.hasYoga(/Kesari/) || d.hasYoga(/Mahapurusha/),
+    why: 'Phala Ch.7 v.16 Kesari (own valour) or Mahapurusha'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    tag: 'BPHS Ch.47 vv.27-32 Mars/courage; Ch.7 3rd=valour',
+    test: d => d.S(d.L(3)) >= 65 || d.S('Mars') >= 65 && _ROLE_KENDRA.includes(d.H('Mars')),
+    why: 'BPHS Ch.47 vv.27-32 Mars/courage; Ch.7 3rd=valour'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L10) >= 65 && (_ROLE_KENDRA.includes(d.H(d.L10)) || _ROLE_TRIKONA.includes(d.H(d.L10))),
+    why: '10th lord အားကောင်း'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [2, 5, 10, 11].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (2,5,10,11 အိမ်)'
+  }, {
+    id: 'R6',
+    layer: 'struct',
+    w: 1,
+    tag: 'BPHS Ch.21 v.4 business with patronage (benefic != L10 itself)',
+    test: d => d.L10 !== 'Jupiter' && (d.conj(d.L10, 'Jupiter') || d.asp('Jupiter', d.L10)) || d.L10 !== 'Venus' && (d.conj(d.L10, 'Venus') || d.asp('Venus', d.L10)),
+    why: 'BPHS Ch.21 v.4 business with patronage (benefic != L10 itself)'
+  }, {
+    id: 'R7',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Mercury', 'Mars', 'Jupiter'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R8',
+    layer: 'struct',
+    w: 2,
+    tag: '7th lord (trade/partnership) strong - the business-partnership element (BPHS Ch.7)',
+    test: d => d.S(d.L(7)) >= 65,
+    why: '7th lord (trade/partnership) strong - the business-partnership element (BPHS Ch.7)'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Mercury', 'Mars', d.L10]),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'OwnBiz',
+  label: 'ကိုယ်ပိုင်လုပ်ငန်းရှင် (Own-Business Owner)',
+  labelMy: 'ကိုယ်ပိုင်လုပ်ငန်းရှင်',
+  high: false,
+  common: true,
+  prevMax: 12,
+  amk: ['Mercury', 'Jupiter', 'Venus'],
+  src: ['trade'],
+  nav: ['Mercury', 'Jupiter', 'Venus'],
+  keys: ['Mercury'],
+  // v5: replaces Businessman (his ruling 2026-11-12). COMMON role (middle-tier own-business owners are
+  // common) - breadth gate, no +2 requirement; prevalence ceiling raised by the role's nature to 12/15.
+  // Derivation from Businessman: R1 narrowed to the trade pattern only (L10 in 7th OR L7 in 10th,
+  // driven by a trade planet) - BPHS Ch.7: 7th = trade; the 2nd/11th wealth placements dropped
+  // (wealth is not trade); D10 back to standard w:1 (the v4 w:2 was a Businessman-only judgment call).
+  // v5b: R7 added after the v5a run (positives 4/7 - Jobs at score 3, one short): 7th lord strong in an
+  // upachaya house (3/6/10/11) - the trade lord placed where effort grows. Upachaya = the classical
+  // houses of growth/effort/improvement (BPHS); a strong trade lord there = a business that grows
+  // through sustained effort. General form (any strong 7th lord in any upachaya house), standard >=65
+  // threshold - not fitted to any case. Alternatives rejected: gate score>=3 (fires Churchill/Streep/
+  // Student2004 as FULL - negative fail); source-count rule (same failure); Mercury-in-2nd (fires
+  // Churchill too). Trump/Oprah remain misses (recorded in the report).
+  req: d => ['trade', 'self', 'familybiz', 'finance', 'tech'].some(s => d.srcIds.includes(s)),
+  // business income must show - in any sector form (a tech founder's business income reads as 'tech', a finance business as 'finance')
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 2,
+    tag: 'trade pattern: L10 in 7th OR L7 in 10th, driven by a trade/commerce planet (Mercury/Jupiter/Venus) - BPHS Ch.7: 7th = trade',
+    test: d => (d.H(d.L10) === 7 || d.H(d.L(7)) === 10) && (['Mercury', 'Jupiter', 'Venus'].includes(d.L10) || ['Mercury', 'Jupiter', 'Venus'].includes(d.L(7))),
+    why: 'trade pattern: L10 in 7th OR L7 in 10th, driven by a trade/commerce planet (Mercury/Jupiter/Venus) - BPHS Ch.7: 7th = trade'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [2, 5, 10, 11].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (2,5,10,11 အိမ်)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 2,
+    tag: '10th lord strong AND in a good house (kendra/trikona/11) - the career lord',
+    test: d => d.S(d.L10) >= 65 && (_ROLE_KENDRA.includes(d.H(d.L10)) || _ROLE_TRIKONA.includes(d.H(d.L10)) || d.H(d.L10) === 11),
+    why: '10th lord strong AND in a good house (kendra/trikona/11) - the career lord'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(7)) >= 65,
+    why: '7 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Mercury', 'Jupiter', 'Venus'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 1,
+    tag: 'BPHS Ch.33 Mercury in Karakamsa (arts and trading)',
+    test: d => d.inKarakamsa('Mercury'),
+    why: 'BPHS Ch.33 Mercury in Karakamsa (arts and trading)'
+  }, {
+    id: 'R7',
+    layer: 'struct',
+    w: 1,
+    tag: '7th lord strong in an upachaya house (3/6/10/11) - trade lord where effort grows (BPHS upachaya doctrine)',
+    test: d => d.S(d.L(7)) >= 65 && [3, 6, 10, 11].includes(d.H(d.L(7))),
+    why: '7th lord strong in an upachaya house (3/6/10/11) - trade lord where effort grows (BPHS upachaya doctrine)'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Mercury', d.L10, d.L(7)]),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Singer',
+  label: 'Singer',
+  labelMy: 'အဆိုတော် / ဂီတပညာရှင်',
+  high: false,
+  amk: ['Venus', 'Mercury', 'Moon'],
+  src: ['art'],
+  nav: ['Venus'],
+  keys: ['Venus', 'Moon'],
+  req: d => d.dashaOK(['Venus', 'Moon', 'Mercury']),
+  // voice must be dasha-activated: distinguishes performing singer from behind-the-scenes producer (Dre has Venus in 10th but no Singer dasha)
+  rules: [{
+    id: 'R1',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.33 Moon 5th from Karakamsa (singing); Sun 5th (musician)',
+    test: d => d.in5Karakamsa('Moon') || d.in5Karakamsa('Sun'),
+    why: 'DIRECT BPHS Ch.33 Moon 5th from Karakamsa (singing); Sun 5th (musician)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 2,
+    tag: 'DIRECT Phala Ch.7 Veena vv.39-41; 2nd=voice',
+    test: d => d.S('Venus') >= 65 && [2, 5].includes(d.H('Venus')) || d.S(d.L(2)) >= 65 && [2, 5].includes(d.H('Venus')),
+    why: 'DIRECT Phala Ch.7 Veena vv.39-41; 2nd=voice'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Venus') >= 65 && [1, 5, 10, 11].includes(d.H('Venus')),
+    why: 'သောကြာ အားကောင်း (1,5,10,11 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && d.H('Mercury') === 2,
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (2nd အိမ်)'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => d.navLord === 'Venus',
+    why: 'navamsa အရှင် သောကြာ'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 1,
+    tag: 'Veena Yoga (if engine has it)',
+    test: d => d.hasYoga(/Veena/),
+    why: 'Veena Yoga (if engine has it)'
+  }, {
+    id: 'R7',
+    layer: 'struct',
+    w: 2,
+    tag: 'Moon in 5th house (D1) - music/emotion in the house of performance; parallel to BPHS Ch.33 Moon 5th from Karakamsa',
+    test: d => d.H('Moon') === 5,
+    why: 'Moon in 5th house (D1) - music/emotion in the house of performance; parallel to BPHS Ch.33 Moon 5th from Karakamsa'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Venus', 'Moon', 'Mercury']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Actor',
+  label: 'Actor',
+  labelMy: 'သရုပ်ဆောင်',
+  high: false,
+  amk: ['Venus', 'Moon', 'Mercury'],
+  src: ['art'],
+  nav: ['Venus', 'Moon'],
+  keys: ['Venus', 'Moon'],
+  req: d => d.S('Venus') >= 65 && [1, 5, 10, 11].includes(d.H('Venus')) || d.S('Moon') >= 65 && [1, 5, 10].includes(d.H('Moon')) || d.hasYoga(/Gaja-Kesari/),
+  // glamour planets in performance houses OR Gaja-Kesari eminence (blocks Churchill: L5-strong + navLord alone is not acting)
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 2,
+    test: d => d.S('Venus') >= 65 && [1, 5, 10, 11].includes(d.H('Venus')) || d.S('Moon') >= 65 && [1, 5, 10].includes(d.H('Moon')),
+    why: 'သောကြာ/တနင်္လာ အားကောင်း (ဖျော်ဖြေရေး အိမ်)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 2,
+    tag: '5th lord strong - the house of performance/acting',
+    test: d => d.S(d.L(5)) >= 65,
+    why: '5th lord strong - the house of performance/acting'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.conj('Venus', 'Moon') || d.asp('Venus', 'Moon') || d.asp('Moon', 'Venus'),
+    why: 'သောကြာ · တနင်္လာ ဆက်စပ်မှု'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => [1, 5, 10].includes(d.H('Rahu')),
+    why: 'ရာဟု 1/5/10 အိမ်'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Venus', 'Moon'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 1,
+    test: d => d.hasYoga(/Gaja-Kesari/),
+    why: 'Gaja-Kesari Yoga'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Venus', 'Moon']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'PerfArtist',
+  label: 'Performance Artist',
+  labelMy: 'Performance Artist (စွမ်းဆောင်ရည် အနုပညာရှင်)',
+  high: false,
+  amk: ['Venus', 'Mercury', 'Saturn'],
+  src: ['art', 'foreign'],
+  nav: ['Venus', 'Mercury', 'Saturn'],
+  keys: ['Venus', 'Saturn'],
+  req: d => [1, 5, 7, 10].includes(d.H('Rahu')) || d.S('Saturn') >= 65 && [1, 5, 10, 12].includes(d.H('Saturn')),
+  // performance art = unconventional/public (Rahu) OR bodily discipline (Saturn); distinguishes it from conventional Actor (blocks Lisa/Hanks)
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 2,
+    test: d => [10, 5].includes(d.H('Venus')),
+    why: 'သောကြာ 10/5 အိမ်'
+  }, {
+    id: 'R2',
+    layer: 'yoga',
+    w: 2,
+    test: d => [1, 5, 7, 10].includes(d.H('Rahu')),
+    why: 'ရာဟု 1/5/7/10 အိမ်'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Saturn') >= 65 && [1, 5, 10, 12].includes(d.H('Saturn')),
+    why: 'စနေ အားကောင်း (1,5,10,12 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.hasYoga(/Gaja-Kesari/) || d.conj('Moon', 'Jupiter') || d.asp('Moon', 'Jupiter') || d.asp('Jupiter', 'Moon'),
+    why: 'Gaja-Kesari Yoga'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(5)) >= 65,
+    why: '5 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R6',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Venus', 'Mercury', 'Saturn'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Venus', 'Saturn']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Painter',
+  label: 'Painter',
+  labelMy: 'ပန်းချီဆရာ',
+  high: false,
+  amk: ['Venus', 'Mercury'],
+  src: ['art'],
+  nav: ['Mercury', 'Saturn'],
+  keys: ['Venus', 'Mercury'],
+  rules: [{
+    id: 'R1',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.33 Mercury in Karakamsa (arts)',
+    test: d => d.inKarakamsa('Mercury'),
+    why: 'DIRECT BPHS Ch.33 Mercury in Karakamsa (arts)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Venus') >= 65 && (_ROLE_KENDRA.includes(d.H('Venus')) || _ROLE_TRIKONA.includes(d.H('Venus')) || d.H('Venus') === 11),
+    why: 'သောကြာ အားကောင်း (ကိန်း/တြိကောဏ/11 အိမ်)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.conj('Venus', 'Mercury') || d.asp('Venus', 'Mercury') || d.asp('Mercury', 'Venus'),
+    why: 'သောကြာ · ဗုဒ္ဓဟူး ဆက်စပ်မှု'
+  }, {
+    id: 'R4',
+    layer: 'prof',
+    w: 1,
+    tag: 'Phala Ch.5 Saturn navamsa (sculpture/visual craft)',
+    test: d => d.navLord === 'Saturn',
+    why: 'Phala Ch.5 Saturn navamsa (sculpture/visual craft)'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [5, 10, 1].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (5,10,1 အိမ်)'
+  }, {
+    id: 'R6',
+    layer: 'prof',
+    w: 1,
+    tag: 'Phala Ch.5 Mercury navamsa (arts)',
+    test: d => d.navLord === 'Mercury',
+    why: 'Phala Ch.5 Mercury navamsa (arts)'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Venus', 'Mercury']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'VisualArtist',
+  label: 'Visual / Conceptual Artist',
+  labelMy: 'Visual / Conceptual Artist (ရုပ်မြင် အနုပညာရှင်)',
+  high: false,
+  amk: ['Venus', 'Mercury', 'Saturn'],
+  src: ['art'],
+  nav: ['Mercury', 'Venus', 'Saturn'],
+  keys: ['Venus', 'Saturn'],
+  req: d => d.S('Saturn') >= 65 && [1, 5, 10].includes(d.H('Saturn')) || d.S('Saturn') >= 80 || ['Mercury', 'Venus', 'Saturn'].includes(d.navLord) || d.S(d.L(9)) >= 65,
+  // Venus alone = general art appreciation; visual art needs form-mastery (Saturn) OR craft navamsa OR vision (9th lord)
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    test: d => [5, 10, 11].includes(d.H('Rahu')),
+    why: 'ရာဟု 5/10/11 အိမ်'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 2,
+    tag: 'Venus (the art planet) in career/performance house or strong in a good house',
+    test: d => [10, 5].includes(d.H('Venus')) || d.S('Venus') >= 65 && (_ROLE_KENDRA.includes(d.H('Venus')) || _ROLE_TRIKONA.includes(d.H('Venus')) || d.H('Venus') === 11),
+    why: 'Venus (the art planet) in career/performance house or strong in a good house'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    tag: 'Saturn = conceptual structure/form (design doc); >=80 anywhere = form-mastery',
+    test: d => d.S('Saturn') >= 65 && [1, 5, 10].includes(d.H('Saturn')) || d.S('Saturn') >= 80,
+    why: 'Saturn = conceptual structure/form (design doc); >=80 anywhere = form-mastery'
+  }, {
+    id: 'R4',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Mercury', 'Venus', 'Saturn'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(9)) >= 65,
+    why: '9 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R6',
+    layer: 'struct',
+    w: 1,
+    test: d => d.conj('Venus', 'Rahu') || d.asp('Venus', 'Rahu') || d.asp('Rahu', 'Venus'),
+    why: 'သောကြာ · ရာဟု ဆက်စပ်မှု'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Venus', 'Saturn']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Scientist',
+  label: 'Scientist',
+  labelMy: 'သိပ္ပံပညာရှင်',
+  high: false,
+  amk: ['Mercury', 'Jupiter', 'Moon'],
+  src: [],
+  nav: ['Mercury', 'Jupiter'],
+  keys: ['Mercury', 'Jupiter'],
+  req: d => d.hasYoga(/Saraswati/),
+  // Saraswati = the scholar's yoga (learning/knowledge/science); required for the Scientist role
+  rules: [{
+    id: 'R1',
+    layer: 'yoga',
+    w: 2,
+    test: d => d.conj('Jupiter', 'Mercury') || d.asp('Jupiter', 'Mercury') || d.asp('Mercury', 'Jupiter') || d.S('Mercury') >= 65 && [5, 9, 10].includes(d.H('Mercury')) && d.S('Jupiter') >= 65,
+    why: 'ကြာသပတေး · ဗုဒ္ဓဟူး ဆက်စပ်မှု'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [5, 9, 10, 1].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (5,9,10,1 အိမ်)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Jupiter') >= 65 && [5, 9, 10, 1].includes(d.H('Jupiter')),
+    why: 'ကြာသပတေး အားကောင်း (5,9,10,1 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(5)) >= 65,
+    why: '5 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Mercury', 'Jupiter'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT Saraswati Yoga - the scholar/science yoga',
+    test: d => d.hasYoga(/Saraswati/),
+    why: 'DIRECT Saraswati Yoga - the scholar/science yoga'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Mercury', 'Jupiter']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Teacher',
+  label: 'Teacher',
+  labelMy: 'ဆရာ / ပညာရှင်',
+  high: false,
+  amk: ['Jupiter', 'Mercury', 'Moon', 'Sun'],
+  src: [],
+  nav: ['Jupiter'],
+  keys: ['Jupiter', 'Mercury'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Jupiter') >= 65 && [1, 5, 9, 10].includes(d.H('Jupiter')),
+    why: 'ကြာသပတေး အားကောင်း (1,5,9,10 အိမ်)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 2,
+    tag: '5th lord strong - the house of students/learning (the teacher indicator)',
+    test: d => d.S(d.L(5)) >= 65,
+    why: '5th lord strong - the house of students/learning (the teacher indicator)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [5, 9, 10].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (5,9,10 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'yoga',
+    w: 1,
+    tag: 'BPHS Ch.33 Jupiter in Karakamsa (good acts)',
+    test: d => d.inKarakamsa('Jupiter'),
+    why: 'BPHS Ch.33 Jupiter in Karakamsa (good acts)'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => d.navLord === 'Jupiter',
+    why: 'navamsa အရှင် ကြာသပတေး'
+  }, {
+    id: 'R6',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(9)) >= 65,
+    why: '9 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Jupiter', 'Mercury']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Writer',
+  label: 'Writer',
+  labelMy: 'စာရေးဆရာ / ကဗျာဆရာ',
+  high: false,
+  amk: ['Mercury', 'Jupiter', 'Venus'],
+  src: [],
+  nav: ['Mercury'],
+  keys: ['Mercury', 'Jupiter'],
+  rules: [{
+    id: 'R1',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.33 vv.41-45 Jupiter+Moon author; Venus in Karakamsa ordinary writer',
+    test: d => d.inKarakamsa('Jupiter') && d.inKarakamsa('Moon') || d.in5Karakamsa('Jupiter') && d.in5Karakamsa('Moon') || d.inKarakamsa('Venus'),
+    why: 'DIRECT BPHS Ch.33 vv.41-45 Jupiter+Moon author; Venus in Karakamsa ordinary writer'
+  }, {
+    id: 'R2',
+    layer: 'prof',
+    w: 2,
+    tag: 'DIRECT Phala Ch.5 v.5 Mercury navamsa = writer',
+    test: d => d.navLord === 'Mercury',
+    why: 'DIRECT Phala Ch.5 v.5 Mercury navamsa = writer'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [2, 3, 5].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (2,3,5 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    tag: 'BPHS Ch.33 Venus 5th from Karakamsa (poet)',
+    test: d => d.in5Karakamsa('Venus'),
+    why: 'BPHS Ch.33 Venus 5th from Karakamsa (poet)'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(3)) >= 65,
+    why: '3 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 1,
+    tag: 'BPHS Ch.33 Jupiter alone in Karakamsa (writer)',
+    test: d => d.inKarakamsa('Jupiter') && !d.inKarakamsa('Moon'),
+    why: 'BPHS Ch.33 Jupiter alone in Karakamsa (writer)'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Mercury', 'Jupiter', 'Venus']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Doctor',
+  label: 'Doctor',
+  labelMy: 'ဆရာဝန် / ကုသသူ',
+  high: false,
+  partial: true,
+  amk: ['Sun', 'Mars'],
+  src: [],
+  nav: ['Sun'],
+  keys: ['Sun', 'Mars'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    fam: 'Rahu',
+    test: d => [6, 8, 12].includes(d.H('Rahu')),
+    why: 'ရာဟု 6/8/12 အိမ်'
+  }, {
+    id: 'R2',
+    layer: 'yoga',
+    w: 1,
+    fam: 'Rahu',
+    tag: 'BPHS Ch.33 Rahu in Karakamsa (machinery/doctor)',
+    test: d => d.inKarakamsa('Rahu'),
+    why: 'BPHS Ch.33 Rahu in Karakamsa (machinery/doctor)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    fam: 'Sun',
+    test: d => d.H('Sun') === 6,
+    why: 'တနင်္ဂနွေ 6th အိမ်'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    fam: 'Sun',
+    test: d => d.S('Sun') >= 65 && [1, 10].includes(d.H('Sun')) && d.S(d.L(6)) >= 65,
+    why: 'တနင်္ဂနွေ အားကောင်း + 6th lord အားကောင်း'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    fam: 'Mars',
+    test: d => d.S('Mars') >= 65 && d.H('Mars') === 6,
+    why: 'အင်္ဂါ အားကောင်း (6th အိမ်)'
+  }, {
+    id: 'R6',
+    layer: 'struct',
+    w: 1,
+    fam: '6th',
+    test: d => d.S(d.L(6)) >= 65 && (_ROLE_KENDRA.includes(d.H(d.L(6))) || _ROLE_TRIKONA.includes(d.H(d.L(6)))),
+    why: '6th lord အားကောင်း (ကိန်း/တြိကောဏ အိမ်)'
+  }, {
+    id: 'R7',
+    layer: 'prof',
+    w: 2,
+    fam: 'prof',
+    tag: 'DIRECT Phala Ch.5 Sun navamsa = medicines',
+    test: d => d.navLord === 'Sun',
+    why: 'DIRECT Phala Ch.5 Sun navamsa = medicines'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    fam: 'd10',
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    fam: 'dasha',
+    test: d => d.dashaOK(['Sun', 'Mars', 'Rahu']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Lawyer',
+  label: 'Lawyer',
+  labelMy: 'ရှေ့နေ / တရားသူကြီး',
+  high: false,
+  amk: ['Jupiter', 'Mercury', 'Saturn'],
+  src: ['law', 'govt'],
+  nav: ['Jupiter'],
+  keys: ['Jupiter', 'Saturn'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Jupiter') >= 65 && [1, 5, 9, 10].includes(d.H('Jupiter')),
+    why: 'ကြာသပတေး အားကောင်း (1,5,9,10 အိမ်)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 2,
+    tag: 'Saturn (justice/law) strong in kendra/service houses',
+    test: d => d.S('Saturn') >= 65 && [1, 6, 10].includes(d.H('Saturn')),
+    why: 'Saturn (justice/law) strong in kendra/service houses'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [2, 3].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (2,3 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(9)) >= 65,
+    why: '9 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => d.navLord === 'Jupiter',
+    why: 'navamsa အရှင် ကြာသပတေး'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 1,
+    test: d => d.inKarakamsa('Jupiter'),
+    why: 'ကြာသပတေး Karakamsa မှာ'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Jupiter', 'Saturn', 'Mercury']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Engineer',
+  label: 'Engineer',
+  labelMy: 'အင်ဂျင်နီယာ',
+  high: false,
+  amk: ['Mars', 'Saturn', 'Mercury'],
+  src: ['trade'],
+  nav: ['Mars', 'Saturn', 'Mercury'],
+  keys: ['Mars', 'Saturn'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mars') >= 65 && [1, 3, 10].includes(d.H('Mars')),
+    why: 'အင်္ဂါ အားကောင်း (1,3,10 အိမ်)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Saturn') >= 65 && [1, 5, 10].includes(d.H('Saturn')),
+    why: 'စနေ အားကောင်း (1,5,10 အိမ်)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [5, 10, 1].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (5,10,1 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => [3, 6].includes(d.H(d.L10)),
+    why: '10th lord 3/6 အိမ်'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Mars', 'Saturn', 'Mercury'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.33 Rahu 5th from Karakamsa (machinist); Mars in Karakamsa',
+    test: d => d.in5Karakamsa('Rahu') || d.inKarakamsa('Mars'),
+    why: 'DIRECT BPHS Ch.33 Rahu 5th from Karakamsa (machinist); Mars in Karakamsa'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Mars', 'Saturn', 'Mercury']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Priest',
+  label: 'Priest / Religious',
+  labelMy: 'ဘုန်းတော်ကြီး / ဘာသာရေးဆရာ',
+  high: false,
+  amk: ['Jupiter'],
+  src: [],
+  nav: ['Jupiter'],
+  keys: ['Jupiter'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Jupiter') >= 65 && [1, 5, 9, 10].includes(d.H('Jupiter')),
+    why: 'ကြာသပတေး အားကောင်း (1,5,9,10 အိမ်)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(9)) >= 65,
+    why: '9 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Moon') >= 65 && [9, 12].includes(d.H('Moon')),
+    why: 'တနင်္လာ အားကောင်း (9,12 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => [12, 9].includes(d.H('Saturn')),
+    why: 'စနေ 12/9 အိမ်'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 2,
+    tag: 'DIRECT Phala Ch.5 Jupiter navamsa (priesthood/religious instruction)',
+    test: d => d.navLord === 'Jupiter',
+    why: 'DIRECT Phala Ch.5 Jupiter navamsa (priesthood/religious instruction)'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 1,
+    test: d => d.inKarakamsa('Jupiter'),
+    why: 'ကြာသပတေး Karakamsa မှာ'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Jupiter']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Farmer',
+  label: 'Farmer',
+  labelMy: 'လယ်သမား',
+  high: false,
+  amk: ['Saturn', 'Moon'],
+  src: [],
+  nav: ['Saturn'],
+  keys: ['Saturn', 'Moon'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Saturn') >= 65 && [1, 4, 10].includes(d.H('Saturn')),
+    why: 'စနေ အားကောင်း (1,4,10 အိမ်)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(4)) >= 65,
+    why: '4 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.H('Moon') === 4,
+    why: 'တနင်္လာ 4th အိမ်'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.H('Mars') === 4,
+    why: 'အင်္ဂါ 4th အိမ်'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 2,
+    tag: 'DIRECT Phala Ch.5 Saturn navamsa (hard labour / land work)',
+    test: d => d.navLord === 'Saturn',
+    why: 'DIRECT Phala Ch.5 Saturn navamsa (hard labour / land work)'
+  }, {
+    id: 'R6',
+    layer: 'struct',
+    w: 1,
+    test: d => d.H(d.L(4)) === 4,
+    why: '4th lord 4th အိမ်'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Saturn', 'Moon']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'CivilServant',
+  label: 'Civil Servant',
+  labelMy: 'အစိုးရဝန်ထမ်း',
+  high: false,
+  amk: ['Sun', 'Saturn'],
+  src: ['govt'],
+  nav: ['Sun'],
+  keys: ['Sun', 'Saturn'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Sun') >= 65 && [1, 10].includes(d.H('Sun')),
+    why: 'တနင်္ဂနွေ အားကောင်း (1,10 အိမ်)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.H(d.L10) === 6 || d.H('Sun') === 6,
+    why: '10th lord/တနင်္ဂနွေ 6th အိမ်'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Saturn') >= 65 && [6, 10].includes(d.H('Saturn')),
+    why: 'စနေ အားကောင်း (6,10 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L10) >= 65,
+    why: '10th lord အားကောင်း'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => d.navLord === 'Sun',
+    why: 'navamsa အရှင် တနင်္ဂနွေ'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.33 Sun in Karakamsa (royal assignments)',
+    test: d => d.inKarakamsa('Sun'),
+    why: 'DIRECT BPHS Ch.33 Sun in Karakamsa (royal assignments)'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Sun', 'Saturn']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Labourer',
+  label: 'Labourer',
+  labelMy: 'အလုပ်သမား / လက်မှုပညာရှင်',
+  high: false,
+  amk: ['Saturn', 'Mars'],
+  src: [],
+  nav: ['Saturn'],
+  keys: ['Saturn', 'Mars'],
+  rules: [{
+    id: 'R1',
+    layer: 'prof',
+    w: 2,
+    tag: 'DIRECT Phala Ch.5 Saturn navamsa (hard labour)',
+    test: d => d.navLord === 'Saturn',
+    why: 'DIRECT Phala Ch.5 Saturn navamsa (hard labour)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => [6, 10].includes(d.H('Saturn')),
+    why: 'စနေ 6/10 အိမ်'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.H(d.L(6)) === 10,
+    why: '6th lord 10th အိမ်'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => [6, 10].includes(d.H('Mars')),
+    why: 'အင်္ဂါ 6/10 အိမ်'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    test: d => d.H('Saturn') === 1,
+    why: 'စနေ 1st အိမ်'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Saturn', 'Mars']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Athlete',
+  label: 'Athlete',
+  labelMy: 'အားကစားသမား',
+  high: false,
+  amk: ['Mars', 'Sun'],
+  src: [],
+  nav: ['Mars'],
+  keys: ['Mars', 'Sun'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mars') >= 65 && [1, 3, 10].includes(d.H('Mars')),
+    why: 'အင်္ဂါ အားကောင်း (1,3,10 အိမ်)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(3)) >= 65,
+    why: '3 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Sun') >= 65 && [1, 10].includes(d.H('Sun')),
+    why: 'တနင်္ဂနွေ အားကောင်း (1,10 အိမ်)'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => [1, 10].includes(d.H('Saturn')),
+    why: 'စနေ 1/10 အိမ်'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => d.navLord === 'Mars',
+    why: 'navamsa အရှင် အင်္ဂါ'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.33 Mars in Karakamsa (fighting/valour)',
+    test: d => d.inKarakamsa('Mars'),
+    why: 'DIRECT BPHS Ch.33 Mars in Karakamsa (fighting/valour)'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Mars', 'Sun']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Manager',
+  label: 'Manager',
+  labelMy: 'မန်နေဂျာ / အုပ်ချုပ်သူ',
+  high: false,
+  amk: ['Sun', 'Mercury', 'Jupiter'],
+  src: ['trade', 'govt'],
+  nav: ['Sun', 'Mercury', 'Jupiter'],
+  keys: ['Sun', 'Mercury'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Sun') >= 65 && [1, 10].includes(d.H('Sun')),
+    why: 'တနင်္ဂနွေ အားကောင်း (1,10 အိမ်)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && d.H('Mercury') === 10,
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (10th အိမ်)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L10) >= 65 && _ROLE_KENDRA.includes(d.H(d.L10)),
+    why: '10th lord အားကောင်း'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Jupiter') >= 65 && d.H('Jupiter') === 10,
+    why: 'ကြာသပတေး အားကောင်း (10th အိမ်)'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Sun', 'Mercury', 'Jupiter'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R6',
+    layer: 'struct',
+    w: 1,
+    test: d => d.H(d.L10) === 1,
+    why: '10th lord 1st အိမ်'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Sun', 'Mercury', 'Jupiter']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Industrialist',
+  label: 'Industrialist',
+  labelMy: 'စက်မှုလုပ်ငန်းရှင်',
+  high: false,
+  amk: ['Saturn', 'Mars', 'Mercury'],
+  src: ['trade'],
+  nav: ['Saturn', 'Mars'],
+  keys: ['Saturn', 'Mars'],
+  rules: [{
+    id: 'R1',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Saturn') >= 65 && [1, 4, 10].includes(d.H('Saturn')),
+    why: 'စနေ အားကောင်း (1,4,10 အိမ်)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mars') >= 65 && [1, 3, 10].includes(d.H('Mars')),
+    why: 'အင်္ဂါ အားကောင်း (1,3,10 အိမ်)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.H(d.L10) === 4,
+    why: '10th lord 4th အိမ်'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [2, 10].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (2,10 အိမ်)'
+  }, {
+    id: 'R5',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Saturn', 'Mars'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R6',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.33 Rahu 5th from Karakamsa (machinist)',
+    test: d => d.in5Karakamsa('Rahu'),
+    why: 'DIRECT BPHS Ch.33 Rahu 5th from Karakamsa (machinist)'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Saturn', 'Mars', 'Mercury']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}, {
+  id: 'Creator',
+  label: 'Creator (YouTuber/Vlogger)',
+  labelMy: 'Creator (YouTuber / Vlogger)',
+  high: false,
+  amk: ['Mercury', 'Venus', 'Moon'],
+  src: ['art'],
+  nav: ['Mercury', 'Venus'],
+  keys: ['Mercury', 'Venus'],
+  rules: [{
+    id: 'R1',
+    layer: 'yoga',
+    w: 2,
+    tag: 'DIRECT BPHS Ch.33 Venus 5th from Karakamsa (eloquent speaker)',
+    test: d => d.in5Karakamsa('Venus'),
+    why: 'DIRECT BPHS Ch.33 Venus 5th from Karakamsa (eloquent speaker)'
+  }, {
+    id: 'R2',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Mercury') >= 65 && [2, 3].includes(d.H('Mercury')),
+    why: 'ဗုဒ္ဓဟူး အားကောင်း (2,3 အိမ်)'
+  }, {
+    id: 'R3',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(2)) >= 65,
+    why: '2 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R4',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Venus') >= 65 && [1, 5, 10, 11].includes(d.H('Venus')),
+    why: 'သောကြာ အားကောင်း (1,5,10,11 အိမ်)'
+  }, {
+    id: 'R5',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S('Moon') >= 65 && [1, 5, 10].includes(d.H('Moon')),
+    why: 'တနင်္လာ အားကောင်း (1,5,10 အိမ်)'
+  }, {
+    id: 'R6',
+    layer: 'struct',
+    w: 1,
+    test: d => d.S(d.L(5)) >= 65,
+    why: '5 တန့် အရှင် အားကောင်း'
+  }, {
+    id: 'R7',
+    layer: 'prof',
+    w: 1,
+    test: d => ['Mercury', 'Venus'].includes(d.navLord),
+    why: 'navamsa အရှင် ကိုက်ညီမှု'
+  }, {
+    id: 'R8',
+    layer: 'yoga',
+    w: 1,
+    tag: 'Phala Ch.7 v.16 Kesari (address assembly with wisdom)',
+    test: d => d.hasYoga(/Kesari/),
+    why: 'Phala Ch.7 v.16 Kesari (address assembly with wisdom)'
+  }, {
+    id: 'D10',
+    layer: 'd10',
+    w: 1,
+    test: d => d.d10Support >= 2,
+    why: 'D10 အထောက် ≥2'
+  }, {
+    id: 'DASH',
+    layer: 'dasha',
+    w: 1,
+    test: d => d.dashaOK(['Mercury', 'Venus', 'Moon']),
+    why: 'ဒဿာ အကျိုးပေး'
+  }]
+}];
+// ---- evaluation (REDESIGN v2) ----
+function _roleEval(d, role) {
+  // Required element (definitional): if absent, the role does not show at all (not even TRACE).
+  if (role.req) {
+    try {
+      if (!role.req(d)) return {
+        verdict: '—',
+        score: 0,
+        layers: [],
+        fired: [],
+        agreement: false,
+        support: false
+      };
+    } catch (e) {
+      return {
+        verdict: '—',
+        score: 0,
+        layers: [],
+        fired: [],
+        agreement: false,
+        support: false
+      };
+    }
+  }
+  const fired = role.rules.filter(r => {
+    try {
+      return r.test(d);
+    } catch (e) {
+      return false;
+    }
+  });
+  const score = fired.reduce((a, r) => a + r.w, 0);
+  // Capped layers: D10 + dasha together count as at most ONE supporting layer (near-free points).
+  const capped = [...new Set(fired.map(r => r.layer === 'd10' || r.layer === 'dasha' ? 'supporting' : r.layer))];
+  const hasPlus2 = fired.some(r => r.w >= 2);
+  const agreement = role.amk.includes(d.kk.AmK) || role.src.some(s => d.srcIds.includes(s)) || role.nav.includes(d.navLord);
+  // Support-v2 (high only): strong support (honour card OR exceptional band) OR the role's own
+  // overwhelming evidence (score>=6 with all 4 capped layers) = its own eminence evidence.
+  // Tycoon: honour does NOT count (wealth role) - exceptional band OR role-score only.
+  const roleEminence = score >= 6 && capped.length === 4;
+  const support = role.bandRequired ? !!d.excBand || roleEminence : !!d.excHonor || !!d.excBand || roleEminence;
+  let fams = null;
+  if (role.partial) fams = new Set(fired.filter(r => r.fam && ['Rahu', 'Sun', 'Mars', '6th'].includes(r.fam)).map(r => r.fam)).size;
+  const thresh = 3,
+    layersNeed = role.high ? 3 : 2;
+  const yogaScore = fired.filter(r => r.layer === 'yoga').reduce((a, r) => a + r.w, 0);
+  let verdict = '—';
+  if (role.high) {
+    // Path 1: 3 capped layers incl. yoga. Path 2 (yoga eminence): two +2 yoga rules
+    // (yogaScore>=4) with 2 capped layers - overwhelming yoga evidence substitutes for a 3rd layer
+    // (Obama StateInfluence: Adhi + Sasa Mahapurusha).
+    const fullPath1 = score >= thresh && capped.length >= layersNeed && capped.includes('yoga') && hasPlus2 && support && agreement;
+    const fullPath2 = yogaScore >= 4 && capped.length >= 2 && hasPlus2 && support && agreement;
+    if (fullPath1 || fullPath2) verdict = 'FULL';else if (score >= thresh && capped.length === layersNeed - 1 && support && agreement) verdict = 'TRACE';
+  } else if (role.common) {
+    // COMMON role (Own-Business Owner): breadth instead of depth - score>=4 (four points of business
+    // evidence across rules) with >=2 capped layers and agreement; no +2 requirement, no support
+    // requirement. TRACE = score>=3 with exactly 1 capped layer and agreement.
+    if (score >= 4 && capped.length >= layersNeed && agreement) verdict = 'FULL';else if (score >= 3 && capped.length === 1 && agreement) verdict = 'TRACE';
+  } else if (role.partial) {
+    if (score >= thresh && capped.length >= layersNeed && hasPlus2 && fams >= 2 && agreement) verdict = 'FULL';else if (score >= thresh && capped.length === layersNeed - 1 && fams >= 2 && agreement) verdict = 'TRACE';
+  } else {
+    if (score >= thresh && capped.length >= layersNeed && hasPlus2 && agreement) verdict = 'FULL';else if (score >= thresh && capped.length === layersNeed - 1 && agreement) verdict = 'TRACE';
+  }
+  // Founder service pattern: a strong negative weight, not a hard block - caps the verdict at TRACE.
+  if (role.serviceCap && (d.H(d.L10) === 6 || d.H(d.L(6)) === 10) && verdict === 'FULL') verdict = 'TRACE';
+  return {
+    verdict,
+    score,
+    layers: capped,
+    fired: fired.map(r => r.id + (r.w > 1 ? '(' + r.w + ')' : '')),
+    agreement,
+    support,
+    fams
+  };
+}
+
+// ---- Tycoon sub-types (interpretation, ruling 2026-11-12) ----
+function _roleTycoonSubtype(d) {
+  const sub = _rolePatronage(d) ? 'Crony (patronage)' : (d.S(d.L(4)) >= 65 || d.S(d.L(9)) >= 65) && _ROLE_KENDRA.includes(d.H('Jupiter')) ? 'Elite (hereditary)' : 'Tycoon (self-made)';
+  return sub;
+}
+// ---- dasha windows for a role: key planets whose maha starts at age 15-65 ----
+function _roleDashaWindows(d, keys) {
+  const out = [];
+  if (!Array.isArray(d.tree)) return out;
+  const bd = d.birthDate ? new Date(d.birthDate).getTime() : null;
+  if (!bd) return out;
+  keys.forEach(k => {
+    const e = d.tree.find(t => t.lord === k);
+    if (!e) return;
+    const ageS = (new Date(e.start).getTime() - bd) / (365.25 * 864e5);
+    const ageE = (new Date(e.end).getTime() - bd) / (365.25 * 864e5);
+    if (ageS >= 15 && ageS <= 65) out.push({
+      lord: k,
+      start: e.start,
+      end: e.end,
+      ageStart: Math.max(0, Math.floor(ageS)),
+      ageEnd: Math.max(0, Math.floor(ageE))
+    });
+  });
+  return out;
+}
+// ---- cross-event flags for a shown high-office role (ruling 4) ----
+function _roleCrossEvent(d) {
+  const flags = [];
+  if (d.dushkriti) flags.push('Dushkriti Yoga (Phala Ch.7 v.64)');
+  const hs = (d.hsFams || []).filter(f => /^(legal|fall|reputation):/.test(f));
+  if (hs.length) flags.push('Hard Season: ' + hs.join(', '));
+  if (d.govTrouble) flags.push('အစိုးရ/အာဏာ ဘက်တွင် အဟန့် ရှိနိုင်သည်');
+  if (d.pubSup < 2) flags.push('လူထု ထောက်ခံမှု အားနည်း (' + d.pubSup + '/3)');
+  return flags;
+}
+// ---- main entry: returns the shown roles, FULL first (score desc), then TRACE ----
+function calculateRolePotential(bp, dashaTree, yogas, ov, geo) {
+  if (!bp || typeof bp.Lagna !== 'number') return [];
+  ov = ov || {};
+  geo = geo || {};
+  const jd = geo.jd,
+    lat = geo.lat,
+    lon = geo.lon,
+    ayan = geo.ayanamsa || 'lahiri',
+    node = geo.nodeType || 'mean';
+  const birthDate = geo.birthDate || null;
+  try {
+    const L10 = _lordOfHouse(bp, 10);
+    const S = x => _planetStrength(bp, x);
+    const H = x => _planetHouse(bp, x);
+    const L = h => _lordOfHouse(bp, h);
+    const sign = x => calculateVarga(bp[x], 1);
+    const d9 = x => calculateVarga(bp[x], 9);
+    const d10 = x => calculateVarga(bp[x], 10);
+    const kk = charaKarakas(bp);
+    const karmSign = d9(kk.AK);
+    const inKarakamsa = n => d9(n) === karmSign;
+    const in5Karakamsa = n => d9(n) === (karmSign + 4) % 12;
+    const conj = (a, b) => sign(a) === sign(b);
+    const asp = (a, b) => {
+      if (conj(a, b)) return true;
+      const hs = a === 'Rahu' || a === 'Ketu' ? _aspectHousesN(bp, a) : _aspectHouses(bp, a);
+      return hs.includes(H(b));
+    };
+    const hasYoga = re => (yogas || []).some(y => re.test(y.name));
+    const yogaCount = re => (yogas || []).filter(y => re.test(y.name)).length;
+    let sb = null;
+    try {
+      sb = computeShadbala(bp, jd, lat, lon, ayan, node);
+    } catch (e) {}
+    const sbTot = x => sb && sb[x] ? sb[x].total : null;
+    const strMap = {
+      Lagna: sbTot(L(1)),
+      Moon: sbTot('Moon'),
+      Sun: sbTot('Sun')
+    };
+    const strongest = Object.keys(strMap).sort((a, b) => (strMap[b] || 0) - (strMap[a] || 0))[0];
+    const tenthLordFromStrongest = (() => {
+      const baseSign = strongest === 'Lagna' ? sign('Lagna') : strongest === 'Moon' ? sign('Moon') : sign('Sun');
+      const tenthSign = (baseSign + 9) % 12;
+      return RASI_LORDS[tenthSign];
+    })();
+    const navLord = RASI_LORDS[d9(tenthLordFromStrongest)];
+    const d10Support = (() => {
+      let s = 0;
+      const d10Sign = x => calculateVarga(bp[x], 10);
+      const d10House = x => (d10Sign(x) - d10Sign('Lagna') + 12) % 12 + 1;
+      const d10Strength = x => {
+        const dg = getPlanetaryDignity(d10Sign(x), x);
+        return dg === 'exalt' ? 95 : dg === 'own' ? 80 : dg === 'friend' ? 65 : dg === 'neutral' ? 50 : dg === 'enemy' ? 35 : 20;
+      };
+      if (d10Strength(L10) >= 65) s++;
+      const d10L10 = RASI_LORDS[(d10Sign('Lagna') + 9) % 12];
+      if (_ROLE_KENDRA.includes(d10House(d10L10)) || _ROLE_TRIKONA.includes(d10House(d10L10))) s++;
+      if (d10Strength('Sun') >= 65 || _ROLE_KENDRA.includes(d10House('Sun'))) s++;
+      return s;
+    })();
+    const dashaOK = keys => {
+      if (!birthDate) return false;
+      const birthMs = new Date(birthDate).getTime();
+      return keys.some(k => {
+        const e = (dashaTree || []).find(t => t.lord === k);
+        if (!e) return false;
+        const age = (new Date(e.start).getTime() - birthMs) / (365.25 * 864e5);
+        return age >= 15 && age <= 65;
+      });
+    };
+    const dustLords = [...new Set([L(6), L(8), L(12)])];
+    const dushkriti = dustLords.every(n => H(n) === 7);
+    const pubSup = ['Sun', L10, L(11)].filter(n => S(n) >= 65).length;
+    const govTrouble = [6, 8, 12].includes(H('Sun')) || _isCombust(bp, 'Sun');
+    let hs = null;
+    try {
+      hs = ov.hardSeason || null;
+    } catch (e) {}
+    const hsFams = hs ? (hs.families || []).map(f => f.id + ':' + f.score) : [];
+    const srcIds = (ov.incomeSources || []).map(x => x.id);
+    const ex = ov.exceptional || {};
+    const d = {
+      bp,
+      tree: dashaTree,
+      yogas,
+      ov,
+      L10,
+      S,
+      H,
+      L,
+      sign,
+      d9,
+      d10,
+      kk,
+      karmSign,
+      inKarakamsa,
+      in5Karakamsa,
+      conj,
+      asp,
+      hasYoga,
+      yogaCount,
+      sbTot,
+      strongest,
+      navLord,
+      d10Support,
+      dashaOK,
+      dushkriti,
+      pubSup,
+      govTrouble,
+      hsFams,
+      srcIds,
+      excBand: ex.band || null,
+      excHonor: ex.honor || null,
+      birthDate
+    };
+    const shown = [];
+    _ROLE_TABLE.forEach(role => {
+      const r = _roleEval(d, role);
+      if (r.verdict === '—') return;
+      const firedRules = role.rules.filter(rl => r.fired.some(f => f === rl.id || f.indexOf(rl.id + '(') === 0)).map(rl => ({
+        id: rl.id,
+        w: rl.w,
+        layer: rl.layer,
+        tag: rl.tag || null,
+        why: rl.why || null
+      }));
+      shown.push({
+        id: role.id,
+        label: role.label,
+        labelMy: role.labelMy,
+        high: !!role.high,
+        common: !!role.common,
+        tier: r.verdict,
+        score: r.score,
+        layers: r.layers,
+        fired: firedRules,
+        dasha: _roleDashaWindows(d, role.keys || []),
+        crossEvent: role.high ? _roleCrossEvent(d) : [],
+        subtype: role.id === 'Tycoon' && r.verdict === 'FULL' ? _roleTycoonSubtype(d) : null,
+        anchor: {
+          L10,
+          L10house: H(L10),
+          L10strength: S(L10),
+          L7: L(7),
+          L7house: H(L(7)),
+          navLord,
+          AmK: kk.AmK
+        }
+      });
+    });
+    shown.sort((a, b) => a.tier === b.tier ? b.score - a.score : a.tier === 'FULL' ? -1 : 1);
+    return shown;
+  } catch (e) {
+    return [];
+  }
+}
+
+// ===== v6.66 Matching module — Kuja dosha + Vedic synastry + dasha-overlap =====
+// Ported VERBATIM from the measured harness (matching-measure.js, 2026-11-12):
+// houseFrom / pairScore / resolveLord / classify4 (v5 graded dasha classifier) /
+// lordAt / ASPECT_NAME / MY / RASI are byte-identical in logic; only identifiers
+// are prefixed (_match/_MATCH) and F._lordOfHouse/F._planetHouse become the app
+// globals. The harness's inline sign-lord list is the app's RASI_LORDS (same values).
+// classify4 takes goodHouses as a parameter: business [2,5,7,9,10,11] (measured)
+// or marriage [2,5,7,9,11]. PAIRS keeps the harness weights; labels are mode-neutral
+// (Q4 ruling, agent's discretion).
+// Rulings applied (2026-11-12): Kuja = Phaladeepika set 1/2/4/7/8/12, Lagna reference
+// ONLY; Moon/Venus shown only as traces/shadows; BOTH-Manglik cancel only (no BPHS
+// benefic-cancel — beneficCancels is NOT ported); Kuja card shown ONLY when a dosha
+// is found. Q5 = v5 (trikona 5/9 in the good-house sets). NO score changes anywhere:
+// Ashtakoota /36, dashaRelPct, futureWindow, KP, Right Person are all untouched.
+// Framing: potential register only, never a verdict, never "don't marry", no remedies.
+// Rahu/Ketu are NOT in the synastry cross-aspects (node aspects are a lineage rule).
+const _MATCH_HARD = [6, 8, 12];
+const _MATCH_GOOD_BUSINESS = [2, 5, 7, 9, 10, 11];
+const _MATCH_GOOD_MARRIAGE = [2, 5, 7, 9, 11];
+const _MATCH_GRAHAS7 = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'];
+const _matchSignOf = lon => calculateVarga(lon, 1); // 0-11, harness signOf
+const _MATCH_PHALA_SET = [1, 2, 4, 7, 8, 12]; // Phaladeepika Ch.4
+const _MATCH_MY = {
+  Sun: 'နေ',
+  Moon: 'တနင်္လာ',
+  Mars: 'အင်္ဂါ',
+  Mercury: 'ဗုဒ္ဓဟူး',
+  Jupiter: 'ကြာသပတေး',
+  Venus: 'သောကြာ',
+  Saturn: 'စနေ',
+  Rahu: 'ရာဟု',
+  Ketu: 'ကေတု'
+};
+const _MATCH_RASI = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+const _MATCH_ASPECT_NAME = {
+  6: '7th မြင်',
+  3: '4th မြင် (Mars)',
+  7: '8th မြင် (Mars)',
+  4: '5th မြင် (Jupiter)',
+  8: '9th မြင် (Jupiter)',
+  2: '3rd မြင် (Saturn)',
+  9: '10th မြင် (Saturn)'
+};
+const _MATCH_PAIRS = [['Moon', 'Moon', 0.20, 'တနင်္လာ × တနင်္လာ — ခံစားချက်'], ['Sun', 'Sun', 0.15, 'နေ × နေ — ဘဝ ဦးတည်ချက်'], ['Sun', 'Moon', 0.13, 'နေ × တနင်္လာ'], ['Moon', 'Sun', 0.12, 'တနင်္လာ × နေ'], ['Venus', 'Mars', 0.12, 'သောကြာ × အင်္ဂါ — ဆွဲဆောင်မှု'], ['Mars', 'Venus', 0.08, 'အင်္ဂါ × သောကြာ'], ['Venus', 'Venus', 0.10, 'သောကြာ × သောကြာ — အလှအပ / အနုပညာ အရသာ'], ['Mercury', 'Mercury', 0.10, 'ဗုဒ္ဓဟူး × ဗုဒ္ဓဟူး — ဆက်သွယ်ရေး']];
+const _matchHouseFrom = (p, refLon, planetLon) => (_matchSignOf(planetLon) - _matchSignOf(refLon) + 12) % 12 + 1;
+function _matchPairScore(diff) {
+  if (diff === 0) return 95; // same sign — conjunction
+  if (diff === 4 || diff === 8) return 85; // trine
+  if (diff === 6) return 75; // 7th — opposition/polarity
+  if (diff === 3 || diff === 9) return 65; // kendra
+  if (diff === 2 || diff === 10) return 55; // 3/11
+  if (diff === 1 || diff === 11) return 45; // 2/12
+  return 40; // 6/8
+}
+function _matchResolveLord(p, planet) {
+  if (planet !== 'Rahu' && planet !== 'Ketu') return planet;
+  return _lordOfHouse(p, _planetHouse(p, planet)) === planet ? planet : RASI_LORDS[_matchSignOf(p[planet])];
+}
+function _matchClassifyDasha(p, lords, goodHouses) {
+  const [maha, antar] = lords;
+  const rm = _matchResolveLord(p, maha),
+    ra = antar ? _matchResolveLord(p, antar) : null;
+  const lagnaLord = _lordOfHouse(p, 1);
+  const isGoodLord = l => l && goodHouses.some(h => _lordOfHouse(p, h) === l);
+  // v5 fix: a lord ruling BOTH a good house and a hard house (or the lagna lord) is
+  // NEITHER good nor hard — v4 wrongly called her Mars (1st+8th lord) purely hard.
+  const isHardLord = l => l && l !== lagnaLord && _MATCH_HARD.some(h => _lordOfHouse(p, h) === l) && !goodHouses.some(h => _lordOfHouse(p, h) === l);
+  const placedGood = l => l && [1, 5, 9, 10, 11].includes(_planetHouse(p, l));
+  let s = 40;
+  if (isGoodLord(rm)) s += 25;else if (isHardLord(rm)) s -= 20;
+  if (isGoodLord(ra)) s += 15;else if (isHardLord(ra)) s -= 10;
+  if (placedGood(maha)) s += 10;
+  if ((antar === 'Jupiter' || antar === 'Venus') && !isHardLord(rm) && !isHardLord(ra)) s += 5;
+  s = Math.max(0, Math.min(100, s));
+  return {
+    cls: s >= 60 ? 'good' : s <= 30 ? 'hard' : 'neutral',
+    score: s
+  };
+}
+function _matchLordAt(tree, dateStr) {
+  const m = tree.find(d => d.start <= dateStr && d.end >= dateStr);
+  if (!m) return null;
+  const a = m.antars ? m.antars.find(x => x.start <= dateStr && x.end >= dateStr) : null;
+  return {
+    maha: m.lord,
+    antar: a ? a.lord : null,
+    mahaEnd: m.end,
+    antarEnd: a ? a.end : null
+  };
+}
+
+// ---- (1) Kuja / Manglik dosha (Phaladeepika Ch.4, Lagna reference only) ----
+function _matchKujaOne(p) {
+  if (!p || typeof p.Mars !== 'number' || typeof p.Lagna !== 'number') return {
+    found: false,
+    marsHouse: null,
+    moonHouse: null,
+    venusHouse: null,
+    severity: null,
+    marsSign: null
+  };
+  const mh = _planetHouse(p, 'Mars');
+  const moonH = typeof p.Moon === 'number' ? _matchHouseFrom(p, p.Moon, p.Mars) : null;
+  const venH = typeof p.Venus === 'number' ? _matchHouseFrom(p, p.Venus, p.Mars) : null;
+  const found = _MATCH_PHALA_SET.includes(mh);
+  // Severity: traditional grading (labelled as such) — 7th very strong, 8th/12th strong, 1/2/4 moderate.
+  const severity = !found ? null : mh === 7 ? 'very-strong' : mh === 8 || mh === 12 ? 'strong' : 'moderate';
+  return {
+    found,
+    marsHouse: mh,
+    moonHouse: moonH,
+    venusHouse: venH,
+    severity,
+    marsSign: _MATCH_RASI[_matchSignOf(p.Mars)]
+  };
+}
+function _matchKuja(bp, gp) {
+  const a = _matchKujaOne(bp),
+    b = _matchKujaOne(gp);
+  const show = a.found || b.found; // Q6: card shown ONLY when a (Lagna-ref) dosha is found
+  const cancelled = a.found && b.found; // both-Manglik cancel (Phala Ch.4 + BPHS vv.48-49)
+  const trace = one => ({
+    moon: one.moonHouse !== null ? _MATCH_PHALA_SET.includes(one.moonHouse) : null,
+    venus: one.venusHouse !== null ? _MATCH_PHALA_SET.includes(one.venusHouse) : null,
+    moonHouse: one.moonHouse,
+    venusHouse: one.venusHouse
+  });
+  return {
+    show,
+    cancelled,
+    a,
+    b,
+    traceA: trace(a),
+    traceB: trace(b)
+  };
+}
+// ---- (2) Vedic planetary synastry (planet-to-planet; Graha Maitri stays in Ashtakoota) ----
+function _matchVedicSynastry(bp, gp) {
+  if (!bp || !gp || typeof bp.Moon !== 'number' || typeof gp.Moon !== 'number') return null;
+  let wsum = 0,
+    acc = 0;
+  const pairs = _MATCH_PAIRS.map(([a, b, w, label]) => {
+    const sa = _matchSignOf(bp[a]),
+      sb = _matchSignOf(gp[b]);
+    const diff = (sb - sa + 12) % 12;
+    const s = _matchPairScore(diff);
+    wsum += w;
+    acc += s * w;
+    return {
+      a,
+      b,
+      w,
+      label,
+      aSign: _MATCH_RASI[sa],
+      bSign: _MATCH_RASI[sb],
+      diff,
+      score: s
+    };
+  });
+  const score = wsum ? Math.round(acc / wsum * 10) / 10 : 60;
+  const verdict = score >= 78 ? 'ဂြိုဟ်ချင်း သဟဇာတ အလွန်ကောင်း' : score >= 65 ? 'ဂြိုဟ်ချင်း သဟဇာတ ကောင်း' : score >= 50 ? 'အလယ်အလတ် — နားလည်မှုနဲ့ ကြိုးစားမှု လို' : 'ပွတ်တိုက်မှု များနိုင် — ဆက်သွယ်ရေး အထူး ဂရုစိုက်ရန်';
+  const sameLord = [];
+  pairs.forEach(pr => {
+    const sa = _matchSignOf(bp[pr.a]),
+      sb = _matchSignOf(gp[pr.b]);
+    if (sa !== sb && RASI_LORDS[sa] === RASI_LORDS[sb]) sameLord.push({
+      a: pr.a,
+      b: pr.b,
+      lord: RASI_LORDS[sa],
+      aSign: _MATCH_RASI[sa],
+      bSign: _MATCH_RASI[sb]
+    });
+  });
+  // Cross-chart aspects (7 classical planets x 7). Conjunctions are symmetric — listed
+  // ONCE (deduped); aspects are directional and listed per direction. Rahu/Ketu excluded.
+  const hits = [];
+  const seenConj = new Set();
+  [['A', bp, gp], ['B', gp, bp]].forEach(([dir, P, Q]) => {
+    _MATCH_GRAHAS7.forEach(a => {
+      const sa = _matchSignOf(P[a]);
+      _MATCH_GRAHAS7.forEach(b => {
+        const sb = _matchSignOf(Q[b]);
+        if (sa === sb) {
+          const key = [dir === 'A' ? 'A:' + a : 'B:' + a, dir === 'A' ? 'B:' + b : 'A:' + b].sort().join('|');
+          if (seenConj.has(key)) return;
+          seenConj.add(key);
+          hits.push({
+            kind: 'conjunction',
+            dir,
+            a,
+            b,
+            aSign: _MATCH_RASI[sa],
+            bSign: _MATCH_RASI[sb],
+            text: _MATCH_MY[a] + ' × ' + _MATCH_MY[b] + ' — ' + _MATCH_RASI[sa] + ' မှာ အတူတူ (conjunction)'
+          });
+          return;
+        }
+        const offs = a === 'Mars' ? [6, 3, 7] : a === 'Jupiter' ? [6, 4, 8] : a === 'Saturn' ? [6, 2, 9] : [6];
+        const o = offs.find(x => (sa + x) % 12 === sb);
+        if (o !== undefined) hits.push({
+          kind: 'aspect',
+          dir,
+          a,
+          b,
+          aSign: _MATCH_RASI[sa],
+          bSign: _MATCH_RASI[sb],
+          aspect: _MATCH_ASPECT_NAME[o],
+          text: _MATCH_MY[a] + ' (' + _MATCH_RASI[sa] + ') က ' + _MATCH_MY[b] + ' (' + _MATCH_RASI[sb] + ') ကို ' + _MATCH_ASPECT_NAME[o]
+        });
+      });
+    });
+  });
+  // 7th-house overlay — ONE line only (Relate owns the house-overlay scoring).
+  const onB7 = _MATCH_GRAHAS7.filter(pl => _matchHouseFrom(gp, gp.Lagna, bp[pl]) === 7);
+  const onA7 = _MATCH_GRAHAS7.filter(pl => _matchHouseFrom(bp, bp.Lagna, gp[pl]) === 7);
+  return {
+    score,
+    verdict,
+    pairs,
+    sameLord,
+    hits,
+    overlay: {
+      aOnB7: onB7,
+      bOnA7: onA7
+    }
+  };
+}
+// ---- (3) Dasha-overlap timeline [now, +10y] (merged boundaries, v5 graded classifier) ----
+function _matchDashaOverlap(bp, gp, bDate, gDate, mode, refDate) {
+  if (!bp || !gp || typeof bp.Moon !== 'number' || typeof gp.Moon !== 'number') return null;
+  const goodHouses = mode === 'marriage' ? _MATCH_GOOD_MARRIAGE : _MATCH_GOOD_BUSINESS;
+  const bTree = calculateDashaTree(bp.Moon, bDate);
+  const gTree = calculateDashaTree(gp.Moon, gDate);
+  if (!Array.isArray(bTree) || !Array.isArray(gTree) || !bTree.length || !gTree.length) return null;
+  const fmt = d => d.toISOString().split('T')[0];
+  const startD = refDate ? new Date(refDate) : new Date();
+  if (isNaN(startD.getTime())) return null;
+  const endD = new Date(startD.getFullYear() + 10, startD.getMonth(), startD.getDate());
+  const bounds = new Set([fmt(startD), fmt(endD)]);
+  [bTree, gTree].forEach(t => t.forEach(m => {
+    [m.start, m.end].forEach(s => {
+      const d = new Date(s);
+      if (d >= startD && d <= endD) bounds.add(s);
+    });
+    (m.antars || []).forEach(a => [a.start, a.end].forEach(s => {
+      const d = new Date(s);
+      if (d >= startD && d <= endD) bounds.add(s);
+    }));
+  }));
+  const sorted = [...bounds].sort();
+  const segments = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const s = sorted[i],
+      e = sorted[i + 1];
+    if (s === e) continue;
+    const mid = fmt(new Date((new Date(s).getTime() + new Date(e).getTime()) / 2));
+    const lh = _matchLordAt(bTree, mid),
+      lr = _matchLordAt(gTree, mid);
+    if (!lh || !lr) continue;
+    const ch = _matchClassifyDasha(bp, [lh.maha, lh.antar], goodHouses);
+    const cr = _matchClassifyDasha(gp, [lr.maha, lr.antar], goodHouses);
+    const verdict = ch.cls === 'good' && cr.cls === 'good' ? 'both-good' : ch.cls === 'hard' && cr.cls === 'hard' ? 'both-hard' : 'mixed';
+    segments.push({
+      start: s,
+      end: e,
+      aMaha: lh.maha,
+      aAntar: lh.antar,
+      aScore: ch.score,
+      aCls: ch.cls,
+      bMaha: lr.maha,
+      bAntar: lr.antar,
+      bScore: cr.score,
+      bCls: cr.cls,
+      verdict
+    });
+  }
+  const bothGood = segments.filter(x => x.verdict === 'both-good');
+  const bothHard = segments.filter(x => x.verdict === 'both-hard');
+  return {
+    mode: mode === 'marriage' ? 'marriage' : 'business',
+    goodHouses,
+    start: fmt(startD),
+    end: fmt(endD),
+    segments,
+    current: segments[0] || null,
+    nextGood: bothGood.length ? bothGood[0] : null,
+    bothGood,
+    bothHard
+  };
+}
+// ---- main entry: null when inputs are incomplete; never throws ----
+function calculateMatchingModule(bp, gp, bDate, gDate, mode, refDate) {
+  if (!bp || !gp || typeof bp.Moon !== 'number' || typeof gp.Moon !== 'number' || typeof bp.Lagna !== 'number' || typeof gp.Lagna !== 'number') return null;
+  try {
+    return {
+      kuja: _matchKuja(bp, gp),
+      synastry: _matchVedicSynastry(bp, gp),
+      overlap: _matchDashaOverlap(bp, gp, bDate, gDate, mode, refDate)
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+// v6.67 wealth zones (2026-11-12): zone-aware wealth display + global tiers.
+// Display/mapping ONLY — wealth score, gates, power, idx, BANDS and _TIERS are
+// untouched (this module READS ov.netWorthTier / ov.exceptional, never writes them).
+// Texts: BPHS Ch.22 Nishka amounts (500/1,000/2,000/6,000) + relative conversion
+// (6,000 Nishka ≈ 16,000× subsistence); Phala Ch.6 graded rulership (king ->
+// king of kings -> emperor); BPHS Chakr Yog -> emperor. Zone dollars per
+// wealth-zone-table-2026-11-12.md (Zone 1 ~1.0, Zone 2 ~0.5, Zone 3 ~0.2;
+// China splits: middle tiers Zone 2, tycoon tier Zone 1 $500M+).
+// Country derivation: (1) birthZone (IANA) -> country via _WZ_ZONE_TO_COUNTRY
+// (generated by INVERTING the app's own ZONE_BY_COUNTRY + US/CA/AU state tables
+// — see build-wealthzones-module.py; no hand transcription); (2) lat/lon
+// bounding boxes (coarse; first match wins; overlaps e.g. Thailand/Myanmar
+// border resolve to the first box — the derived country is DISPLAYED, so a
+// wrong derivation is visible); (3) unknown -> Zone 2 + note. Birth-country
+// anchor per his ruling; the migrant tension (born in one country, wealth in
+// another) is noted, not solved.
+const _WZ_BANDS = ['Ultra Wealth — သန်း ၁၀၀ ပတ်လည် အင်အား', 'Ultra Wealth — သန်း ၂၀၀ ပတ်လည် အင်အား', 'Ultra Wealth — သန်း ၅၀၀ ပတ်လည် အင်အား', 'Super Wealth — သန်း ၈၀၀ ပတ်လည် အင်အား', 'Super Wealth — တစ်ဘီလျံ အင်အား', 'Super Wealth — ဘီလျံ ၅၀ ပတ်လည် အင်အား', 'Super Wealth — ဘီလျံ ၁၀၀ ကျော် အင်အား'];
+const _WZ_ZONE_TO_COUNTRY = {
+  'Africa/Abidjan': 'Ivory Coast',
+  'Africa/Accra': 'Ghana',
+  'Africa/Addis_Ababa': 'Ethiopia',
+  'Africa/Algiers': 'Algeria',
+  'Africa/Cairo': 'Egypt',
+  'Africa/Casablanca': 'Morocco',
+  'Africa/Dakar': 'Senegal',
+  'Africa/Dar_es_Salaam': 'Tanzania',
+  'Africa/Douala': 'Cameroon',
+  'Africa/Harare': 'Zimbabwe',
+  'Africa/Johannesburg': 'South Africa',
+  'Africa/Kampala': 'Uganda',
+  'Africa/Kigali': 'Rwanda',
+  'Africa/Kinshasa': 'DR Congo',
+  'Africa/Lagos': 'Nigeria',
+  'Africa/Luanda': 'Angola',
+  'Africa/Lusaka': 'Zambia',
+  'Africa/Maputo': 'Mozambique',
+  'Africa/Nairobi': 'Kenya',
+  'Africa/Tripoli': 'Libya',
+  'Africa/Tunis': 'Tunisia',
+  'America/Anchorage': 'United States',
+  'America/Argentina/Buenos_Aires': 'Argentina',
+  'America/Argentina/Cordoba': 'Argentina',
+  'America/Asuncion': 'Paraguay',
+  'America/Belize': 'Belize',
+  'America/Bogota': 'Colombia',
+  'America/Boise': 'United States',
+  'America/Cancun': 'Mexico',
+  'America/Caracas': 'Venezuela',
+  'America/Chicago': 'United States',
+  'America/Costa_Rica': 'Costa Rica',
+  'America/Denver': 'United States',
+  'America/Detroit': 'United States',
+  'America/Edmonton': 'Canada',
+  'America/El_Salvador': 'El Salvador',
+  'America/Fortaleza': 'Brazil',
+  'America/Guatemala': 'Guatemala',
+  'America/Guayaquil': 'Ecuador',
+  'America/Halifax': 'Canada',
+  'America/Havana': 'Cuba',
+  'America/Indiana/Indianapolis': 'United States',
+  'America/Iqaluit': 'Canada',
+  'America/Jamaica': 'Jamaica',
+  'America/La_Paz': 'Bolivia',
+  'America/Lima': 'Peru',
+  'America/Los_Angeles': 'United States',
+  'America/Managua': 'Nicaragua',
+  'America/Manaus': 'Brazil',
+  'America/Mexico_City': 'Mexico',
+  'America/Moncton': 'Canada',
+  'America/Monterrey': 'Mexico',
+  'America/Montevideo': 'Uruguay',
+  'America/New_York': 'United States',
+  'America/Panama': 'Panama',
+  'America/Phoenix': 'United States',
+  'America/Port-au-Prince': 'Haiti',
+  'America/Puerto_Rico': 'Puerto Rico',
+  'America/Regina': 'Canada',
+  'America/Rio_Branco': 'Brazil',
+  'America/Santiago': 'Chile',
+  'America/Santo_Domingo': 'Dominican Republic',
+  'America/Sao_Paulo': 'Brazil',
+  'America/St_Johns': 'Canada',
+  'America/Tegucigalpa': 'Honduras',
+  'America/Tijuana': 'Mexico',
+  'America/Toronto': 'Canada',
+  'America/Vancouver': 'Canada',
+  'America/Whitehorse': 'Canada',
+  'America/Winnipeg': 'Canada',
+  'America/Yellowknife': 'Canada',
+  'Asia/Aden': 'Yemen',
+  'Asia/Almaty': 'Kazakhstan',
+  'Asia/Amman': 'Jordan',
+  'Asia/Ashgabat': 'Turkmenistan',
+  'Asia/Baghdad': 'Iraq',
+  'Asia/Bahrain': 'Bahrain',
+  'Asia/Baku': 'Azerbaijan',
+  'Asia/Bangkok': 'Thailand',
+  'Asia/Beirut': 'Lebanon',
+  'Asia/Bishkek': 'Kyrgyzstan',
+  'Asia/Brunei': 'Brunei',
+  'Asia/Colombo': 'Sri Lanka',
+  'Asia/Damascus': 'Syria',
+  'Asia/Dhaka': 'Bangladesh',
+  'Asia/Dubai': 'United Arab Emirates',
+  'Asia/Dushanbe': 'Tajikistan',
+  'Asia/Ho_Chi_Minh': 'Vietnam',
+  'Asia/Hong_Kong': 'Hong Kong',
+  'Asia/Jakarta': 'Indonesia',
+  'Asia/Jerusalem': 'Israel',
+  'Asia/Kabul': 'Afghanistan',
+  'Asia/Karachi': 'Pakistan',
+  'Asia/Kathmandu': 'Nepal',
+  'Asia/Kolkata': 'India',
+  'Asia/Kuala_Lumpur': 'Malaysia',
+  'Asia/Kuwait': 'Kuwait',
+  'Asia/Manila': 'Philippines',
+  'Asia/Muscat': 'Oman',
+  'Asia/Phnom_Penh': 'Cambodia',
+  'Asia/Qatar': 'Qatar',
+  'Asia/Riyadh': 'Saudi Arabia',
+  'Asia/Seoul': 'South Korea',
+  'Asia/Shanghai': 'China',
+  'Asia/Singapore': 'Singapore',
+  'Asia/Taipei': 'Taiwan',
+  'Asia/Tashkent': 'Uzbekistan',
+  'Asia/Tbilisi': 'Georgia',
+  'Asia/Tehran': 'Iran',
+  'Asia/Thimphu': 'Bhutan',
+  'Asia/Tokyo': 'Japan',
+  'Asia/Ulaanbaatar': 'Mongolia',
+  'Asia/Vientiane': 'Laos',
+  'Asia/Yangon': 'Myanmar',
+  'Asia/Yerevan': 'Armenia',
+  'Atlantic/Reykjavik': 'Iceland',
+  'Australia/Adelaide': 'Australia',
+  'Australia/Brisbane': 'Australia',
+  'Australia/Darwin': 'Australia',
+  'Australia/Hobart': 'Australia',
+  'Australia/Melbourne': 'Australia',
+  'Australia/Perth': 'Australia',
+  'Australia/Sydney': 'Australia',
+  'Europe/Amsterdam': 'Netherlands',
+  'Europe/Athens': 'Greece',
+  'Europe/Berlin': 'Germany',
+  'Europe/Brussels': 'Belgium',
+  'Europe/Bucharest': 'Romania',
+  'Europe/Budapest': 'Hungary',
+  'Europe/Copenhagen': 'Denmark',
+  'Europe/Dublin': 'Ireland',
+  'Europe/Helsinki': 'Finland',
+  'Europe/Istanbul': 'Turkey',
+  'Europe/Kyiv': 'Ukraine',
+  'Europe/Lisbon': 'Portugal',
+  'Europe/London': 'United Kingdom',
+  'Europe/Madrid': 'Spain',
+  'Europe/Moscow': 'Russia',
+  'Europe/Oslo': 'Norway',
+  'Europe/Paris': 'France',
+  'Europe/Prague': 'Czechia',
+  'Europe/Rome': 'Italy',
+  'Europe/Stockholm': 'Sweden',
+  'Europe/Vienna': 'Austria',
+  'Europe/Warsaw': 'Poland',
+  'Europe/Zurich': 'Switzerland',
+  'Indian/Maldives': 'Maldives',
+  'Pacific/Auckland': 'New Zealand',
+  'Pacific/Fiji': 'Fiji',
+  'Pacific/Honolulu': 'United States',
+  'Pacific/Port_Moresby': 'Papua New Guinea'
+};
+const _WZ_COUNTRY_TO_ZONE = {
+  // Zone 1 — high-wealth West + developed Asia (draft list + UAE/Saudi/Qatar/Kuwait
+  // by income, agent-added, flagged for his correction).
+  'United States': 1,
+  'Canada': 1,
+  'United Kingdom': 1,
+  'Ireland': 1,
+  'France': 1,
+  'Germany': 1,
+  'Italy': 1,
+  'Spain': 1,
+  'Netherlands': 1,
+  'Switzerland': 1,
+  'Austria': 1,
+  'Belgium': 1,
+  'Sweden': 1,
+  'Norway': 1,
+  'Denmark': 1,
+  'Finland': 1,
+  'Portugal': 1,
+  'Greece': 1,
+  'Iceland': 1,
+  'Israel': 1,
+  'Japan': 1,
+  'South Korea': 1,
+  'Singapore': 1,
+  'Australia': 1,
+  'New Zealand': 1,
+  'United Arab Emirates': 1,
+  'Saudi Arabia': 1,
+  'Qatar': 1,
+  'Kuwait': 1,
+  // Zone 2 — upper-middle (draft list; China middle tiers only — tycoon tier moves
+  // to Zone 1 in the dollars lookup below).
+  'China': 2,
+  'Thailand': 2,
+  'Malaysia': 2,
+  'Hong Kong': 1,
+  'Taiwan': 1,
+  'Poland': 2,
+  'Czechia': 2,
+  'Hungary': 2,
+  'Romania': 2,
+  'Ukraine': 2,
+  'Turkey': 2,
+  'Russia': 2,
+  'Mexico': 2,
+  'Brazil': 2,
+  'Argentina': 2,
+  'Chile': 2,
+  'Colombia': 2,
+  'Peru': 2,
+  'Venezuela': 2,
+  'Bolivia': 2,
+  'Paraguay': 2,
+  'Uruguay': 2,
+  'Ecuador': 2,
+  'Costa Rica': 2,
+  'Panama': 2,
+  'Guatemala': 2,
+  'Cuba': 2,
+  'Dominican Republic': 2,
+  'Jamaica': 2,
+  'Haiti': 2,
+  'Puerto Rico': 2,
+  'El Salvador': 2,
+  'Honduras': 2,
+  'Nicaragua': 2,
+  'Belize': 2,
+  'Bahrain': 2,
+  'Oman': 2,
+  // Zone 3 — lower-middle (draft list; South Africa stays Zone 3 — its tycoon tier
+  // may be higher, data not checked, not adjusted).
+  'India': 3,
+  'Indonesia': 3,
+  'Philippines': 3,
+  'Myanmar': 3,
+  'Bangladesh': 3,
+  'Nepal': 3,
+  'Sri Lanka': 3,
+  'Pakistan': 3,
+  'Vietnam': 3,
+  'Cambodia': 3,
+  'Laos': 3,
+  'Mongolia': 3,
+  'Maldives': 3,
+  'Bhutan': 3,
+  'Brunei': 3,
+  'Egypt': 3,
+  'Nigeria': 3,
+  'Kenya': 3,
+  'Ethiopia': 3,
+  'South Africa': 3,
+  'Morocco': 3,
+  'Tunisia': 3,
+  'Algeria': 3,
+  'Libya': 3,
+  'Ghana': 3,
+  'Ivory Coast': 3,
+  'Senegal': 3,
+  'Angola': 3,
+  'Zambia': 3,
+  'Zimbabwe': 3,
+  'Mozambique': 3,
+  'Tanzania': 3,
+  'Uganda': 3,
+  'Rwanda': 3,
+  'Cameroon': 3,
+  'DR Congo': 3,
+  'Iran': 3,
+  'Iraq': 3,
+  'Lebanon': 3,
+  'Syria': 3,
+  'Jordan': 3,
+  'Yemen': 3,
+  'Georgia': 3,
+  'Armenia': 3,
+  'Azerbaijan': 3,
+  'Kazakhstan': 3,
+  'Uzbekistan': 3,
+  'Kyrgyzstan': 3,
+  'Tajikistan': 3,
+  'Turkmenistan': 3,
+  'Afghanistan': 3,
+  'Fiji': 3,
+  'Papua New Guinea': 3
+};
+const _WZ_COUNTRY_MY = {
+  'Myanmar': 'မြန်မာ',
+  'Thailand': 'ထိုင်း',
+  'Singapore': 'စင်ကာပူ',
+  'Malaysia': 'မလေးရှား',
+  'Japan': 'ဂျပန်',
+  'South Korea': 'ကိုရီးယား',
+  'India': 'အိန္ဒိယ',
+  'United Kingdom': 'အင်္ဂလန်',
+  'Ireland': 'အိုင်ယာလန်',
+  'France': 'ပြင်သစ်',
+  'Germany': 'ဂျာမနီ',
+  'Italy': 'အီတလီ',
+  'Spain': 'စပိန်',
+  'Netherlands': 'နယ်သာလန်',
+  'United Arab Emirates': 'ယူအေအီး',
+  'Vietnam': 'ဗီယက်နမ်',
+  'Philippines': 'ဖိလစ်ပိုင်',
+  'Indonesia': 'အင်ဒိုနီးရှား',
+  'Cambodia': 'ကမ္ဘောဒီးယား',
+  'Laos': 'လာအို',
+  'Bangladesh': 'ဘင်္ဂလားဒေ့ရှ်',
+  'Nepal': 'နီပေါ',
+  'Sri Lanka': 'သီရိလင်္ကာ',
+  'China': 'တရုတ်',
+  'Hong Kong': 'ဟောင်ကောင်',
+  'Taiwan': 'ထိုင်ဝမ်',
+  'Turkey': 'တူရကီ',
+  'Israel': 'အစ္စရေး',
+  'Saudi Arabia': 'ဆော်ဒီအာရေဗျ',
+  'Qatar': 'ကာတာ',
+  'Kuwait': 'ကူဝိတ်',
+  'Pakistan': 'ပါကစ္စတန်',
+  'Maldives': 'မော်လ်ဒိုက်ဗ်',
+  'Bhutan': 'ဘူတန်',
+  'Brunei': 'ဘရူနိုင်း',
+  'Mongolia': 'မွန်ဂိုလီးယား',
+  'New Zealand': 'နယူးဇီလန်',
+  'South Africa': 'တောင်အာဖရိက',
+  'Egypt': 'အီဂျစ်',
+  'Nigeria': 'နိုင်ဂျီးရီးယား',
+  'Kenya': 'ကင်ညာ',
+  'Ethiopia': 'အီသီယိုးပီးယား',
+  'Greece': 'ဂရိ',
+  'Portugal': 'ပေါ်တူဂီ',
+  'Switzerland': 'ဆွစ်ဇာလန်',
+  'Austria': 'သြစတြီးယား',
+  'Belgium': 'ဘယ်လ်ဂျီယမ်',
+  'Sweden': 'ဆွီဒင်',
+  'Norway': 'နော်ဝေး',
+  'Denmark': 'ဒိန်းမတ်',
+  'Finland': 'ဖင်လန်',
+  'Poland': 'ပိုလန်',
+  'Czechia': 'ချက်ခ်',
+  'Hungary': 'ဟန်ဂေရီ',
+  'Romania': 'ရိုမေးနီးယား',
+  'Ukraine': 'ယူကရိန်း',
+  'United States': 'အမေရိကန်',
+  'Canada': 'ကနေဒါ',
+  'Australia': 'သြစတြေးလျ',
+  'Mexico': 'မက္ကဆီကို',
+  'Brazil': 'ဘရာဇီး',
+  'Argentina': 'အာဂျင်တီးနား',
+  'Chile': 'ချီလီ',
+  'Colombia': 'ကိုလံဘီယာ',
+  'Peru': 'ပီရူး',
+  'Venezuela': 'ဗင်နီဇွဲလား',
+  'Bolivia': 'ဘိုလီးဗီးယား',
+  'Paraguay': 'ပါရာဂွေး',
+  'Uruguay': 'ဥရုဂွေး',
+  'Ecuador': 'အီကွေဒေါ',
+  'Costa Rica': 'ကော့စတာရီကာ',
+  'Panama': 'ပနားမား',
+  'Guatemala': 'ဂွါတီမာလာ',
+  'Cuba': 'ကျူးဘား',
+  'Dominican Republic': 'ဒိုမီနီကန်',
+  'Jamaica': 'ဂျမေကာ',
+  'Haiti': 'ဟေတီ',
+  'Puerto Rico': 'ပေါ်တိုရီကို',
+  'El Salvador': 'အယ်လ်ဆာဗေဒေါ',
+  'Honduras': 'ဟွန်ဒူးရပ်စ်',
+  'Nicaragua': 'နီကာရာဂွာ',
+  'Belize': 'ဘေလီ့ဇ်',
+  'Russia': 'ရုရှား',
+  'Iran': 'အီရန်',
+  'Iraq': 'အီရတ်',
+  'Lebanon': 'လက်ဘနွန်',
+  'Syria': 'ဆီးရီးယား',
+  'Jordan': 'ဂျော်ဒန်',
+  'Yemen': 'ယီမင်',
+  'Oman': 'အိုမန်',
+  'Bahrain': 'ဘာရိန်း',
+  'Georgia': 'ဂျော်ဂျီယာ',
+  'Armenia': 'အာမေးနီးယား',
+  'Azerbaijan': 'အဇာဘိုင်ဂျန်',
+  'Kazakhstan': 'ကာဇက်စတန်',
+  'Uzbekistan': 'ဥဇဘက်ကစ္စတန်',
+  'Kyrgyzstan': 'ကာဂျစ္စတန်',
+  'Tajikistan': 'တာဂျစ်ကစ္စတန်',
+  'Turkmenistan': 'တာ့ခ်မင်နစ္စတန်',
+  'Afghanistan': 'အာဖဂန်နစ္စတန်',
+  'Morocco': 'မော်ရိုကို',
+  'Tunisia': 'တူနီးရှား',
+  'Algeria': 'အယ်လ်ဂျီးရီးယား',
+  'Libya': 'လစ်ဗျား',
+  'Ghana': 'ဂါနာ',
+  'Ivory Coast': 'အိုင်ဗရီကို့စ်',
+  'Senegal': 'ဆီနီဂေါ',
+  'Angola': 'အင်ဂိုလာ',
+  'Zambia': 'ဇမ်ဘီယာ',
+  'Zimbabwe': 'ဇင်ဘာဘွေ',
+  'Mozambique': 'မိုဇမ်ဘစ်',
+  'Tanzania': 'တန်ဇေးနီးယား',
+  'Uganda': 'ယူဂန်းဒါ',
+  'Rwanda': 'ရဝမ်ဒါ',
+  'Cameroon': 'ကင်မရွန်း',
+  'DR Congo': 'ကွန်ဂို',
+  'Fiji': 'ဖီဂျီ',
+  'Papua New Guinea': 'ပါပူအာ နယူးဂီနီ',
+  'Iceland': 'အိုက်စလန်'
+};
+const _WZ_ZONE_DOLLARS = {
+  '500': {
+    1: '~$50M',
+    2: '~$25M',
+    3: '~$10M'
+  },
+  '1000': {
+    1: '~$100M',
+    2: '~$50M',
+    3: '~$20M'
+  },
+  '2000': {
+    1: '~$200M',
+    2: '~$100M',
+    3: '~$40M'
+  },
+  '6000': {
+    1: '$500M+',
+    2: '~$250M+',
+    3: '~$100M+'
+  }
+};
+const _WZ_TIER_CLASS = {
+  'below500': 'သာမန် (500 Nishka အောက်)',
+  '500': 'လူလတ်တန်းစား (500 Nishka)',
+  '1000': 'သူဌေး (1,000 Nishka)',
+  '2000': 'အလွန်ချမ်းသာသူ (2,000 Nishka)',
+  '6000': 'တိုင်ကွန်း (6,000 Nishka)'
+};
+const _WZ_MY_NUM = {
+  1: '၁',
+  2: '၂',
+  3: '၃'
+};
+// Coarse lat/lon bounding boxes [latMin, latMax, lonMin, lonMax, country] —
+// fallback only, when birthZone is empty. Order matters: small/distinctive
+// countries first; overlapping boxes resolve to the first match (e.g. the
+// Thailand/Myanmar border strip resolves to Thailand).
+const _WZ_BOXES = [[1.2, 1.5, 103.6, 104.1, 'Singapore'], [22.1, 22.6, 113.8, 114.4, 'Hong Kong'], [21.9, 25.3, 119.9, 122.0, 'Taiwan'], [4.0, 5.1, 114.1, 115.4, 'Brunei'], [5.9, 9.9, 79.7, 81.9, 'Sri Lanka'], [26.3, 30.5, 80.0, 88.2, 'Nepal'], [20.7, 26.7, 88.0, 92.7, 'Bangladesh'], [23.7, 37.1, 60.9, 74.8, 'Pakistan'], [33.1, 38.6, 124.6, 131.9, 'South Korea'], [41.6, 52.2, 87.7, 119.9, 'Mongolia'], [30.0, 45.5, 129.0, 146.0, 'Japan'], [5.5, 20.5, 97.5, 105.5, 'Thailand'], [9.5, 28.5, 92.0, 101.0, 'Myanmar'], [13.9, 22.5, 100.0, 107.7, 'Laos'], [8.5, 23.4, 102.1, 109.4, 'Vietnam'], [10.3, 14.7, 102.3, 107.7, 'Cambodia'], [0.9, 7.4, 99.6, 104.6, 'Malaysia'], [0.8, 7.4, 109.6, 119.3, 'Malaysia'], [4.6, 21.0, 116.9, 126.6, 'Philippines'], [-11.0, 6.0, 95.0, 141.0, 'Indonesia'], [6.7, 37.1, 68.0, 97.4, 'India'], [18.1, 53.6, 73.5, 135.1, 'China'], [49.9, 60.9, -8.2, 1.8, 'United Kingdom'], [51.4, 55.4, -10.6, -5.5, 'Ireland'], [41.3, 51.1, -5.2, 10.1, 'France'], [47.3, 55.1, 5.9, 15.1, 'Germany'], [36.0, 43.8, -9.3, 3.3, 'Spain'], [35.5, 47.1, 6.6, 18.5, 'Italy'], [50.7, 53.7, 3.4, 7.2, 'Netherlands'], [45.8, 47.8, 6.0, 10.5, 'Switzerland'], [46.4, 49.0, 9.5, 17.2, 'Austria'], [49.5, 51.5, 2.5, 6.4, 'Belgium'], [55.3, 69.1, 11.1, 24.2, 'Sweden'], [57.9, 71.2, 4.6, 31.1, 'Norway'], [54.9, 57.8, 8.1, 12.7, 'Denmark'], [59.8, 70.1, 19.1, 31.6, 'Finland'], [36.9, 42.2, -9.5, -6.2, 'Portugal'], [34.8, 41.8, 19.4, 29.6, 'Greece'], [49.0, 54.9, 14.1, 24.2, 'Poland'], [48.5, 51.1, 12.1, 18.9, 'Czechia'], [45.7, 48.6, 16.1, 22.9, 'Hungary'], [43.6, 48.3, 20.3, 29.7, 'Romania'], [44.4, 52.4, 22.1, 40.2, 'Ukraine'], [36.0, 42.1, 26.0, 45.0, 'Turkey'], [24.5, 49.4, -125.0, -66.9, 'United States'], [51.0, 71.4, -179.8, -129.9, 'United States'], [18.9, 22.3, -160.3, -154.8, 'United States'], [41.7, 83.1, -141.0, -52.6, 'Canada'], [14.5, 32.7, -117.1, -86.7, 'Mexico'], [-33.8, 5.3, -73.9, -34.8, 'Brazil'], [22.6, 26.2, 51.6, 56.4, 'United Arab Emirates'], [16.3, 32.2, 34.6, 55.7, 'Saudi Arabia'], [22.0, 31.7, 24.7, 36.9, 'Egypt'], [4.2, 13.9, 2.7, 14.7, 'Nigeria'], [-4.7, 5.0, 33.9, 41.9, 'Kenya'], [3.4, 14.9, 33.0, 43.0, 'Ethiopia'], [-35.0, -22.1, 16.5, 33.0, 'South Africa'], [-43.6, -10.4, 113.3, 153.6, 'Australia'], [-47.3, -34.4, 166.4, 178.6, 'New Zealand']];
+function _wzCountryFromZone(zone) {
+  if (!zone) return null;
+  const z = String(zone).trim();
+  return _WZ_ZONE_TO_COUNTRY[z] || null;
+}
+function _wzCountryFromLatLon(lat, lon) {
+  const la = parseFloat(lat),
+    lo = parseFloat(lon);
+  if (!isFinite(la) || !isFinite(lo)) return null;
+  for (let i = 0; i < _WZ_BOXES.length; i++) {
+    const b = _WZ_BOXES[i];
+    if (la >= b[0] && la <= b[1] && lo >= b[2] && lo <= b[3]) return b[4];
+  }
+  return null;
+}
+// ov = lifeOverview (reads netWorthTier + exceptional only — never writes).
+// geo = { zone: birthZone (IANA string or ''), lat, lon, birthPlace }.
+// Returns null-safe display data; never throws for bad input (call site guards
+// anyway). The exceptional band's $100M+ absolute entry is retired as a display
+// threshold: the entry rung is now the zone tycoon figure, and the old 7-rung
+// Ultra/Super ladder is shown as a 3-rung ladder (tycoon -> G1 $1B+ -> G2
+// $100B+), the rung picked from the EXISTING band string's index in _WZ_BANDS
+// (idx 0-2 tycoon, 3-4 G1, 5-6 G2) — power/idx computation untouched.
+function calculateWealthZones(ov, geo) {
+  const tier = ov && typeof ov.netWorthTier === 'string' ? ov.netWorthTier : '';
+  let tierKey = 'below500';
+  if (tier.indexOf('High Wealth') === 0) tierKey = '2000';else if (tier.indexOf('Strong Wealth') === 0) tierKey = '1000';else if (tier.indexOf('Middle') === 0) tierKey = '500';else tierKey = 'below500';
+  const band = ov && ov.exceptional && typeof ov.exceptional.band === 'string' ? ov.exceptional.band : '';
+  const bandIdx = band ? _WZ_BANDS.indexOf(band) : -1;
+  if (bandIdx >= 0) tierKey = '6000';
+  const rung = bandIdx < 0 ? null : bandIdx <= 2 ? 'tycoon' : bandIdx <= 4 ? 'g1' : 'g2';
+  let country = null;
+  if (geo && geo.zone) country = _wzCountryFromZone(geo.zone);
+  if (!country && geo) country = _wzCountryFromLatLon(geo.lat, geo.lon);
+  const zoneKnown = !!country;
+  const zoneId = country ? _WZ_COUNTRY_TO_ZONE[country] || 2 : 2;
+  // China splits: middle tiers Zone 2 dollars, tycoon tier Zone 1 ($500M+).
+  const effZone = tierKey === '6000' && country === 'China' ? 1 : zoneId;
+  const tierDollars = (_WZ_ZONE_DOLLARS[tierKey] || {})[effZone] || null;
+  const tierClass = _WZ_TIER_CLASS[tierKey];
+  const countryMy = country ? _WZ_COUNTRY_MY[country] || country : '';
+  const zNum = _WZ_MY_NUM[zoneId];
+  const eNum = _WZ_MY_NUM[effZone];
+  let tierLine;
+  if (!country) {
+    tierLine = 'မွေးနိုင်ငံ zone ကို အတိအကျ မသိရ — အလယ် zone (Zone ၂) နဲ့ ပြထားတယ်။ ကျမ်းအရ ဒီအဆင့်က ' + tierClass + ' တန်း' + (tierDollars ? '; Zone ၂ မှာ ' + tierDollars + ' နီးပါး အဓိပ္ပာယ် ရှိတယ်' : '') + '။';
+  } else if (tierDollars) {
+    // The zone label for the COUNTRY is zoneId; the dollars follow effZone.
+    // They differ only for the China tycoon split (country Zone 2, tycoon
+    // dollars Zone 1) — the parenthetical says so explicitly.
+    tierLine = 'မွေးနိုင်ငံ: ' + countryMy + ' (Zone ' + zNum + ') — ကျမ်းအရ ဒီအဆင့်က ' + tierClass + ' တန်း; Zone ' + eNum + ' မှာ ' + tierDollars + ' နီးပါး အဓိပ္ပာယ် ရှိတယ်' + (effZone !== zoneId ? ' (တိုင်ကွန်း အဆင့်က Zone ၁ နဲ့ တွက်တယ်)' : '') + '။';
+  } else {
+    tierLine = 'မွေးနိုင်ငံ: ' + countryMy + ' (Zone ' + zNum + ') — ကျမ်းအရ ဒီအဆင့်က ' + tierClass + ' တန်း (ကျမ်းရဲ့ Nishka စကေး 500+ အောက်မှာ ရှိတယ်)။';
+  }
+  let bandZone = null,
+    ladder = null;
+  if (bandIdx >= 0) {
+    if (rung === 'tycoon') bandZone = 'တိုင်ကွန်း အဆင့် — ' + tierDollars + ' ဝန်းကျင် အင်အား';else if (rung === 'g1') bandZone = 'G1 — ကမ္ဘာလုံးဆိုင်ရာ ဘီလျံနာ $1B+ (king of kings)';else bandZone = 'G2 — စကြဝတေး $100B+ (emperor)';
+    ladder = [{
+      label: 'တိုင်ကွန်း — ' + tierDollars + ' (Zone ' + _WZ_MY_NUM[effZone] + ')',
+      current: rung === 'tycoon'
+    }, {
+      label: 'G1 — ကမ္ဘာလုံးဆိုင်ရာ ဘီလျံနာ $1B+',
+      current: rung === 'g1'
+    }, {
+      label: 'G2 — စကြဝတေး $100B+',
+      current: rung === 'g2'
+    }];
+  }
+  return {
+    country: country,
+    countryMy: countryMy,
+    zoneId: zoneId,
+    effZone: effZone,
+    zoneKnown: zoneKnown,
+    tierKey: tierKey,
+    tierClass: tierClass,
+    tierDollars: tierDollars,
+    tierLine: tierLine,
+    bandZone: bandZone,
+    ladder: ladder,
+    rung: rung,
+    bandIdx: bandIdx
+  };
 }
 function generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas) {
   if (!birthPlanets || typeof birthPlanets.Lagna !== 'number') return {
@@ -13410,6 +16246,7 @@ function MainApp() {
   });
   const [rivalOn, setRivalOn] = useState(false);
   const [rpContext, setRpContext] = useState('marriage');
+  const [matchMode, setMatchMode] = useState('marriage'); // v6.66: dasha-overlap good-house set — 'marriage' [2,5,7,9,11] (default, tab context) or 'business' [2,5,7,9,10,11]
   const [rpCenter, setRpCenter] = useState('girl');
   const [citySuggestions, setCitySuggestions] = useState([]);
   const [searchTarget, setSearchTarget] = useState(null);
@@ -13776,6 +16613,36 @@ function MainApp() {
     end: '2033-01-01'
   };
   const lifeOverview = generateLifeOverview(birthPlanets, ayanamsa, dashaTree, yogas);
+  // v6.65: role potential (Career) — computed from the same chart and attached to the
+  // overview object; generateLifeOverview itself is untouched, so the overview stays
+  // byte-identical to v6.64 apart from this new field. Guarded so a role failure can
+  // never break the rest of the reading.
+  try {
+    lifeOverview.rolePotential = calculateRolePotential(birthPlanets, dashaTree, yogas, lifeOverview, {
+      jd: birthJD,
+      lat: parseFloat(birthLat) || 16.84,
+      lon: parseFloat(birthLon) || 96.17,
+      birthDate: birthDateObj,
+      ayanamsa,
+      nodeType
+    });
+  } catch (e) {
+    lifeOverview.rolePotential = [];
+  }
+  // v6.67: wealth zones (zone-aware tier line + global tiers) — computed from the
+  // same overview and attached to it; generateLifeOverview itself is untouched, so
+  // the overview stays byte-identical to v6.66 apart from this new field. Guarded
+  // so a zone failure can never break the rest of the reading.
+  try {
+    lifeOverview.wealthZone = calculateWealthZones(lifeOverview, {
+      zone: birthZone,
+      lat: birthLat,
+      lon: birthLon,
+      birthPlace
+    });
+  } catch (e) {
+    lifeOverview.wealthZone = null;
+  }
   const careerBenefit = calculateCareerBenefitSummary(birthPlanets, dashaTree);
   const spouseProfile = buildSpouseProfile(birthPlanets, dashaTree);
   const childrenProfile = buildChildrenProfile(birthPlanets, dashaTree);
@@ -13880,6 +16747,21 @@ function MainApp() {
   const boyPlanets = calculateNASA_JPL_Planets(boyJD, boy.lat, boy.lon, ayanamsa);
   const girlPlanets = calculateNASA_JPL_Planets(girlJD, girl.lat, girl.lon, ayanamsa);
   const matchResult = calculateSynastry(boyPlanets, girlPlanets, ayanamsa, boyDateObj, girlDateObj);
+  // v6.66: matching module (Kuja + Vedic synastry + dasha-overlap) — guarded so a
+  // matching failure can never break the rest of the tab; matchResult untouched.
+  let matchModule = null;
+  try {
+    matchModule = calculateMatchingModule(boyPlanets, girlPlanets, boyDateObj, girlDateObj, matchMode);
+  } catch (e) {
+    matchModule = null;
+  }
+  const matchOverlayText = matchModule && matchModule.synastry ? (() => {
+    const o = matchModule.synastry.overlay;
+    const parts = [];
+    if (o.aOnB7.length) parts.push((boy.name || 'ပထမလူ') + '၏ ' + o.aOnB7.map(pl => _MATCH_MY[pl]).join(', ') + ' → ' + (girl.name || 'ဒုတိယလူ') + ' 7th တန့်');
+    if (o.bOnA7.length) parts.push((girl.name || 'ဒုတိယလူ') + '၏ ' + o.bOnA7.map(pl => _MATCH_MY[pl]).join(', ') + ' → ' + (boy.name || 'ပထမလူ') + ' 7th တန့်');
+    return parts.join('; ');
+  })() : '';
   const kpMatch = ayanamsa === 'kp' ? calculateKPMatching(boyPlanets, girlPlanets, calculatePlacidusCusps(boyJD, boy.lat, boy.lon, 'kp'), calculatePlacidusCusps(girlJD, girl.lat, girl.lon, 'kp')) : null;
   const boyTreeRP = calculateDashaTree(boyPlanets.Moon, boyDateObj);
   const girlTreeRP = calculateDashaTree(girlPlanets.Moon, girlDateObj);
@@ -15124,7 +18006,9 @@ function MainApp() {
     className: "text-sm font-bold mt-0.5"
   }, lifeOverview.netWorthTier), /*#__PURE__*/React.createElement("p", {
     className: "text-emerald-100 text-[11px] mt-1 leading-relaxed"
-  }, lifeOverview.netWorthDesc), /*#__PURE__*/React.createElement("p", {
+  }, lifeOverview.netWorthDesc), lifeOverview.wealthZone && /*#__PURE__*/React.createElement("p", {
+    className: "text-emerald-100 text-[11px] mt-1 leading-relaxed"
+  }, "🌍 ", lifeOverview.wealthZone.tierLine), /*#__PURE__*/React.createElement("p", {
     className: "text-[9px] text-emerald-200/60 mt-0.5 leading-relaxed"
   }, "ဖော်ပြ ပါ အမောင့် သည် လူ တစ်ယောက် ၏ ဘဝ အတွက် ဖြစ်နိုင် ချေ အရှိ ဆုံး သော ပမာဏ ကို ကျမ်းရင်း နှင့် ယနေ့ ခေတ် ငွေ ကြေး တန်ဖိုး ချိန်ဆ ကာ ဖော်ထုတ် ထား ခြင်း ဖြစ်ပြီး ကာယကံရှင် ၏ အားထုတ်မှု, လက်ခံ မှု, နေထိုင် ရာ နိုင်ငံ ၏ အကျိုး သက်ရောက် မှု များ အပေါ် မူတည် ၍ ပြောင်းလဲ နိုင် ပါ သည်။"), /*#__PURE__*/React.createElement("div", {
     className: "mt-2 grid grid-cols-2 gap-1"
@@ -15222,7 +18106,40 @@ function MainApp() {
     } catch (e) {
       return null;
     }
-  })()), (lifeOverview.incomeSources?.length > 0 || lifeOverview.assetProfile?.length > 0) && /*#__PURE__*/React.createElement("div", {
+  })()), lifeOverview.rolePotential?.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-baseline border-b pb-1"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "font-bold text-slate-800 text-xs"
+  }, "💼 အလုပ်အကိုင် ဖြစ်တန်စွမ်း (Career Potential)"), /*#__PURE__*/React.createElement("span", {
+    className: "text-[9px] text-slate-400"
+  }, "Role Module · v6.65")), /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] text-slate-500 leading-relaxed"
+  }, "အောက်ပါ role များသည် ဇာတာထဲက ", /*#__PURE__*/React.createElement("strong", null, "ဖြစ်တန်စွမ်း (potential)"), " သာ ဖြစ်သည် — အလုပ်အကိုင် အတည်ပြု ချက် မဟုတ်ပါ။ ကျမ်းရင်း (BPHS / Phaladeepika) နှင့် app ၏ career pattern များမှ တွက်ထားသည်။ အမှတ်များသော role များ အရင် ပြထားသည်။"), lifeOverview.rolePotential.map((r, i) => /*#__PURE__*/React.createElement("div", {
+    key: r.id,
+    className: "space-y-0.5 border-t pt-1.5 first:border-t-0 first:pt-0"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] leading-relaxed"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-bold text-slate-700"
+  }, i + 1, ". ", r.labelMy), r.subtype && /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-500"
+  }, " (", {
+    'Crony (patronage)': 'အာဏာ/အကျိုးခံ ဆက်စပ်မှု (Crony)',
+    'Elite (hereditary)': 'အမွေခံ အထက်တန်း (Elite)',
+    'Tycoon (self-made)': 'ကိုယ်တိုင် တည်ထောင် (self-made)'
+  }[r.subtype] || r.subtype, ")"), /*#__PURE__*/React.createElement("span", {
+    className: r.tier === 'FULL' ? 'text-emerald-700 font-semibold' : 'text-amber-700 font-semibold'
+  }, " — ", r.tier === 'FULL' ? 'ဖြစ်တန်စွမ်း ရှိ' : 'အရိပ် အဆင့် — အထောက် တစ်စိတ်တစ်ပိုင်း သာ ရှိ'), /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-400"
+  }, " (အမှတ် ", r.score, ")")), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500 leading-relaxed"
+  }, "သက်သေ: ", r.fired.map(f => f.id + ' — ' + (f.why || f.tag || '')).join(' · ')), r.dasha?.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500 leading-relaxed"
+  }, "ပွင့်နိုင်သော ဒဿာ: ", r.dasha.map(w => (PLANET_MY[w.lord] || w.lord) + ' မဟာဒဿာ (အသက် ' + w.ageStart + '–' + w.ageEnd + ')').join(', ')), r.crossEvent?.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-amber-700 leading-relaxed"
+  }, "⚠️ သတိပြုရန်: ", r.crossEvent.join(' · '), " — ဤ role ၏ လမ်းကြောင်းတွင် အဟန့် ရှိနိုင်သည်။")))), (lifeOverview.incomeSources?.length > 0 || lifeOverview.assetProfile?.length > 0) && /*#__PURE__*/React.createElement("div", {
     className: "bg-white border border-slate-200 p-3 rounded-lg shadow-sm space-y-2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex justify-between items-baseline border-b pb-1"
@@ -15311,9 +18228,14 @@ function MainApp() {
     className: "text-[11px] text-amber-300 font-bold"
   }, "ဓန အင်အား အဆင့် (Capacity):"), /*#__PURE__*/React.createElement("div", {
     className: "text-sm font-bold mt-0.5"
-  }, lifeOverview.exceptional.band), lifeOverview.exceptional.pct != null && /*#__PURE__*/React.createElement("div", {
+  }, lifeOverview.wealthZone && lifeOverview.wealthZone.bandZone ? lifeOverview.wealthZone.bandZone : lifeOverview.exceptional.band), lifeOverview.exceptional.pct != null && /*#__PURE__*/React.createElement("div", {
     className: "text-[9px] text-amber-200/60 mt-0.5"
-  }, "အဖက်ဖက် ချိန်ညှိ အင်အား: ", lifeOverview.exceptional.pct, "%")), lifeOverview.exceptional.honor && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  }, "အဖက်ဖက် ချိန်ညှိ အင်အား: ", lifeOverview.exceptional.pct, "%"), lifeOverview.wealthZone && lifeOverview.wealthZone.ladder && /*#__PURE__*/React.createElement("div", {
+    className: "mt-1 space-y-0.5"
+  }, lifeOverview.wealthZone.ladder.map((r, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: r.current ? "text-[10px] text-amber-200 font-bold" : "text-[10px] text-amber-200/50"
+  }, r.current ? '▸ ' : '· ', r.label)))), lifeOverview.exceptional.honor && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "text-[11px] text-amber-300 font-bold"
   }, "ဂုဏ် / ဆု အဆင့်:"), /*#__PURE__*/React.createElement("div", {
     className: "text-[12px] font-bold mt-0.5"
@@ -16822,7 +19744,92 @@ function MainApp() {
     className: "text-[10px] text-slate-500 mt-1"
   }, "အနည်းဆုံး ၁၈ မှတ်နှင့်အထက် ရရှိပါက အိမ်ထောင်ပြုရန် သင့်တင့်လျောက်ပတ်သည်ဟု သတ်မှတ်ပါသည်။"), ayanamsa === 'kp' && /*#__PURE__*/React.createElement("div", {
     className: "text-[11px] text-emerald-800 font-bold mt-1.5 bg-white p-1 rounded border border-amber-200"
-  }, matchResult.kpAnalysis))), "              ", !isTrop && /*#__PURE__*/React.createElement("div", {
+  }, matchResult.kpAnalysis))), "              ", !isTrop && matchModule && matchModule.kuja && matchModule.kuja.show && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border border-red-300 p-3 rounded space-y-1.5 shadow-sm"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-red-900 text-xs"
+  }, "🔴 Kuja Dosha စစ်ချက် (Phaladeepika Ch.4)"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "လဂ် ကနေ အင်္ဂါ တည်တဲ့ အိမ်ကို စစ်တယ် — 1/2/4/7/8/12 အိမ်တွေမှာ ရှိရင် Kuja Dosha ရှိတယ်။ 7th = အလွန်ပြင်းထန်, 8th/12th = ပြင်းထန်, 1/2/4 = အလယ်အလတ် (traditional grading)။"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-slate-700"
+  }, "👦 ", boy.name || 'ပထမလူ', ": အင်္ဂါ ", matchModule.kuja.a.marsHouse, " တန့် (", matchModule.kuja.a.marsSign, ") — ", matchModule.kuja.a.found ? 'Dosha ရှိ' + (matchModule.kuja.a.severity === 'very-strong' ? ' (အလွန်ပြင်းထန်)' : matchModule.kuja.a.severity === 'strong' ? ' (ပြင်းထန်)' : ' (အလယ်အလတ်)') : 'Dosha မရှိ'), /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-slate-700"
+  }, "👧 ", girl.name || 'ဒုတိယလူ', ": အင်္ဂါ ", matchModule.kuja.b.marsHouse, " တန့် (", matchModule.kuja.b.marsSign, ") — ", matchModule.kuja.b.found ? 'Dosha ရှိ' + (matchModule.kuja.b.severity === 'very-strong' ? ' (အလွန်ပြင်းထန်)' : matchModule.kuja.b.severity === 'strong' ? ' (ပြင်းထန်)' : ' (အလယ်အလတ်)') : 'Dosha မရှိ'), matchModule.kuja.cancelled ? /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] font-semibold text-emerald-800"
+  }, "နှစ်ဦးလုံး Manglik ဖြစ်လို့ Dosha ပျက်ပြယ်တယ် (both-Manglik cancel — Phaladeepika Ch.4)။") : /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-slate-700"
+  }, "ဒါက ရှေးကျမ်း စစ်ချက် သက်သက်ပါ — လက်ထပ်ခြင်းကို တားမြစ်တဲ့ အဓိပ္ပာယ် မဟုတ်ပါ။ ဖြေဆေး (remedy) မပေးပါ။"), (matchModule.kuja.traceA.moon || matchModule.kuja.traceA.venus) && /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-slate-500"
+  }, "အရိပ် (", boy.name || 'ပထမလူ', "): ", matchModule.kuja.traceA.moon ? `တနင်္လာကနေ ကြည့်ရင် အင်္ဂါ ${matchModule.kuja.traceA.moonHouse} တန့်မှာ — ဒါမျိုးကိုတော့ သတိထားသင့်တယ် ဆိုတဲ့ အရိပ်အဆင့်ပဲ ရှိတယ်။ ` : '', matchModule.kuja.traceA.venus ? `သောကြာကနေ ကြည့်ရင် အင်္ဂါ ${matchModule.kuja.traceA.venusHouse} တန့်မှာ — ဒါမျိုးကိုတော့ သတိထားသင့်တယ် ဆိုတဲ့ အရိပ်အဆင့်ပဲ ရှိတယ်။` : ''), (matchModule.kuja.traceB.moon || matchModule.kuja.traceB.venus) && /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-slate-500"
+  }, "အရိပ် (", girl.name || 'ဒုတိယလူ', "): ", matchModule.kuja.traceB.moon ? `တနင်္လာကနေ ကြည့်ရင် အင်္ဂါ ${matchModule.kuja.traceB.moonHouse} တန့်မှာ — ဒါမျိုးကိုတော့ သတိထားသင့်တယ် ဆိုတဲ့ အရိပ်အဆင့်ပဲ ရှိတယ်။ ` : '', matchModule.kuja.traceB.venus ? `သောကြာကနေ ကြည့်ရင် အင်္ဂါ ${matchModule.kuja.traceB.venusHouse} တန့်မှာ — ဒါမျိုးကိုတော့ သတိထားသင့်တယ် ဆိုတဲ့ အရိပ်အဆင့်ပဲ ရှိတယ်။` : ''))), "              ", !isTrop && matchModule && matchModule.synastry && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border border-amber-300 p-3 rounded space-y-1.5 shadow-sm"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-center"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-bold text-emerald-900 text-xs"
+  }, "🪐 Vedic Synastry — ဂြိုဟ်ချင်း သဟဇာတ"), /*#__PURE__*/React.createElement("span", {
+    className: "font-bold text-amber-700"
+  }, matchModule.synastry.score, "/100")), /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] font-semibold text-emerald-800"
+  }, matchModule.synastry.verdict), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "ဂြိုဟ်ချင်း ဆက်သွယ်မှုကိုပဲ ဖတ်တယ် — Moon-sign lord friendship (Graha Maitri) က Ashtakoota #5 မှာ ရှိပြီးသား။ အမှတ်က app-own sign-relation တွက်ချက်မှုပါ။"), matchModule.synastry.pairs.map((pr, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "flex justify-between border-b border-slate-50 pb-0.5"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-700"
+  }, pr.label), /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold text-slate-800 whitespace-nowrap"
+  }, pr.aSign, " × ", pr.bSign, " · ", pr.score))), matchModule.synastry.sameLord.map((n, i) => /*#__PURE__*/React.createElement("div", {
+    key: 'sl' + i,
+    className: "text-[11px] text-slate-600"
+  }, "🤝 ", _MATCH_MY[n.a], " × ", _MATCH_MY[n.b], " — နှစ်ခုလုံး ", _MATCH_MY[n.lord], " ပိုင် ရာသီ (", n.aSign, " × ", n.bSign, ") — အရသာ/အလှအပ ဘက်မှာ မျှဝေတဲ့ ဘာသာစကား ရှိတယ်။")), matchModule.synastry.hits.map((h, i) => /*#__PURE__*/React.createElement("div", {
+    key: 'h' + i,
+    className: "text-[11px] text-slate-600"
+  }, "• ", h.dir === 'A' ? (boy.name || 'ပထမလူ') + ' → ' + (girl.name || 'ဒုတိယလူ') : (girl.name || 'ဒုတိယလူ') + ' → ' + (boy.name || 'ပထမလူ'), ": ", h.text)), matchOverlayText && /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-slate-700"
+  }, "🏠 7th အိမ် ပေါ် ကျတဲ့ ဂြိုဟ်: ", matchOverlayText))), "              ", !isTrop && matchModule && matchModule.overlap && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border border-sky-300 p-3 rounded space-y-1.5 shadow-sm"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-center"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-bold text-sky-900 text-xs"
+  }, "⏳ ဒဿာ အချိန်တိုက်ဆိုင်မှု (Dasha Overlap — ", matchModule.overlap.start, " → ", matchModule.overlap.end, ")"), /*#__PURE__*/React.createElement("span", {
+    className: "flex gap-1"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setMatchMode('marriage'),
+    className: `px-2 py-0.5 rounded-full text-[10px] font-bold border ${matchModule.overlap.mode === 'marriage' ? 'bg-sky-600 text-white border-sky-700' : 'bg-white text-sky-700 border-sky-300'}`
+  }, "💍 အိမ်ထောင်"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setMatchMode('business'),
+    className: `px-2 py-0.5 rounded-full text-[10px] font-bold border ${matchModule.overlap.mode === 'business' ? 'bg-sky-600 text-white border-sky-700' : 'bg-white text-sky-700 border-sky-300'}`
+  }, "💼 အလုပ်"))), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "နှစ်ဦးရဲ့ ဒဿာ အချိန်ကို ပေါင်းပြီး အပိုင်းလိုက် ခွဲထားတယ် — ကောင်းတဲ့ ဒဿာ (≥60) / ခက်ခဲတဲ့ ဒဿာ (≤30) / အလယ်အလတ်။ ", matchModule.overlap.mode === 'marriage' ? 'အိမ်ထောင် mode: ကောင်းတဲ့ အိမ် [2,5,7,9,11]' : 'အလုပ် mode: ကောင်းတဲ့ အိမ် [2,5,7,9,10,11]', " (trikona 5/9 ပါ)။"), matchModule.overlap.current && /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-slate-700"
+  }, "📌 ", /*#__PURE__*/React.createElement("strong", null, "လက်ရှိ:"), " ", boy.name || 'ပထမလူ', " ", matchModule.overlap.current.aMaha, "/", matchModule.overlap.current.aAntar || '—', " (", matchModule.overlap.current.aScore, ") × ", girl.name || 'ဒုတိယလူ', " ", matchModule.overlap.current.bMaha, "/", matchModule.overlap.current.bAntar || '—', " (", matchModule.overlap.current.bScore, ") — ", matchModule.overlap.current.verdict === 'both-good' ? 'နှစ်ဦးလုံး ကောင်းတဲ့ ဒဿာ' : matchModule.overlap.current.verdict === 'both-hard' ? 'နှစ်ဦးလုံး ခက်ခဲတဲ့ ဒဿာ' : 'ရောနေတဲ့ ကာလ (mixed)', " (", matchModule.overlap.current.start, " → ", matchModule.overlap.current.end, ")"), matchModule.overlap.nextGood && /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] font-semibold text-emerald-800"
+  }, "🌟 နောက် နှစ်ဦးလုံး ကောင်းတဲ့ ပြတင်း: ", matchModule.overlap.nextGood.start, " → ", matchModule.overlap.nextGood.end), matchModule.overlap.bothHard.map((w, i) => /*#__PURE__*/React.createElement("div", {
+    key: 'bh' + i,
+    className: "text-[11px] text-amber-800"
+  }, "⚠️ ", w.start, " → ", w.end, ": ဒီကာလမှာ နှစ်ဦးလုံး ခက်ခဲတဲ့ ဒသာမှာ ရှိနေတတ်လို့၊ ပေါင်းဖက်ဖို့ အလွန် ကြိုးစား အားထုတ်မှသာ ဖြစ်နိုင်မည်")), /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] font-bold text-slate-600 pt-1 border-t border-slate-100"
+  }, "အပိုင်း တစ်ခုချင်းစီ (ထိပ်ဆုံး ၆ ခု):"), matchModule.overlap.segments.slice(0, 6).map((s, i) => /*#__PURE__*/React.createElement("div", {
+    key: 's' + i,
+    className: "flex justify-between text-[11px] border-b border-slate-50 pb-0.5"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-700"
+  }, s.start, " → ", s.end), /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold whitespace-nowrap"
+  }, s.verdict === 'both-good' ? '✅ နှစ်ဦးလုံး ကောင်း' : s.verdict === 'both-hard' ? '⚠️ နှစ်ဦးလုံး ခက်' : '◐ ရောနေ', " (", s.aScore, "/", s.bScore, ")"))), matchModule.overlap.segments.length > 6 && /*#__PURE__*/React.createElement("div", {
+    className: "text-[10px] text-slate-500"
+  }, "…နောက် ", matchModule.overlap.segments.length - 6, " ပိုင်း ကျန်သေးတယ် (စုစုပေါင်း ", matchModule.overlap.segments.length, " ပိုင်း)။"))), "              ", !isTrop && /*#__PURE__*/React.createElement("div", {
     className: "space-y-3"
   }, /*#__PURE__*/React.createElement("div", {
     className: "bg-white border border-amber-200 p-3 rounded space-y-1.5 shadow-sm"
