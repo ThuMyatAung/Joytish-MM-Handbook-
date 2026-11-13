@@ -74,6 +74,8 @@
 // v6.59 (2026-11-10): user order — build the family-profile gaps in one go (spouse detail lines + children card + siblings card). (1) Spouse profile gains three explicit lines after the meet line: distance (7th lord in 9th/12th = far/foreign, in 1st/2nd/4th/7th = near/home, else silent), background (Rahu/Ketu on 7th/7th lord/Venus or 7th lord in 12th = foreign/other background; clean 7th + Venus >= 50 = same community, else silent), age DIRECTION only (Saturn links = older, Mercury links = younger, Venus links = similar; no year count — the texts give none, so none is invented). (2) NEW buildChildrenProfile: promise from 5th lord + Jupiter (putrakaraka) + malefics in 5th, benefit from 5th lord house (1/9/10/11 = benefit, 6/8/12 = worry/expense), Jupiter-in-5th line, malefic-in-5th difficulty line with a medical-advice caveat, and a timing line when the current maha/antar lord is the 5th lord or Jupiter (via rpCurrentLords). (3) NEW buildSiblingsProfile: younger siblings from 3rd lord + malefics in 3rd, elder siblings from 11th lord, Mars as sibling karaka, benefit from 3rd lord house. Both cards render beside the spouse block in the အကျိုးပေး အနှစ်ချုပ် card. Scores, wealth rules, windows, timing, rectification and every other rule unchanged. Nothing else changed.
 // v6.60 (2026-11-10): user order — teacher's-notes supplements, built after the resort/Rahu-Ketu text check. (1) Rahu/Ketu special aspects 5/9/12 counted clockwise (teacher's lineage rule; BPHS Ch.26 names specials only for Saturn/Jupiter/Mars) live in a NEW helper _aspectHousesN used only by the new v6.60 lines — _aspectHouses itself is untouched, so Sudarshana, wealth, yogas and rectification stay byte-identical. (2) Resort gains a second path: Jupiter-Venus link (teacher's VE+JU rule) worth 2 points beside the v6.21 Saturn/Venus/Moon components (gate still >=3). (3) NEW buildMarriageDetail: 5+7 love marriage vs 5!=7 (teacher's note: MARRIAGE, not MIRAGE), delay/difficulty/early wording only, multiple (sequential) marriages + separation (BPHS Ch.18 vv.4-6, 17-21, 42 + 6th-house link), second marriage read from 9th/2nd, sign mobility (chara/sthira/dvisvabhava) of 7th + Venus sign. (4) Character traits in mindProfileRows: အညှိုးကြီး (Moon+Saturn), ယုံကြည် (strong Jupiter on Moon/lagna), သဘောကောင်း (Venus/Jupiter on Moon + Moon strong). (5) UR/NE: conjunct (<=10 deg) + science links = science/innovation line; conjunct + 8th/12th/Moon affliction without science links = occult-pull line (Hawking example NOT verified — UR-NE 123 deg apart at 02:29 Oxford — no person named in-app). (6) Black-magic/attack indication: Moon/Lagna afflicted by BOTH Saturn and Rahu (teacher's note), Ketu in 5th as support (Phaladeepika: oppressed by evil spirits; Mars = witchcraft significator). (7) Property types in assets: building (Mars), factory/hospital (Mars+Saturn), shophouse (Mercury), complex (Mars+Mercury) on the 4th. NOT built: entrepreneur type (no classical seed), film-career combos + combination rules (meanings sit in the unread Burmese glosses). Scores unchanged; wealth sources change only by the intended resort addition on charts where VE+JU links. Nothing else changed.
 // v6.67 (2026-11-12): user order — wealth zones + global tiers (display/mapping ONLY — wealth score, gates, power, idx, BANDS, _TIERS untouched; the wealth measurement FAILED so no score tuning). NEW calculateWealthZones: (1) zone from birth country — birthZone (IANA) -> country (the app's own ZONE_BY_COUNTRY + US/CA/AU state tables inverted by script, plus a small LatAm/other supplement) -> Zone 1/2/3; fallback lat/lon bounding boxes; last resort Zone 2 + note; China splits (middle tiers Zone 2, tycoon tier Zone 1 $500M+). (2) tier -> Nishka class (below-500 သာမန် / 500 လူလတ်တန်းစား / 1,000 သူဌေး / 2,000 အလွန်ချမ်းသာသူ / 6,000 တိုင်ကွန်း) with zone dollars (~$50M/$25M/$10M at 500 etc. per the zone table); labels are grades on the texts' wealth scale, not population classes. (3) exceptional band: the $100M+ absolute entry is retired as display; the entry rung is now the zone tycoon figure; the old 7-rung Ultra/Super ladder is shown as 3 rungs (tycoon -> G1 $1B+ king of kings -> G2 $100B+ Chakravarti/emperor), the rung picked from the existing band string's index (0-2 tycoon, 3-4 G1, 5-6 G2). Texts: BPHS Ch.22 Nishka amounts + relative conversion (6,000 ≈ 16,000x subsistence); Phala Ch.6 graded rulership; BPHS Chakr Yog. Renders as a zone line under the net-worth tier and a zone-aware band + ladder in the exceptional card. Migrant tension noted, not solved (birth-country anchor stands). Nothing else changed.
+// v6.68 (2026-11-13): user order — Tropical matching (Astro-Seek-style presentation), TABLE ONLY (his ruling 2026-11-13 08:54: NO bi-wheel — no stacked/side-by-side wheels). NEW: (1) calculateWesternCrossAspects — full cross-chart aspect table (10 planets + Lagna, all hits, orb order, orbScale 0.8) as a SEPARATE function — calculateWesternSynastry (score/verdict/pairRows/aspectHits) is byte-identical, so the score cannot move; (2) calculateHouseOverlays + composed overlays both directions (westernHouseOf); (3) composite presentation — aspects table (composed) + full 11-point planet-sign table (fmtWestDeg), NO composite houses (v6.16); (4) shared WesternCompatDetail component (Matching Tropical first, reused in Relate Tropical). Interpretations composed from the app's own tables (WESTERN_PLANET_THEME x WESTERN_HOUSE_DOMAIN x aspect-kind effect, v6.55 pattern) — no Astro-Seek text/images/layout copied. Matching data: boyCusps/girlCusps named consts (behavior-neutral); Relate calc() returns jd for cusps (behavior-neutral) + one-word note clarification ("Vedic အခန်းကဏ္ဍ" — the old "အိမ် အခြေခံ" phrase collided with the new overlay tables). Nothing else changed.
+// v6.69 (2026-11-13): user order — Tropical text rewrite: simpler, direct, striking writing (his 2026-11-13 feedback: the composed lines read too textbook-like / ဖတ်စာလိုလို, meaning circles without landing). Scope = ALL Tropical composed texts, Vedic untouched: (1) matching compose fns (cross/overlay/composite) — placement first with names, area named ONCE in the placement sentence, effects flow from the placement ("ဒီရပ်တည်မှုကြောင့်ပဲ …"), short theme labels (WESTERN_PLANET_THEME shortened in place — same meanings, fewer words) + short kind verbs (flow/tension/merge), no "…တဲ့ ပုံစံ …တယ်" tail, no triple-တတ် hedging; (2) monthly forecast (general Sun/planets/Jupiter-Saturn, personal aspect lines, Jupiter/Saturn transits, lunations) — same rules, no names (single-person); (3) natal sign/house lines, composite summary lines, partner-profile lines, vocational MC lines, Solar Return / Progressed lines — same rules. NOT touched: WESTERN_ASPECT_TEXT generic kind sentences (different template, already short), fast-planet transit-house lines (already placement-only), hand-written traits/fields, all Vedic text. Names wiring verified end-to-end (Matching boy.name/girl.name + Relate personA.name/personB.name, fallback ပထမလူ/ဒုတိယလူ kept). Also fixed a missing "။" in the cross/monthly-aspect templates when the B-house is unknown (areaPart empty). Scores/gates/verdicts/computation unchanged (synastry 61, cross 29, anchors 67/58/73).
 // v6.66 (2026-11-12): user order — matching module (Kuja/Manglik dosha + Vedic synastry + dasha-overlap), measured in matching-measure.js (design 2026-11-12). NEW calculateMatchingModule: (1) Kuja — Phaladeepika Ch.4 set 1/2/4/7/8/12, Lagna reference ONLY; Moon/Venus shown only as traces/shadows (အရိပ်, "သတိထားသင့်" wording); both-Manglik cancel only (no BPHS benefic-cancel); card shown ONLY when a dosha is found, otherwise nothing. (2) Vedic synastry — 8-pair weighted table /100 (app-own sign-relation scorer, labelled; mode-neutral labels), cross-chart aspects 7x7 (conjunctions deduped, directional; Rahu/Ketu excluded), same-lord notes, ONE 7th-overlay line. (3) Dasha-overlap — merged-boundary timeline [now, +10y], per-person graded score v5 (base 40; maha good +25, antar good +15, placed in [1,5,9,10,11] +10, hard-lord penalties, benefic antar +5; Rahu/Ketu via dispositor; mixed lord neutral), good >=60 / hard <=30; good houses business [2,5,7,9,10,11] / marriage [2,5,7,9,11] with a mode toggle (default marriage); BOTH futureWindow + overlap timeline kept; both-hard wording is his approved line. Q5 = v5 (trikona 5/9) per his build order without an explicit Q5 answer — flagged for his correction. Renders as three cards in the Matching tab (Vedic side) below the Ashtakoota total, above Deep Synastry Metrics. Ashtakoota /36, dashaRelPct, futureWindow, KP, Right Person and all scores untouched. Nothing else changed.
 // v6.65 (2026-11-12): user order — role / အလုပ်အကိုင် module (Career potential), measured in v5 (PASS 25/25; v4 FAIL (1) Businessman prevalence fixed by his ruling: drop Businessman, replace with ကိုယ်ပိုင်လုပ်ငန်းရှင် Own-Business Owner, a COMMON role with a breadth gate — score>=4 with >=2 layers, no +2 requirement). NEW calculateRolePotential: 25 roles (StateInfluence/Minister/ArmyChief/Tycoon/Founder + 20 ordinary incl. OwnBiz), each scored from D1 structure + yoga + Phala Ch.5 navamsa profession + D10 support (one-fourth voice) + dasha activation, with agreement check (AmK / income sources / navamsa lord) and required elements; high-office roles need a +2 DIRECT text-named rule + support (honour card or exceptional band) and 3 capped layers incl. yoga. StateInfluence label is his exact wording "နိုင်ငံတော်အဆင့် ဩဇာလွှမ်းမိုးမှု ရရှိနိုင်သော". NO negative verdicts — only roles that fire are shown, FULL first then TRACE (partial support). Cross-event flags on shown high-office roles (Dushkriti / govt trouble / low public support / hard-season legal-fall-reputation). Tycoon sub-types (Elite/Crony/Tycoon) are interpretation. Renders as a new "Career (ဖြစ်နိုင်ခြေ)" section in Life Overview, just above income sources. Mahapurusha fold-in NOT included (separate pending decision — honour triad untouched). Scores, wealth, marriage, children, rectification and every other rule unchanged. Nothing else changed.
 // v6.64 (2026-11-11): user order — varga fold-in, starting with D10 (Dasamsa) for the honour card (user delegated the starting chart: "whichever chart you like"). Design: no standalone "according to D-X" readings — D10 evidence folds into the existing D1 honour line. BPHS Ch.7 vv.1-8 ("power (and position) from Dashamsa"); Phaladeepika Ch.3 v.3 (a varga's effect is one-fourth of Rasi for D10), so D10 is a supporting voice only: it never creates a card and is never named in the text. Support = >=2 of 3 (D1 10th lord dignified in D10; 10th lord in a D10 kendra/trikona from the D10 lagna; Sun dignified or in a D10 kendra) -> the tier wording gains " (ခိုင်မာတဲ့ အရိပ်)". Full contradiction (0 of 3) -> tier drops one level (lowest tier keeps the tier + " (အဟန့် ရှိနိုင်တယ်)"). Neutral (1 of 3) -> no change. D1 honour card absent -> D10 adds nothing. Measurement on the 12-case study set (honour dimension) decides whether it ships; see v664 report. Nothing else changed.
@@ -11162,24 +11164,24 @@ function generateTropicalMonthly(birthPlanets, tropCusps, y, m, lat, lon, nodeTy
   const general = [];
   const tSunSign = Math.floor(norm360(tp.Sun) / 30);
   const sunH = houseFromSun(tSunSign);
-  general.push(`ဒီလ နေ ဟာ ${WESTERN_SIGNS[tSunSign].my}မှာ ရှိနေတယ် — ${sunSign.my}ဖွား အတွက် နေ ဟာ ${sunH} တန့် (${WESTERN_HOUSE_DOMAIN[sunH - 1]}) မှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ဒီလ အလေး ရောက်ရာ ဟာ ${WESTERN_HOUSE_DOMAIN[sunH - 1]} ဖြစ်တယ်။`);
+  general.push(`ဒီလ နေ ဟာ ${WESTERN_SIGNS[tSunSign].my}မှာ ရှိနေတယ် — ${sunSign.my}ဖွား အတွက် ${sunH} တန့် (${WESTERN_HOUSE_DOMAIN[sunH - 1]}) မှာ ရှိနေတယ်။ ဒီလ အလေး ရောက်ရာ ဟာ အဲ့ဒီ နယ်ပယ် ဖြစ်တယ်။`);
   ['Mercury', 'Venus', 'Mars'].forEach(k => {
     if (typeof tp[k] !== 'number') return;
     const s = Math.floor(norm360(tp[k]) / 30),
       h = houseFromSun(s);
-    general.push(`${WESTERN_PLANET_MY[k]} ဟာ ${WESTERN_SIGNS[s].my}မှာ၊ ${h} တန့်မှာ ရှိနေတယ် — ${WESTERN_HOUSE_DOMAIN[h - 1]} ဘက်မှာ လှုပ်ရှားမှု ရှိတယ်။`);
+    general.push(`${WESTERN_PLANET_MY[k]} ဟာ ${WESTERN_SIGNS[s].my}မှာ၊ ${h} တန့် (${WESTERN_HOUSE_DOMAIN[h - 1]}) မှာ ရှိနေတယ်။`);
   });
   const jupS = Math.floor(norm360(tp.Jupiter) / 30),
     satS = Math.floor(norm360(tp.Saturn) / 30);
-  general.push(`ကြာသပတေး ဟာ ${WESTERN_SIGNS[jupS].my}မှာ၊ စနေ ဟာ ${WESTERN_SIGNS[satS].my}မှာ ရှိနေတယ် — ရေရှည် ${WESTERN_HOUSE_DOMAIN[houseFromSun(jupS) - 1]} နဲ့ ${WESTERN_HOUSE_DOMAIN[houseFromSun(satS) - 1]} ဘက်တွေမှာ ဖြည်းဖြည်းချင်း ပြောင်းလဲနေတဲ့ ကာလ ဖြစ်တယ်။`);
+  general.push(`ကြာသပတေး ဟာ ${WESTERN_SIGNS[jupS].my}မှာ၊ စနေ ဟာ ${WESTERN_SIGNS[satS].my}မှာ ရှိနေတယ် — ရေရှည် ${WESTERN_HOUSE_DOMAIN[houseFromSun(jupS) - 1]} နဲ့ ${WESTERN_HOUSE_DOMAIN[houseFromSun(satS) - 1]} မှာ ဖြည်းဖြည်းချင်း ပြောင်းလဲနေတယ်။`);
   // --- Personal: transit-to-natal aspects (mid-month) ---
   const personal = [];
   const tAsps = calculateTransitAspects(tp, birthPlanets).slice(0, 6);
   // v6.55: each line says HOW (aspect), IN WHICH AREA (natal planet's Placidus house), and WHAT tends to happen (both planets' themes + aspect kind).
   const ASPECT_AREA_EFFECT = {
-    flow: 'ချောမွေ့ပြီး အထောက်အပံ့ ရတတ်',
-    tension: 'ပွတ်တိုက်မှု ရှိတတ်ပြီး အဲ့ဒီ အားပြိုင်မှုကနေပဲ တိုးတက်အောင် တွန်းပေးတတ်',
-    merge: 'ပေါင်းစည်း လှုပ်ရှားတတ်'
+    flow: 'ချောမွေ့ပြီး အားပေးတယ်',
+    tension: 'ပွတ်တိုက်ပြီး တိုးတက်စေတယ်',
+    merge: 'တစ်သားတည်း ဖြစ်တယ်'
   };
   tAsps.forEach(a => {
     const tTheme = WESTERN_PLANET_THEME[a.t] || '';
@@ -11188,7 +11190,7 @@ function generateTropicalMonthly(birthPlanets, tropCusps, y, m, lat, lon, nodeTy
     const area = nHouse ? WESTERN_HOUSE_DOMAIN[nHouse - 1] : '';
     const effect = ASPECT_AREA_EFFECT[a.kind] || '';
     const areaPart = nHouse ? ` — မွေး ${pn(a.n)} ဟာ ${nHouse} တန့် (${area}) မှာ ရှိနေတယ်။` : '';
-    personal.push(`Transit ${pn(a.t)} ဟာ မွေး ${pn(a.n)}နဲ့ ${a.typeMy} ဖြစ်နေတယ်${areaPart} ဒီရပ်တည်မှုကြောင့် ${area ? area + ' ဘက်မှာ ' : ''}${tTheme} နဲ့ ${nTheme} ${effect}တဲ့ ကာလ ဖြစ်တယ်။`);
+    personal.push(`Transit ${pn(a.t)} ဟာ မွေး ${pn(a.n)}နဲ့ ${a.typeMy} ဖြစ်တယ်${areaPart || '။'} ဒီရပ်တည်မှုကြောင့်ပဲ ${tTheme} နဲ့ ${nTheme} ${effect}။`);
   });
   // --- Personal: fast-planet transit houses (Placidus natal houses) ---
   ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars'].forEach(k => {
@@ -11199,7 +11201,7 @@ function generateTropicalMonthly(birthPlanets, tropCusps, y, m, lat, lon, nodeTy
   if (tropCusps && typeof tp.Jupiter === 'number' && typeof tp.Saturn === 'number') {
     const hj = westernHouseOf(tp.Jupiter, tropCusps),
       hs = westernHouseOf(tp.Saturn, tropCusps);
-    if (hj && hs) personal.push(`Transit ကြာသပတေး ဟာ ${hj} တန့်မှာ၊ Transit စနေ ဟာ ${hs} တန့်မှာ ရှိနေတယ် — ရေရှည် နယ်ပယ် နှစ်ခု ဖြစ်တဲ့ ${WESTERN_HOUSE_DOMAIN[hj - 1]} နဲ့ ${WESTERN_HOUSE_DOMAIN[hs - 1]} ဘက်မှာ ဖြည်းဖြည်းချင်း အလုပ် လုပ်နေတဲ့ ကာလ ဖြစ်တယ်။`);
+    if (hj && hs) personal.push(`Transit ကြာသပတေး ဟာ ${hj} တန့် (${WESTERN_HOUSE_DOMAIN[hj - 1]}) မှာ၊ Transit စနေ ဟာ ${hs} တန့် (${WESTERN_HOUSE_DOMAIN[hs - 1]}) မှာ ရှိနေတယ် — ရေရှည် နယ်ပယ် နှစ်ခုမှာ ဖြည်းဖြည်းချင်း အလုပ် လုပ်နေတယ်။`);
   }
   // --- Lunations in this month ---
   const luns = findLunationsInMonth(y, m, latN, lonN, nodeType, tzEff);
@@ -11210,8 +11212,8 @@ function generateTropicalMonthly(birthPlanets, tropCusps, y, m, lat, lon, nodeTy
     const h = tropCusps ? westernHouseOf(lp.Moon, tropCusps) : null;
     const dom = h ? WESTERN_HOUSE_DOMAIN[h - 1] : WESTERN_SIGNS[s].my;
     const where = h ? `${WESTERN_SIGNS[s].my}မှာ၊ ${h} တန့် (${dom}) မှာ` : `${WESTERN_SIGNS[s].my}မှာ`;
-    if (kind === 'new') return `လဆန်း (${lun.label}) ဟာ ${where} ကျတယ် — ဒီလ အစ အသစ် စရမယ့် နယ်ပယ် ဟာ ${dom} ဖြစ်တယ်။`;
-    return `လပြည့် (${lun.label}) ဟာ ${where} ကျတယ် — ${dom} ဘက်က ရလဒ် မြင်ရပြီး ဟန်ချက် ပြန်ညှိရတဲ့ အချိန် ဖြစ်တယ်။`;
+    if (kind === 'new') return `လဆန်း (${lun.label}) ဟာ ${where} ကျတယ် — ဒီလ အစ အသစ် စရမယ့် နယ်ပယ် ဖြစ်တယ်။`;
+    return `လပြည့် (${lun.label}) ဟာ ${where} ကျတယ် — အဲ့ဒီ နယ်ပယ်က ရလဒ် မြင်ရပြီး ဟန်ချက် ပြန်ညှိရတဲ့ အချိန် ဖြစ်တယ်။`;
   };
   const lunations = [lunLine('new', luns.newMoon), lunLine('full', luns.fullMoon)];
   return {
@@ -12429,19 +12431,19 @@ const WESTERN_PLANET_MY = {
   Lagna: 'လဂ် (Ascendant)'
 };
 const WESTERN_PLANET_THEME = {
-  Sun: 'ကိုယ့် အဓိက စရိုက်နဲ့ ဘဝ ဦးတည်ချက်',
-  Moon: 'ခံစားချက်နဲ့ စိတ် လိုအပ်ချက်',
-  Mars: 'လုပ်ရဲစွမ်းနဲ့ လုပ်ဆောင် တိုက်ခိုက်ပုံ',
-  Mercury: 'အတွေးနဲ့ ဆက်သွယ် ပြောဆိုပုံ',
-  Jupiter: 'ကြီးထွားမှုနဲ့ အခွင့်အလမ်း ရှာပုံ',
-  Venus: 'အချစ်၊ အလှနဲ့ တန်ဖိုး ထားပုံ',
-  Saturn: 'စည်းကမ်း၊ တာဝန်နဲ့ ရေရှည် တည်ဆောက်ပုံ',
-  Uranus: 'ဆန်းသစ်မှုနဲ့ လွတ်လပ်ချင်စိတ်',
-  Neptune: 'စိတ်ကူးနဲ့ စိတ်ဓာတ် ဆိုင်ရာ ရှာဖွေမှု',
-  Pluto: 'အတွင်း စွမ်းအားနဲ့ ကြီးကြီးမားမား အပြောင်းအလဲ',
-  Rahu: 'ဘဝ သင်ယူရာ ဦးတည်ချက် (North Node)',
-  Ketu: 'အကျွမ်းတဝင် ရှိပြီး လွှတ်ချရမယ့် ပုံစံ (South Node)',
-  Lagna: 'အပေါ်ယံ ပုံစံနဲ့ ဘဝ ချဉ်းကပ်ပုံ'
+  Sun: 'ကိုယ့် အဓိက စရိုက်',
+  Moon: 'ခံစားချက်',
+  Mars: 'လုပ်ရဲစွမ်း',
+  Mercury: 'အတွေး',
+  Jupiter: 'အခွင့်အလမ်း',
+  Venus: 'အချစ်',
+  Saturn: 'စည်းကမ်း၊ တာဝန်',
+  Uranus: 'အသစ်အဆန်း',
+  Neptune: 'စိတ်ကူး',
+  Pluto: 'အတွင်း စွမ်းအား',
+  Rahu: 'ဘဝ ဦးတည်ချက်',
+  Ketu: 'အကျွမ်းတဝင် ပုံစံ',
+  Lagna: 'ဘဝ ချဉ်းကပ်ပုံ'
 };
 const WESTERN_HOUSE_DOMAIN = ['ကိုယ့် ပုံစံနဲ့ ခန္ဓာ', 'ငွေကြေးနဲ့ ကိုယ်ပိုင် တန်ဖိုး', 'ဆက်သွယ်ရေးနဲ့ အခြေခံ သင်ယူမှု', 'အိမ်နဲ့ မိသားစု အရင်း', 'ဖန်တီးမှု၊ အချစ်နဲ့ သားသမီး', 'နေ့စဉ် အလုပ်နဲ့ ကျန်းမာရေး', 'လက်တွဲဖော်နဲ့ အိမ်ထောင်', 'မျှဝေ ပိုင်ဆိုင်မှုနဲ့ အတွင်း အပြောင်းအလဲ', 'ခရီး၊ အဆင့်မြင့် ပညာနဲ့ ယုံကြည်မှု', 'အလုပ်အကိုင်နဲ့ လူထု ပုံရိပ်', 'မိတ်ဆွေနဲ့ အနာဂတ် မျှော်မှန်းချက်', 'စိတ် အတွင်းပိုင်းနဲ့ လျှို့ဝှက် အရာ'];
 const WESTERN_ASPECT_DEFS = [{
@@ -12584,7 +12586,7 @@ function generateWesternReadings(p, cusps) {
     return {
       planet: k,
       sign: sg,
-      text: `${WESTERN_PLANET_MY[k]} သည် ${sg.my} ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ${WESTERN_PLANET_THEME[k]} ကို ${sg.style} ပုံစံနဲ့ ဖော်ပြ လှုပ်ရှား တယ်။`
+      text: `${WESTERN_PLANET_MY[k]} သည် ${sg.my} ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ ${WESTERN_PLANET_THEME[k]} ကို ${sg.style} ပုံစံနဲ့ ဖော်ပြတယ်။`
     };
   });
   const houseLines = cusps ? keys.filter(k => typeof p[k] === 'number').map(k => {
@@ -12592,7 +12594,7 @@ function generateWesternReadings(p, cusps) {
     return {
       planet: k,
       house: h,
-      text: `${WESTERN_PLANET_MY[k]} သည် ${h} တန့် မှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ${WESTERN_PLANET_THEME[k]} ဟာ ${WESTERN_HOUSE_DOMAIN[h - 1]} နယ်ပယ်မှာ အဓိက အလေး ရောက် တယ်။`
+      text: `${WESTERN_PLANET_MY[k]} သည် ${h} တန့် (${WESTERN_HOUSE_DOMAIN[h - 1]}) မှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ ${WESTERN_PLANET_THEME[k]} ဟာ အဲ့ဒီ နယ်ပယ်မှာ အဓိက အလေး ရောက် တယ်။`
     };
   }) : [];
   const aspects = calculateWesternAspects(p);
@@ -12745,6 +12747,71 @@ function calculateWesternSynastry(bP, gP) {
 }
 
 // ==========================================
+// WESTERN COMPAT DETAIL — v6.68: Astro-Seek-style Tropical
+// compatibility presentation. Tropical-only; the existing
+// calculateWesternSynastry score/verdict/pairRows/aspectHits path is
+// byte-identical (the expanded table below is a SEPARATE function —
+// expanding crossKeys inside calculateWesternSynastry would change
+// the score). All text is composed from the app's own tables
+// (WESTERN_PLANET_THEME / WESTERN_HOUSE_DOMAIN / aspect-kind effect,
+// v6.55 pattern) — no Astro-Seek text copied. No bi-wheel
+// (user ruling 2026-11-13: table only).
+// ==========================================
+const WESTERN_CROSS_KEYS = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto', 'Lagna'];
+const _WESTERN_KIND_MY = {
+  flow: 'သဟဇာတ',
+  tension: 'ပွတ်တိုက်',
+  merge: 'ပေါင်းစည်း'
+};
+const _WESTERN_ASPECT_EFFECT = {
+  flow: 'ချောမွေ့ပြီး အားပေးတယ်',
+  tension: 'ပွတ်တိုက်ပြီး တိုးတက်စေတယ်',
+  merge: 'တစ်သားတည်း ဖြစ်တယ်'
+};
+function calculateWesternCrossAspects(bP, gP) {
+  if (!bP || !gP) return [];
+  const hits = [];
+  WESTERN_CROSS_KEYS.forEach(ak => WESTERN_CROSS_KEYS.forEach(bk => {
+    if (typeof bP[ak] !== 'number' || typeof gP[bk] !== 'number') return;
+    const asp = westernAspectBetween(bP[ak], gP[bk], 0.8);
+    if (asp) hits.push({
+      a: ak,
+      b: bk,
+      type: asp.type,
+      typeMy: asp.typeMy,
+      kind: asp.kind,
+      orb: asp.orb
+    });
+  }));
+  return hits.sort((x, y) => x.orb - y.orb);
+}
+function composeWesternCrossAspectText(h, nameA, nameB, houseB) {
+  const themeA = WESTERN_PLANET_THEME[h.a] || '',
+    themeB = WESTERN_PLANET_THEME[h.b] || '';
+  const effect = _WESTERN_ASPECT_EFFECT[h.kind] || '';
+  const area = houseB ? WESTERN_HOUSE_DOMAIN[houseB - 1] : '';
+  const areaPart = houseB ? ` — ${WESTERN_PLANET_MY[h.b]} ဟာ ${houseB} တန့် (${area}) မှာ ရှိနေတယ်။` : '';
+  return `${nameA} ရဲ့ ${WESTERN_PLANET_MY[h.a]} ဟာ ${nameB} ရဲ့ ${WESTERN_PLANET_MY[h.b]}နဲ့ ${h.typeMy} ဖြစ်တယ်${areaPart || '။'} ဒီရပ်တည်မှုကြောင့်ပဲ ${themeA} နဲ့ ${themeB} ${effect}။`;
+}
+function composeWesternCompositeAspectText(h) {
+  const themeA = WESTERN_PLANET_THEME[h.a] || '',
+    themeB = WESTERN_PLANET_THEME[h.b] || '';
+  const effect = _WESTERN_ASPECT_EFFECT[h.kind] || '';
+  return `ပေါင်းစပ် ဇာတာမှာ ${WESTERN_PLANET_MY[h.a]} ဟာ ${WESTERN_PLANET_MY[h.b]}နဲ့ ${h.typeMy} ဖြစ်တယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ ${themeA} နဲ့ ${themeB} ${effect}။`;
+}
+function calculateHouseOverlays(planetsA, cuspsB) {
+  if (!planetsA || !cuspsB) return [];
+  return WESTERN_CROSS_KEYS.filter(k => typeof planetsA[k] === 'number').map(k => ({
+    planet: k,
+    house: westernHouseOf(planetsA[k], cuspsB)
+  })).filter(o => o.house).sort((x, y) => x.house - y.house || WESTERN_CROSS_KEYS.indexOf(x.planet) - WESTERN_CROSS_KEYS.indexOf(y.planet));
+}
+function composeWesternOverlayText(o, nameA, nameB) {
+  const dom = WESTERN_HOUSE_DOMAIN[o.house - 1] || '';
+  return `${nameA} ရဲ့ ${WESTERN_PLANET_MY[o.planet]} ဟာ ${nameB} ရဲ့ ${o.house} တန့် (${dom}) မှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ ${WESTERN_PLANET_THEME[o.planet]} က ${nameB} ရဲ့ ဘဝကို တိုက်ရိုက် ထိတယ်။`;
+}
+
+// ==========================================
 // WESTERN LAYER 2 — v6.16: timing (Solar Return, Progressions),
 // aspect patterns, Composite chart, partner profile, vocational.
 // Used ONLY when ayanamsa === 'tropical'.
@@ -12874,7 +12941,7 @@ function calculateComposite(bP, gP) {
   });
   const aspects = calculateWesternAspects(comp);
   const sOf = k => WESTERN_SIGNS[Math.floor(norm360(comp[k]) / 30)];
-  const lines = ['Composite နေ သည် ' + sOf('Sun').my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ဒီ ဆက်ဆံရေးရဲ့ အနှစ်သာရ ဟာ ' + sOf('Sun').style + ' ပုံစံ ဖြစ်တယ်။', 'Composite တနင်္လာ သည် ' + sOf('Moon').my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် နှစ်ယောက် အတူ ရှိချိန် ခံစားချက် ဟာ ' + sOf('Moon').style + ' ဖြစ်တယ်။', 'Composite သောကြာ သည် ' + sOf('Venus').my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် နှစ်ယောက်ကြား ချစ်ခြင်း ဖော်ပြပုံ ဟာ ' + sOf('Venus').style + ' ဖြစ်တယ်။'];
+  const lines = ['Composite နေ သည် ' + sOf('Sun').my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ ဒီ ဆက်ဆံရေးရဲ့ အနှစ်သာရ ဟာ ' + sOf('Sun').style + ' ပုံစံ ဖြစ်တယ်။', 'Composite တနင်္လာ သည် ' + sOf('Moon').my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ နှစ်ယောက် အတူ ရှိချိန် ခံစားချက် ဟာ ' + sOf('Moon').style + ' ဖြစ်တယ်။', 'Composite သောကြာ သည် ' + sOf('Venus').my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ နှစ်ယောက်ကြား ချစ်ခြင်း ဖော်ပြပုံ ဟာ ' + sOf('Venus').style + ' ဖြစ်တယ်။'];
   return {
     planets: comp,
     aspects,
@@ -12890,7 +12957,7 @@ function buildWesternPartnerProfile(p, cusps) {
   const in7 = keys.filter(k => westernHouseOf(p[k], cusps) === 7);
   const venSign = WESTERN_SIGNS[Math.floor(norm360(p.Venus) / 30)];
   const marSign = WESTERN_SIGNS[Math.floor(norm360(p.Mars) / 30)];
-  const lines = ['Descendant (7th တန့် ထိပ်) သည် ' + desc.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ' + desc.style + ' စရိုက် ရှိသူကို လက်တွဲဖော် အဖြစ် ဆွဲဆောင် ခံရတတ် တယ်။', rulerSign ? '7th အရှင် ' + ruler + ' သည် ' + rulerSign.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် လက်တွဲဖော် ဟာ ' + rulerSign.style + ' ပုံစံ ရှိနေတတ် တယ်။' : '', in7.length ? '7th တန့်ထဲမှာ ' + in7.join(', ') + ' ရှိနေတယ် — အဲ့ဒီ ဂြိုဟ်တွေရဲ့ စရိုက်က လက်တွဲဖော်မှာ ထင်ရှား တတ်တယ်။' : '7th တန့်ထဲမှာ ဂြိုဟ် မရှိပါ — အရှင် ရပ်တည်မှုကို အဓိက ကြည့်ပါ။', 'သောကြာ သည် ' + venSign.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် အချစ်ကို ' + venSign.style + ' ပုံစံနဲ့ ဖော်ပြ တတ်တယ်။', 'အင်္ဂါ သည် ' + marSign.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ဆွဲဆောင်မှုနဲ့ လိုချင်တာကို လိုက်ပုံ ဟာ ' + marSign.style + ' ဖြစ်တယ်။'].filter(Boolean);
+  const lines = ['Descendant (7th တန့် ထိပ်) သည် ' + desc.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ ' + desc.style + ' စရိုက် ရှိသူကို လက်တွဲဖော် အဖြစ် ဆွဲဆောင်တယ်။', rulerSign ? '7th အရှင် ' + ruler + ' သည် ' + rulerSign.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ လက်တွဲဖော် ဟာ ' + rulerSign.style + ' ပုံစံ ရှိနေတယ်။' : '', in7.length ? '7th တန့်ထဲမှာ ' + in7.join(', ') + ' ရှိနေတယ် — အဲ့ဒီ ဂြိုဟ်တွေရဲ့ စရိုက်က လက်တွဲဖော်မှာ ထင်ရှားတယ်။' : '7th တန့်ထဲမှာ ဂြိုဟ် မရှိပါ — အရှင် ရပ်တည်မှုကို အဓိက ကြည့်ပါ။', 'သောကြာ သည် ' + venSign.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ အချစ်ကို ' + venSign.style + ' ပုံစံနဲ့ ဖော်ပြတယ်။', 'အင်္ဂါ သည် ' + marSign.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ ဆွဲဆောင်မှုနဲ့ လိုချင်တာကို လိုက်ပုံ ဟာ ' + marSign.style + ' ဖြစ်တယ်။'].filter(Boolean);
   return {
     desc,
     ruler,
@@ -12907,7 +12974,7 @@ function buildWesternVocational(p, cusps) {
   const ruler = mc.ruler;
   const rulerHouse = typeof p[ruler] === 'number' ? westernHouseOf(p[ruler], cusps) : null;
   const inH = h => keys.filter(k => westernHouseOf(p[k], cusps) === h);
-  const lines = ['MC (10th တန့် ထိပ်) သည် ' + mc.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် အလုပ်မှာ ' + mc.style + ' ပုံစံနဲ့ အသိအမှတ် ပြုခံချင်တယ်။', 'MC အရှင် ' + ruler + (rulerHouse ? ' သည် ' + rulerHouse + ' တန့် မှာ ရှိနေတယ် — အလုပ်ရဲ့ အသီးအပွင့် ဟာ ' + WESTERN_HOUSE_DOMAIN[rulerHouse - 1] + ' နယ်ပယ်နဲ့ ဆက်နေ တယ်။' : '။'), inH(10).length ? '10th တန့်ထဲက ဂြိုဟ်: ' + inH(10).join(', ') + ' — အဲ့ဒီ စွမ်းအင်တွေက အလုပ်မှာ တိုက်ရိုက် ထင်ရှား တယ်။' : '10th တန့်ထဲမှာ ဂြိုဟ် မရှိပါ — MC ရာသီနဲ့ အရှင်ကို အဓိက ကြည့်ပါ။', inH(6).length ? '6th တန့် (နေ့စဉ် အလုပ်) ထဲက ဂြိုဟ်: ' + inH(6).join(', ') + '။' : '', inH(2).length ? '2nd တန့် (ဝင်ငွေ) ထဲက ဂြိုဟ်: ' + inH(2).join(', ') + '။' : ''].filter(Boolean);
+  const lines = ['MC (10th တန့် ထိပ်) သည် ' + mc.my + ' ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ အလုပ်မှာ ' + mc.style + ' ပုံစံနဲ့ အသိအမှတ် ပြုခံချင်တယ်။', 'MC အရှင် ' + ruler + (rulerHouse ? ' သည် ' + rulerHouse + ' တန့် (' + WESTERN_HOUSE_DOMAIN[rulerHouse - 1] + ') မှာ ရှိနေတယ် — အလုပ်ရဲ့ အသီးအပွင့် ဟာ အဲ့ဒီ နယ်ပယ်နဲ့ ဆက်နေ တယ်။' : '။'), inH(10).length ? '10th တန့်ထဲက ဂြိုဟ်: ' + inH(10).join(', ') + ' — အဲ့ဒီ စွမ်းအင်တွေက အလုပ်မှာ တိုက်ရိုက် ထင်ရှား တယ်။' : '10th တန့်ထဲမှာ ဂြိုဟ် မရှိပါ — MC ရာသီနဲ့ အရှင်ကို အဓိက ကြည့်ပါ။', inH(6).length ? '6th တန့် (နေ့စဉ် အလုပ်) ထဲက ဂြိုဟ်: ' + inH(6).join(', ') + '။' : '', inH(2).length ? '2nd တန့် (ဝင်ငွေ) ထဲက ဂြိုဟ်: ' + inH(2).join(', ') + '။' : ''].filter(Boolean);
   return {
     mc,
     fields: MC_FIELDS[mcIdx],
@@ -14726,6 +14793,101 @@ function RelPersonForm({
     className: "w-full border border-emerald-400 bg-emerald-50/50 p-0.5 rounded text-center text-xs font-bold text-emerald-900"
   }))));
 }
+function WesternCompatDetail({
+  nameA,
+  nameB,
+  planetsA,
+  planetsB,
+  cuspsA,
+  cuspsB,
+  composite
+}) {
+  if (!planetsA || !planetsB) return null;
+  const cross = calculateWesternCrossAspects(planetsA, planetsB);
+  const ovAB = calculateHouseOverlays(planetsA, cuspsB);
+  const ovBA = calculateHouseOverlays(planetsB, cuspsA);
+  const compAspects = composite ? composite.aspects : [];
+  const compPlanets = composite ? Object.keys(composite.planets) : [];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border border-indigo-200 p-3 rounded shadow-sm space-y-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-indigo-900"
+  }, "🔭 ဂြိုဟ်ချင်း Aspect ဇယား — အစုံလုံး (", cross.length, " ခု)"), /*#__PURE__*/React.createElement("div", {
+    className: "text-slate-500"
+  }, "ဂြိုဟ် 10 လုံး + လဂ် (Ascendant) — orb အနည်းဆုံး အရင် စီထားတယ်။ ဒါက အသေးစိတ် အလွှာပဲ — အပေါ်က score (5 ဂြိုဟ် အစုံ) ကို မပြောင်းဘူး။"), cross.map((h, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "border-b border-slate-50 pb-1.5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold text-slate-800"
+  }, WESTERN_PLANET_MY[h.a], " — ", WESTERN_PLANET_MY[h.b]), /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-600"
+  }, h.typeMy, " · orb ", h.orb, "° · ", _WESTERN_KIND_MY[h.kind])), /*#__PURE__*/React.createElement("div", {
+    className: "text-slate-600 leading-relaxed"
+  }, composeWesternCrossAspectText(h, nameA, nameB, cuspsB ? westernHouseOf(planetsB[h.b], cuspsB) : null))))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border border-indigo-200 p-3 rounded shadow-sm space-y-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-indigo-900"
+  }, "🏠 အိမ် ထပ်မှု (House Overlays) — နှစ်ဘက်လုံး"), /*#__PURE__*/React.createElement("div", {
+    className: "font-semibold text-slate-800"
+  }, nameA, " ရဲ့ ဂြိုဟ်တွေ → ", nameB, " ရဲ့ အိမ်တွေ"), ovAB.map((o, i) => /*#__PURE__*/React.createElement("div", {
+    key: 'ab' + i,
+    className: "border-b border-slate-50 pb-1.5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold text-slate-800"
+  }, WESTERN_PLANET_MY[o.planet], " → ", o.house, " တန့်"), /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-600"
+  }, WESTERN_HOUSE_DOMAIN[o.house - 1])), /*#__PURE__*/React.createElement("div", {
+    className: "text-slate-600 leading-relaxed"
+  }, composeWesternOverlayText(o, nameA, nameB)))), /*#__PURE__*/React.createElement("div", {
+    className: "font-semibold text-slate-800"
+  }, nameB, " ရဲ့ ဂြိုဟ်တွေ → ", nameA, " ရဲ့ အိမ်တွေ"), ovBA.map((o, i) => /*#__PURE__*/React.createElement("div", {
+    key: 'ba' + i,
+    className: "border-b border-slate-50 pb-1.5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold text-slate-800"
+  }, WESTERN_PLANET_MY[o.planet], " → ", o.house, " တန့်"), /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-600"
+  }, WESTERN_HOUSE_DOMAIN[o.house - 1])), /*#__PURE__*/React.createElement("div", {
+    className: "text-slate-600 leading-relaxed"
+  }, composeWesternOverlayText(o, nameB, nameA))))), composite && /*#__PURE__*/React.createElement("div", {
+    className: "bg-white border border-indigo-200 p-3 rounded shadow-sm space-y-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-indigo-900"
+  }, "🧬 Composite — Aspect ဇယား + ဂြိုဟ် ရာသီ ဇယား"), compAspects.map((h, i) => /*#__PURE__*/React.createElement("div", {
+    key: 'c' + i,
+    className: "border-b border-slate-50 pb-1.5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold text-slate-800"
+  }, WESTERN_PLANET_MY[h.a], " — ", WESTERN_PLANET_MY[h.b]), /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-600"
+  }, h.typeMy, " · orb ", h.orb, "° · ", _WESTERN_KIND_MY[h.kind])), /*#__PURE__*/React.createElement("div", {
+    className: "text-slate-600 leading-relaxed"
+  }, composeWesternCompositeAspectText(h)))), /*#__PURE__*/React.createElement("div", {
+    className: "pt-1"
+  }, compPlanets.map(k => {
+    const f = fmtWestDeg(composite.planets[k]);
+    return /*#__PURE__*/React.createElement("div", {
+      key: k,
+      className: "flex justify-between border-b border-slate-50 pb-1"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-700"
+    }, WESTERN_PLANET_MY[k]), /*#__PURE__*/React.createElement("span", {
+      className: "font-semibold text-slate-800"
+    }, f.sign.glyph, " ", f.sign.en, " · ", f.deg, "°", String(f.min).padStart(2, '0'), "′"));
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "text-slate-500"
+  }, "Composite သည် နှစ်ယောက် ဂြိုဟ်တွေရဲ့ အလယ်မှတ် ဇာတာ ဖြစ်ပါတယ် — အိမ် (house) မပါဘဲ ရာသီနဲ့ aspect ကိုပဲ ဖတ်ပါတယ်။")));
+}
 function RelateTab({
   ayanamsa,
   nodeType,
@@ -14795,7 +14957,8 @@ function RelateTab({
     return {
       planets,
       dasha,
-      kp
+      kp,
+      jd
     };
   };
   const A = calc(personA),
@@ -14803,13 +14966,15 @@ function RelateTab({
   if (ayanamsa === 'tropical') {
     const wsyn = calculateWesternSynastry(A.planets, B.planets);
     const comp = calculateComposite(A.planets, B.planets);
+    const cuspsA = calculatePlacidusCusps(A.jd, parseFloat(personA.lat) || 16.84, parseFloat(personA.lon) || 96.17, 'tropical');
+    const cuspsB = calculatePlacidusCusps(B.jd, parseFloat(personB.lat) || 16.84, parseFloat(personB.lon) || 96.17, 'tropical');
     return /*#__PURE__*/React.createElement("div", {
       className: "p-3 space-y-3 text-xs"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "font-bold text-emerald-900 text-sm"
     }, "🤝 ပေါင်းသင်း ဆက်ဆံရေး — Western Synastry"), /*#__PURE__*/React.createElement("div", {
       className: "text-slate-600"
-    }, "Tropical (Western) mode မှာ ရာသီ သဟဇာတနဲ့ cross-chart aspect တွေနဲ့ပဲ ဖတ်တယ် — ဒသာ တိုက်ဆိုင်မှုနဲ့ အိမ် အခြေခံ အခန်းကဏ္ဍ ခွဲတာတွေက Vedic နည်းမို့ Lahiri / KP / Raman မှာ ကြည့်ပါ။"), /*#__PURE__*/React.createElement(RelPersonForm, {
+    }, "Tropical (Western) mode မှာ ရာသီ သဟဇာတနဲ့ cross-chart aspect တွေနဲ့ပဲ ဖတ်တယ် — ဒသာ တိုက်ဆိုင်မှုနဲ့ Vedic အခန်းကဏ္ဍ ခွဲတာတွေက Vedic နည်းမို့ Lahiri / KP / Raman မှာ ကြည့်ပါ။"), /*#__PURE__*/React.createElement(RelPersonForm, {
       title: "လူ (က) အချက်အလက်",
       person: personA,
       setPerson: setPersonA,
@@ -14832,7 +14997,15 @@ function RelateTab({
     }, wsyn.lines.map((l, i) => /*#__PURE__*/React.createElement("div", {
       key: i,
       className: "text-slate-700"
-    }, "• ", l))), comp && /*#__PURE__*/React.createElement("div", {
+    }, "• ", l))), /*#__PURE__*/React.createElement(WesternCompatDetail, {
+      nameA: personA.name,
+      nameB: personB.name,
+      planetsA: A.planets,
+      planetsB: B.planets,
+      cuspsA: cuspsA,
+      cuspsB: cuspsB,
+      composite: comp
+    }), comp && /*#__PURE__*/React.createElement("div", {
       className: "bg-white border border-indigo-200 p-3 rounded shadow-sm space-y-1.5"
     }, /*#__PURE__*/React.createElement("div", {
       className: "font-bold text-indigo-900"
@@ -16774,8 +16947,10 @@ function MainApp() {
   const rivalSynastry = rivalPlanets ? rpCenter === 'girl' ? calculateSynastry(rivalPlanets, girlPlanets, ayanamsa, rivalDateObj, girlDateObj) : calculateSynastry(boyPlanets, rivalPlanets, ayanamsa, boyDateObj, rivalDateObj) : null;
   const westernSynastry = isTrop ? calculateWesternSynastry(boyPlanets, girlPlanets) : null;
   const composite = isTrop ? calculateComposite(boyPlanets, girlPlanets) : null;
-  const boyPartner = isTrop ? buildWesternPartnerProfile(boyPlanets, calculatePlacidusCusps(boyJD, parseFloat(boy.lat) || 16.84, parseFloat(boy.lon) || 96.17, 'tropical')) : null;
-  const girlPartner = isTrop ? buildWesternPartnerProfile(girlPlanets, calculatePlacidusCusps(girlJD, parseFloat(girl.lat) || 16.84, parseFloat(girl.lon) || 96.17, 'tropical')) : null;
+  const boyCusps = isTrop ? calculatePlacidusCusps(boyJD, parseFloat(boy.lat) || 16.84, parseFloat(boy.lon) || 96.17, 'tropical') : null;
+  const girlCusps = isTrop ? calculatePlacidusCusps(girlJD, parseFloat(girl.lat) || 16.84, parseFloat(girl.lon) || 96.17, 'tropical') : null;
+  const boyPartner = isTrop ? buildWesternPartnerProfile(boyPlanets, boyCusps) : null;
+  const girlPartner = isTrop ? buildWesternPartnerProfile(girlPlanets, girlCusps) : null;
   const rpAlt = rivalPlanets ? rpCenter === 'girl' ? calculateRightPerson(rivalPlanets, girlPlanets, rivalTreeRP, girlTreeRP, rpContext, rivalSynastry ? rivalSynastry.total : 0, rival.name || 'ပြိုင်ဘက်', girl.name || 'ဒုတိယလူ', null) : calculateRightPerson(boyPlanets, rivalPlanets, boyTreeRP, rivalTreeRP, rpContext, rivalSynastry ? rivalSynastry.total : 0, boy.name || 'ပထမလူ', rival.name || 'ပြိုင်ဘက်', null) : null;
   const timePad = n => n < 10 ? '0' + n : n;
   const _tzDisp = new Date(transitDate.getTime() + ((parseFloat(transitTz) || 6.5) * 60 + transitDate.getTimezoneOffset()) * 60000);
@@ -17900,9 +18075,9 @@ function MainApp() {
     className: "font-bold text-slate-800 text-xs border-b pb-1"
   }, "☀️ Solar Return — ဒီနှစ် ဇာတာ (အသက် ", solarReturn.age, " ပြည့်)"), /*#__PURE__*/React.createElement("p", {
     className: "text-slate-700 leading-relaxed"
-  }, "Solar Return လဂ် သည် ", WESTERN_SIGNS[Math.floor(norm360(solarReturn.planets.Lagna) / 30)].my, " ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ဒီနှစ် ဘဝ ချဉ်းကပ်ပုံ ဟာ ", WESTERN_SIGNS[Math.floor(norm360(solarReturn.planets.Lagna) / 30)].style, " ဖြစ်တယ်။"), /*#__PURE__*/React.createElement("p", {
+  }, "Solar Return လဂ် သည် ", WESTERN_SIGNS[Math.floor(norm360(solarReturn.planets.Lagna) / 30)].my, " ရာသီမှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ ဒီနှစ် ဘဝ ချဉ်းကပ်ပုံ ဟာ ", WESTERN_SIGNS[Math.floor(norm360(solarReturn.planets.Lagna) / 30)].style, " ဖြစ်တယ်။"), /*#__PURE__*/React.createElement("p", {
     className: "text-slate-700 leading-relaxed"
-  }, "Solar Return နေ သည် ", westernHouseOf(solarReturn.planets.Sun, solarReturn.cusps), " တန့် မှာ ရှိနေတယ် — ဒီနှစ် အဓိက အလေး ရောက်ရာ နယ်ပယ် ဟာ ", WESTERN_HOUSE_DOMAIN[westernHouseOf(solarReturn.planets.Sun, solarReturn.cusps) - 1], " ဖြစ်တယ်။"), /*#__PURE__*/React.createElement("p", {
+  }, "Solar Return နေ သည် ", westernHouseOf(solarReturn.planets.Sun, solarReturn.cusps), " တန့် (", WESTERN_HOUSE_DOMAIN[westernHouseOf(solarReturn.planets.Sun, solarReturn.cusps) - 1], ") မှာ ရှိနေတယ် — ဒီနှစ် အဓိက အလေး ရောက်ရာ ဟာ အဲ့ဒီ နယ်ပယ် ဖြစ်တယ်။"), /*#__PURE__*/React.createElement("p", {
     className: "text-slate-700 leading-relaxed"
   }, "Solar Return တနင်္လာ သည် ", WESTERN_SIGNS[Math.floor(norm360(solarReturn.planets.Moon) / 30)].my, " ရာသီ၊ ", westernHouseOf(solarReturn.planets.Moon, solarReturn.cusps), " တန့် မှာ ရှိနေတယ်။"), /*#__PURE__*/React.createElement("p", {
     className: "text-slate-500"
@@ -17912,7 +18087,7 @@ function MainApp() {
     className: "font-bold text-slate-800 text-xs border-b pb-1"
   }, "🌙 Secondary Progressions — လက်ရှိ ဘဝ အခန်း (အသက် ", progressions.age.toFixed(1), ")"), /*#__PURE__*/React.createElement("p", {
     className: "text-slate-700 leading-relaxed"
-  }, "Progressed တနင်္လာ သည် ", WESTERN_SIGNS[Math.floor(norm360(progressions.planets.Moon) / 30)].my, " ရာသီ၊ ", westernHouseOf(progressions.planets.Moon, progressions.cusps), " တန့် မှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့် ဒီကာလ စိတ် အလေး ရောက်ရာ ဟာ ", WESTERN_HOUSE_DOMAIN[westernHouseOf(progressions.planets.Moon, progressions.cusps) - 1], " ဖြစ်တယ်။"), /*#__PURE__*/React.createElement("p", {
+  }, "Progressed တနင်္လာ သည် ", WESTERN_SIGNS[Math.floor(norm360(progressions.planets.Moon) / 30)].my, " ရာသီ၊ ", westernHouseOf(progressions.planets.Moon, progressions.cusps), " တန့် (", WESTERN_HOUSE_DOMAIN[westernHouseOf(progressions.planets.Moon, progressions.cusps) - 1], ") မှာ ရှိနေတယ်။ ဒီရပ်တည်မှုကြောင့်ပဲ ဒီကာလ စိတ် အလေး ရောက်ရာ ဟာ အဲ့ဒီ နယ်ပယ် ဖြစ်တယ်။"), /*#__PURE__*/React.createElement("p", {
     className: "text-slate-700 leading-relaxed"
   }, "Progressed နေ သည် ", WESTERN_SIGNS[Math.floor(norm360(progressions.planets.Sun) / 30)].my, " ရာသီမှာ ရှိနေတယ် — ", Math.floor(norm360(progressions.planets.Sun) / 30) !== Math.floor(norm360(birthPlanets.Sun) / 30) ? 'မွေး နေ ရာသီ (' + WESTERN_SIGNS[Math.floor(norm360(birthPlanets.Sun) / 30)].en + ') ကနေ ပြောင်းသွား ပြီ၊ စရိုက် အသစ် တစ်ခု ကြီးထွား လာနေတဲ့ ကာလ ဖြစ်တယ်။' : 'မွေး နေ ရာသီ အတိုင်းပဲ ရှိသေးတယ်။'), /*#__PURE__*/React.createElement("p", {
     className: "text-slate-700 leading-relaxed"
@@ -19707,7 +19882,15 @@ function MainApp() {
     className: "text-slate-600"
   }, "• ", h.a, " — ", h.b, ": ", h.typeMy, " (orb ", h.orb, "°)")), /*#__PURE__*/React.createElement("div", {
     className: "text-slate-500"
-  }, "Ashtakoota / Right Person / ဒသာ အချိန်တွေသည် Vedic နည်းများ ဖြစ်လို့ Tropical မှာ မပြပါ။")), isTrop && composite && /*#__PURE__*/React.createElement("div", {
+  }, "Ashtakoota / Right Person / ဒသာ အချိန်တွေသည် Vedic နည်းများ ဖြစ်လို့ Tropical မှာ မပြပါ။")), isTrop && westernSynastry && /*#__PURE__*/React.createElement(WesternCompatDetail, {
+    nameA: boy.name || 'ပထမလူ',
+    nameB: girl.name || 'ဒုတိယလူ',
+    planetsA: boyPlanets,
+    planetsB: girlPlanets,
+    cuspsA: boyCusps,
+    cuspsB: girlCusps,
+    composite: composite
+  }), isTrop && composite && /*#__PURE__*/React.createElement("div", {
     className: "bg-white border border-indigo-200 p-3 rounded shadow-sm space-y-1.5"
   }, /*#__PURE__*/React.createElement("div", {
     className: "font-bold text-indigo-900"
